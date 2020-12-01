@@ -9,18 +9,18 @@ nums = [int(line.strip()) for line in input_file]
 # Part 1
 
 nums = set(nums)
-perms = itertools.permutations(nums, 2)
+combs = itertools.combinations(nums, 2)
 #print(list(perms))
-for perm in perms:
-	if sum(perm) == 2020:
- 		print(perm)
- 		print(perm[0] * perm[1])
+for comb in combs:
+	if sum(comb) == 2020:
+ 		print(comb)
+ 		print(comb[0] * comb[1])
 
 # Part 2
 
-perms = itertools.permutations(nums, 3)
-for perm in perms:
-	if sum(perm) == 2020:
-		print(perm)
-		print(perm[0] * perm[1] * perm[2])
+combs = itertools.combinations(nums, 3)
+for comb in combs:
+	if sum(comb) == 2020:
+		print(comb)
+		print(comb[0] * comb[1] * comb[2])
 
