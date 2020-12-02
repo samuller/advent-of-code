@@ -27,13 +27,11 @@ def password_valid_part2(password, pos_str, character):
 	assert(len(pos) == 2)
 	# Convert to indexes
 	idx = [int(p) - 1 for p in pos]
-	
-	char_matches = 0
-	if idx[0] < len(password) and password[idx[0]] == character:
-		char_matches += 1
-	if idx[1] < len(password) and password[idx[1]] == character:
-		char_matches += 1
-	
+	# Check indexes are valid
+	valid_idx = [i < len(password) for i in idx]
+	assert(all(valid_idx))
+
+	char_matches = sum([1 if password[i] == character else 0 for i in idx])
 	if char_matches == 1:
 		return True
 	return False
