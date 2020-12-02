@@ -21,6 +21,23 @@ def password_valid(password, range_str, character):
 		return True
 	return False
 
+def password_valid_part2(password, pos_str, character):
+	assert(len(character) == 1)
+	pos = pos_str.split('-')
+	assert(len(pos) == 2)
+	# Convert to indexes
+	idx = [int(p) - 1 for p in pos]
+	
+	char_matches = 0
+	if idx[0] < len(password) and password[idx[0]] == character:
+		char_matches += 1
+	if idx[1] < len(password) and password[idx[1]] == character:
+		char_matches += 1
+	
+	if char_matches == 1:
+		return True
+	return False
+
 if __name__ == '__main__':
 	input_file = open('input.txt','r')
 	lines = [line.strip() for line in input_file.readlines()]
@@ -30,8 +47,9 @@ if __name__ == '__main__':
 	for line in lines:
 		fields = line.split(' ')
 		assert(len(fields) == 3)
-		valid = password_valid(fields[2], fields[0], fields[1][0])
+		valid = password_valid_part2(fields[2], fields[0], fields[1][0])
 		if valid:
 			count_valid += 1
+			#print(fields) # debugging
 
 	print('Valid: {}'.format(count_valid))
