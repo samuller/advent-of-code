@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys; sys.path.append("..")
-from lib import prod, Map2D, wrap
+from lib import Map2D, wrap, prod
 
 
 def print_map(input):
@@ -30,8 +30,8 @@ def run_slope(mapp, row_jmp, col_jmp, debug=False):
 		row = row + row_jmp
 		col = wrap(col + col_jmp, limit=mapp.cols())
 	return (row, col), trees_found
-'
-'
+
+
 if __name__ == '__main__':
 	# Part 1
 	mappy = Map2D()
