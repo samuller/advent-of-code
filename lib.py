@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import numpy as np
 import functools
 import numbers
 # from copy import deepcopy
@@ -74,6 +75,9 @@ class Map2D:
 	def load_from_file(self, filename):
 		input_file = open(filename,'r')
 		mappy = [line.rstrip('\n') for line in input_file.readlines()]
+		# lines = [line.rstrip('\n') for line in input_file.readlines()]
+		# # numpy arrays won't work if line lengths aren't exactly the same
+		# arr = np.array([list(line) for line in lines])
 		self.load_from_data(mappy)
 
 	def load_from_data(self, list_of_strings):
