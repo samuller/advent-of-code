@@ -124,6 +124,28 @@ class Map2D:
 		whole_row = self.map_data[row]
 		self.map_data[row] = set_char(whole_row, col, value)
 
+	def traverse(self, row_jmp, col_jmp, wrap=False, row_start=0, col_start=0):
+		"""
+		Generator to move across map at a constant rate.
+
+		m.traverse(5,6,wrap=True)
+		m.traverse(5,6,wrap=(True, False))
+		"""
+		if isinstance(wrap, bool):
+			wrap = (wrap, wrap)
+
+		row = row_start
+		col = col_start
+		while self.in_bounds(row, col):
+			# Allow calculation based on current position and value
+			yield self.get(row, col), row, col
+			# Move
+			row += row_jmp
+			col += col_jmp
+			# Wrap if specified
+			row = row % self.rows() if wrap[0] else row
+			col = col % self.cols() if wrap[1] else col
+
 	def __getitem__(self, key):
 		"""
 		No wrapping capabilities. Use get() for that.

@@ -38,16 +38,10 @@ if __name__ == '__main__':
 	mappy.load_from_file('input.txt')
 	print(mappy)
 
-	row = 0
-	col = 0
 	trees_found = 0
-	while mappy.in_bounds(row, col):
-		# Count
-		if mappy.get(row, col) == '#':
+	for value, r, c in mappy.traverse(1, 3, wrap=(False, True)):
+		if value == '#':
 			trees_found += 1
-		# Move
-		row = row + 1
-		col = wrap(col + 3, limit=mappy.cols())
 	print(trees_found)
 
 	# Part 2
