@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys; sys.path.append("..")
+from lib import prod, Map2D
 
 class Classy:
 	def __init__(self):
