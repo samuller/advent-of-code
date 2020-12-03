@@ -15,24 +15,28 @@ def set_char(stringy, pos, charry):
 	return ''.join(list1)
 
 
+def wrap(value, limit):
+	return value % limit
+
+
 class Pos2D:
 	def __init__(self, row, col):
 		self.row = row
 		self.col = col
 
-	def wrap(self, row, col, shape, wrap=False):
-		"""
-		p.wrap(5, 6, wrap=True)
-		p.wrap(5, 6, wrap=(True, False))
-		"""
-		assert(isinstance(shape, tuple))
-		if isinstance(wrap, bool):
-			wrap = (wrap, wrap)
-		if wrap[0]:
-			row = row % self.rows()
-		if wrap[1]:
-			col = col % self.cols()
-		return row, col
+	# def wrap(self, row, col, shape, wrap=False):
+	# 	"""
+	# 	p.wrap(5, 6, wrap=True)
+	# 	p.wrap(5, 6, wrap=(True, False))
+	# 	"""
+	# 	assert(isinstance(shape, tuple))
+	# 	if isinstance(wrap, bool):
+	# 		wrap = (wrap, wrap)
+	# 	if wrap[0]:
+	# 		row = row % self.rows()
+	# 	if wrap[1]:
+	# 		col = col % self.cols()
+	# 	return row, col
 
 	@property
 	def r(self):
@@ -94,43 +98,25 @@ class Map2D:
 	def shape(self):
 		return (self.rows(), self.cols())
 
-	def wrap(self, row, col, wrap=False):
-		"""
-		m.wrap(5,6,wrap=True)
-		m.wrap(5,6,wrap=(True, False))
-		"""
-		if isinstance(wrap, bool):
-			wrap = (wrap, wrap)
-		if wrap[0]:
-			row = row % self.rows()
-		if wrap[1]:
-			col = col % self.cols()
-		return row, col
-
-	def row(self, idx, wrap=False):
-		idx, _  = self.wrap(idx, 0, wrap)
+	def row(self, idx):
 		return self[idx]
 	
-	def col(self, idx, wrap=False):
+	def col(self, idx):
 		"""Get a whole column as a string"""
-		_, idx  = self.wrap(0, idx, wrap)
 		colly = ''
 		for row in self.map_data:
 			colly += row[idx]
 		return colly
 
-	def in_bounds(self, row, col, wrap=False):
-		row, col = self.wrap(row, col, wrap)
+	def in_bounds(self, row, col):
 		if (0 <= row < self.rows()) and (0 <= col < self.cols()):
 			return True
 		return False
 
-	def get(self, row, col, wrap=False):
-		row, col = self.wrap(row, col, wrap)
+	def get(self, row, col):
 		return self.map_data[row][col]
 
-	def set(self, row, col, value, wrap=False):
-		row, col = self.wrap(row, col, wrap)
+	def set(self, row, col, value):
 		whole_row = self.map_data[row]
 		self.map_data[row] = set_char(whole_row, col, value)
 

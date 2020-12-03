@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys; sys.path.append("..")
-from lib import prod, Map2D
+from lib import prod, Map2D, wrap
 
 def print_map(input):
 	for line in input:
@@ -13,20 +13,20 @@ def run_slope(mapp, row_jmp, col_jmp, debug=False):
 	row = 0
 	col = 0
 	trees_found = 0
-	while mapp.in_bounds(row, col, wrap=(False, True)):
+	while mapp.in_bounds(row, col):
 		# Count
-		if mapp.get(row, col, wrap=(False, True)) == '#':
+		if mapp.get(row, col) == '#':
 			trees_found += 1
 		if debug:
 			# WARN: only make changes on copy!
-			# mapp.set(row, col, 'O', wrap=(False, True))
+			# mapp.set(row, col, 'O')
 			# Show
 			print(row, col)
-			print(mapp.get(row, col, wrap=(False, True)))
+			print(mapp.get(row, col))
 			print(mapp)
 		# Move
-		row += row_jmp
-		col += col_jmp
+		row = row + row_jmp
+		col = wrap(col + col_jmp, limit=mapp.cols())
 	return (row, col), trees_found
 
 if __name__ == '__main__':
@@ -38,13 +38,13 @@ if __name__ == '__main__':
 	row = 0
 	col = 0
 	trees_found = 0
-	while mappy.in_bounds(row, col, wrap=(False, True)):
+	while mappy.in_bounds(row, col):
 		# Count
-		if mappy.get(row, col, wrap=(False, True)) == '#':
+		if mappy.get(row, col) == '#':
 			trees_found += 1
 		# Move
-		row += 1
-		col += 3
+		row = row + 1
+		col = wrap(col + 3, limit=mappy.cols())
 	print(trees_found)
 
 	# Part 2
