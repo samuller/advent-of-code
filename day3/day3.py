@@ -30,9 +30,24 @@ def run_slope(mapp, row_jmp, col_jmp, debug=False):
 	return (row, col), trees_found
 
 if __name__ == '__main__':
+	# Part 1
 	mappy = Map2D()
 	mappy.load_from_file('input.txt')
 	print(mappy)
+
+	row = 0
+	col = 0
+	trees_found = 0
+	while mappy.in_bounds(row, col, wrap=(False, True)):
+		# Count
+		if mappy.get(row, col, wrap=(False, True)) == '#':
+			trees_found += 1
+		# Move
+		row += 1
+		col += 3
+	print(trees_found)
+
+	# Part 2
 
 	# Opposite order of question
 	slopes = [
