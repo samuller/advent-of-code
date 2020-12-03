@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from collections import Counter
 
+
 def password_valid(password, range_str, character):
 	assert(len(character) == 1)
 	range = range_str.split('-')
@@ -21,6 +22,7 @@ def password_valid(password, range_str, character):
 		return True
 	return False
 
+
 def password_valid_part2(password, pos_str, character):
 	assert(len(character) == 1)
 	pos = pos_str.split('-')
@@ -35,6 +37,7 @@ def password_valid_part2(password, pos_str, character):
 	if char_matches == 1:
 		return True
 	return False
+
 
 if __name__ == '__main__':
 	input_file = open('input.txt','r')

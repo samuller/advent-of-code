@@ -3,10 +3,12 @@
 import sys; sys.path.append("..")
 from lib import prod, Map2D, wrap
 
+
 def print_map(input):
 	for line in input:
 		print(line)
 	print()
+
 
 def run_slope(mapp, row_jmp, col_jmp, debug=False):
 	# mappy = mappy.copy()
@@ -28,7 +30,8 @@ def run_slope(mapp, row_jmp, col_jmp, debug=False):
 		row = row + row_jmp
 		col = wrap(col + col_jmp, limit=mapp.cols())
 	return (row, col), trees_found
-
+'
+'
 if __name__ == '__main__':
 	# Part 1
 	mappy = Map2D()

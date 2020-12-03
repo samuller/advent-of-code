@@ -157,6 +157,7 @@ class Map2D:
 			stry += self.to_str_partial()
 		return stry
 
+
 if __name__ == '__main__':
 	# mapp = Map2D()
 	# mapp.load_from_file('input.txt')
