@@ -1,69 +1,55 @@
 #!/usr/bin/env python
-from functools import reduce
+
+import sys; sys.path.append("..")
+from lib import prod, Map2D
 
 def print_map(input):
 	for line in input:
 		print(line)
 	print()
 
-def set_char(stringy, pos, charry):
-	list1 = list(stringy)
-	list1[pos] = charry
-	return ''.join(list1)
-
-def run_slope(mappy, next_pos, debug=False):
-	# We use copy in case we want to change map for debugging
-	mappy = mappy.copy()
+def run_slope(mapp, row_jmp, col_jmp, debug=False):
+	# mappy = mappy.copy()
+	row = 0
+	col = 0
 	trees_found = 0
-	curr_pos = {'row': 0, 'col': 0}
-	while curr_pos['row'] < len(mappy):
-		# Move
-		curr_pos['row'] += next_pos['row']
-		if curr_pos['row'] >= len(mappy):
-			break
-		assert(len(mappy[curr_pos['row']]) == 31)
-
-		curr_pos['col'] += next_pos['col']
-		if curr_pos['col'] >= len(mappy[curr_pos['row']]):
-			curr_pos['col'] -= len(mappy[curr_pos['row']])
-
+	while mapp.in_bounds(row, col, wrap=(False, True)):
 		# Count
-		if mappy[curr_pos['row']][curr_pos['col']] == '#':
+		if mapp.get(row, col, wrap=(False, True)) == '#':
 			trees_found += 1
-
 		if debug:
-			mappy[curr_pos['row']] = set_char(mappy[curr_pos['row']], curr_pos['col'], 'O')
+			# WARN: only make changes on copy!
+			# mapp.set(row, col, 'O', wrap=(False, True))
 			# Show
-			print(curr_pos)
-			print(mappy[curr_pos['row']][curr_pos['col']])
-			print_map(mappy)
-	return curr_pos, trees_found
-
-def prod(iterable):
-	# operator.mul
-    return reduce(lambda a,b,: a*b, iterable, 1)
+			print(row, col)
+			print(mapp.get(row, col, wrap=(False, True)))
+			print(mapp)
+		# Move
+		row += row_jmp
+		col += col_jmp
+	return (row, col), trees_found
 
 if __name__ == '__main__':
-	input_file = open('input.txt','r')
-	mappy = [line.strip() for line in input_file.readlines()]
-	print('Lines: {}'.format(len(mappy)))
-	print('Width: {}'.format(len(mappy[0])))
+	mappy = Map2D()
+	mappy.load_from_file('input.txt')
+	print(mappy)
 
-	# Opposite order of question (e.g. 2nd is right 3, down 1)
+	# Opposite order of question
 	slopes = [
-		{'row': 1, 'col': 1},
-		{'row': 1, 'col': 3},
-		{'row': 1, 'col': 5},
-		{'row': 1, 'col': 7},
-		{'row': 2, 'col': 1},
+		[1, 1],
+		[1, 3], # e.g. right 3, down 1
+		[1, 5],
+		[1, 7],
+		[2, 1],
 	]
 
 	all_found = []
-	for next_pos in slopes:
-		print(next_pos)
-		curr_pos, trees_found = run_slope(mappy, next_pos)
-		print(curr_pos)
-		print(trees_found)
+	for slope in slopes:
+		print("Slope: {}".format(slope))
+		curr_pos, trees_found = run_slope(mappy, slope[0], slope[1])
+		print("End position: {}".format(curr_pos))
+		print("Trees found: {}".format(trees_found))
 		all_found.append(trees_found)
+	print()
 	print(all_found)
 	print(prod(all_found))
