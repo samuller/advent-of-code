@@ -28,7 +28,7 @@ def run_slope(mapp, row_jmp, col_jmp, debug=False):
 			print(mapp)
 		# Move
 		row = row + row_jmp
-		col = wrap(col + col_jmp, limit=mapp.cols())
+		col = wrap(col + col_jmp, limit=mapp.cols)
 	return (row, col), trees_found
 
 

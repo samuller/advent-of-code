@@ -34,9 +34,9 @@ class Pos2D:
 	# 	if isinstance(wrap, bool):
 	# 		wrap = (wrap, wrap)
 	# 	if wrap[0]:
-	# 		row = row % self.rows()
+	# 		row = row % self.rows
 	# 	if wrap[1]:
-	# 		col = col % self.cols()
+	# 		col = col % self.cols
 	# 	return row, col
 
 	@property
@@ -85,22 +85,24 @@ class Map2D:
 		self.validate()
 
 	def validate(self):
-		assert(self.rows() > 0)
-		first_row_len = self.cols()
+		assert(self.rows > 0)
+		first_row_len = self.cols
 		for row in self.map_data:
 			assert(len(row) == first_row_len)
 
-	# height, y-axis
+	@property
 	def rows(self):
+		# height, y-axis
 		return len(self.map_data)
 
-	# width, x-axis
+	@property
 	def cols(self):
+		# width, x-axis
 		return len(self.row(0))
 
 	@property
 	def shape(self):
-		return (self.rows(), self.cols())
+		return (self.rows, self.cols)
 
 	def row(self, idx):
 		return self[idx]
@@ -113,7 +115,7 @@ class Map2D:
 		return colly
 
 	def in_bounds(self, row, col):
-		if (0 <= row < self.rows()) and (0 <= col < self.cols()):
+		if (0 <= row < self.rows) and (0 <= col < self.cols):
 			return True
 		return False
 
@@ -126,7 +128,7 @@ class Map2D:
 
 	def traverse(self, row_jmp, col_jmp, wrap=False, row_start=0, col_start=0):
 		"""
-		Generator to move across map at a constant rate.
+		Generator to move across map at a constant rate until out of bounds.
 
 		m.traverse(5,6,wrap=True)
 		m.traverse(5,6,wrap=(True, False))
@@ -143,8 +145,8 @@ class Map2D:
 			row += row_jmp
 			col += col_jmp
 			# Wrap if specified
-			row = row % self.rows() if wrap[0] else row
-			col = col % self.cols() if wrap[1] else col
+			row = row % self.rows if wrap[0] else row
+			col = col % self.cols if wrap[1] else col
 
 	def __getitem__(self, key):
 		"""
@@ -176,8 +178,8 @@ class Map2D:
 		return stry
 
 	def __str__(self):
-		stry = 'Size: {}x{}\n'.format(self.rows(), self.cols())	
-		if self.rows() <= 10:
+		stry = 'Size: {}x{}\n'.format(self.rows, self.cols)	
+		if self.rows <= 10:
 			stry += self.to_str()
 		else:
 			stry += self.to_str_partial()
