@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 from functools import reduce
 
-class Classy:
-	def __init__(self):
-		pass
-
 def print_map(input):
 	for line in input:
 		print(line)
