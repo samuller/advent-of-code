@@ -3,6 +3,9 @@ import sys; sys.path.append("..")
 from lib import prod, Map2D, wrap
 import re
 
+all_valid_fields =    ['byr','iyr','eyr','hgt','hcl','ecl','pid','cid']
+all_required_fields = ['byr','iyr','eyr','hgt','hcl','ecl','pid']
+
 
 def byr(val):
 	# byr (Birth Year) - four digits; at least 1920 and at most 2002.
@@ -49,36 +52,34 @@ def cid(val):
 
 
 def check_field_value(key, val):
+	global all_valid_fields
+	assert(key in all_valid_fields)
 	# Dirty switch-case/dict-to-func workaround
 	if not eval(key + '(val)'):
 		return False
 	return True
 
 
-# ['byr','iyr','eyr','hgt','hcl','ecl','pid','cid']
-def check_passport(full_fields, debug=False):
+def check_passport(full_fields):
+	# Extract each field
 	fields_found = []
 	for field in full_fields:
 		assert(len(field.split(':')) == 2)
 		key, val = field.split(':')
 		assert(len(key) == 3)
 		fields_found.append(key)
-
+		# And check that field's value is valid
 		if not check_field_value(key, val):
 			return False
 
+	# Check for duplicate fields
+	assert(len(set(fields_found)) == len(fields_found))
+	# Remove optional field
 	if 'cid' in fields_found:
-				fields_found.remove('cid') #optional
-	# print(len(curr_fields_found))
-	assert(len(set(fields_found)) == len(fields_found) )
-	if sorted(fields_found) == \
-		sorted(['byr','iyr','eyr','hgt','hcl','ecl','pid']):
-		if debug:
-			print(idx)
-			print(fields_found)
-			print(sorted(fields_found))
-			print(sorted(['byr','iyr','eyr','hgt','hcl','ecl','pid']))
-			print()
+		fields_found.remove('cid')
+	# And check that all mandatory fields exist
+	global all_required_fields
+	if sorted(fields_found) == sorted(all_required_fields):
 		return True
 	return False
 
@@ -93,24 +94,23 @@ if __name__ == '__main__':
 	lines = [line.strip() for line in input_file.readlines()]
 	print('Lines: {}'.format(len(lines)))
 
-	# curr_passport
-	curr_full_fields = []
+	curr_passport = []
 	valid_passports = 0
 	for idx, line in enumerate(lines):
 		if line.strip() == '':
 			# process prev. passport
-			if check_passport(curr_full_fields):
+			if check_passport(curr_passport):
 				valid_passports += 1
 
 			# new passport
-			curr_full_fields = []
+			curr_passport = []
 		else:
 			for field in line.split(' '):
 				assert(len(field.split(':')) == 2)
 				key, val = field.split(':')
 				assert(len(key) == 3)
-				curr_full_fields.append(field)
+				curr_passport.append(field)
 
-	if check_passport(curr_full_fields):
+	if check_passport(curr_passport):
 		valid_passports += 1
 	print(valid_passports)
