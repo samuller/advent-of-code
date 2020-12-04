@@ -60,26 +60,19 @@ def check_field_value(key, val):
 	return True
 
 
-def check_passport(full_fields):
-	# Extract each field
-	fields_found = []
-	for field in full_fields:
-		assert(len(field.split(':')) == 2)
-		key, val = field.split(':')
-		assert(len(key) == 3)
-		fields_found.append(key)
-		# And check that field's value is valid
-		if not check_field_value(key, val):
+def check_passport(passport):
+	# Check that each field's value is valid
+	for key in passport.keys():
+		if not check_field_value(key, passport[key]):
 			return False
 
-	# Check for duplicate fields
-	assert(len(set(fields_found)) == len(fields_found))
+	fields_found = set(passport.keys())
 	# Remove optional field
 	if 'cid' in fields_found:
 		fields_found.remove('cid')
 	# And check that all mandatory fields exist
 	global all_required_fields
-	if sorted(fields_found) == sorted(all_required_fields):
+	if fields_found == set(all_required_fields):
 		return True
 	return False
 
@@ -94,23 +87,24 @@ if __name__ == '__main__':
 	lines = [line.strip() for line in input_file.readlines()]
 	print('Lines: {}'.format(len(lines)))
 
-	curr_passport = []
+	curr_passport = {}
 	valid_passports = 0
 	for idx, line in enumerate(lines):
 		if line.strip() == '':
-			# process prev. passport
+			# Process current passport
 			if check_passport(curr_passport):
 				valid_passports += 1
-
-			# new passport
-			curr_passport = []
+			# Start with next passport
+			curr_passport = {}
 		else:
+			# Add fields to current passport
 			for field in line.split(' '):
 				assert(len(field.split(':')) == 2)
 				key, val = field.split(':')
 				assert(len(key) == 3)
-				curr_passport.append(field)
-
+				assert(key not in curr_passport)
+				curr_passport[key] = val
+	# Handle last value that is missed because we use an empty line as separator
 	if check_passport(curr_passport):
 		valid_passports += 1
 	print(valid_passports)
