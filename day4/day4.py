@@ -6,24 +6,15 @@ import re
 
 def byr(val):
 	# byr (Birth Year) - four digits; at least 1920 and at most 2002.
-	val = int(val)
-	if not (1920 <= val <= 2002):
-		return False
-	return True
+	return (1920 <= int(val) <= 2002)
 
 def iyr(val):
 	# iyr (Issue Year) - four digits; at least 2010 and at most 2020.
-	val = int(val)
-	if not (2010 <= val <= 2020):
-		return False
-	return True
+	return (2010 <= int(val) <= 2020)
 
 def eyr(val):
 	# eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
-	val = int(val)
-	if not (2020 <= val <= 2030):
-		return False
-	return True
+	return (2020 <= int(val) <= 2030)
 
 def hgt(val):
 	# hgt (Height) - a number followed by either cm or in:
@@ -31,35 +22,26 @@ def hgt(val):
 	#     If in, the number must be at least 59 and at most 76.
 	if len(val) <= 2:
 		return False
+	amt = int(val[:-2])
 	unit = val[-2:]
-	if unit not in ['in', 'cm']:
-		return False
-	val = int(val[:-2])
-	if unit == 'cm' and not (150 <= val <= 193):
-		return False
-	if unit == 'in' and not (59 <= val <= 76):
-		return False
-	return True
+	
+	return unit in ['in', 'cm'] and (
+		(unit == 'cm' and (150 <= amt <= 193))
+		or
+		(unit == 'in' and (59 <= amt <= 76))
+	)
 
 def hcl(val):
 	# hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
-	# if len(val) != 7 or val[0] != '#':
-	# 	return False
-	if not re.match("^#[a-f0-9]{6}$", val):
-		return False
-	return True
+	return re.match("^#[a-f0-9]{6}$", val)
 
 def ecl(val):
 	# ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-	if val not in ['amb','blu','brn','gry','grn','hzl','oth']:
-		return False
-	return True
+	return val in ['amb','blu','brn','gry','grn','hzl','oth']
 
 def pid(val):
 	# pid (Passport ID) - a nine-digit number, including leading zeroes.
-	if len(val) != 9 or not re.match("^[0-9]+$", val):
-		return False
-	return True
+	return re.match("^[0-9]{9}$", val)
 
 def cid(val):
 	# cid (Country ID) - ignored, missing or not.
