@@ -3,71 +3,62 @@ import sys; sys.path.append("..")
 from lib import prod, Map2D
 
 
-def function(input):
-	return False
+def gaps_in_list(listy):
+	gaps = []
+	listy = sorted(listy)
+	prev_val = listy[0] - 1
+	for val in listy:
+		if (val - prev_val) != 1:
+			gaps.append((prev_val, val))
+		prev_val = val
+	return gaps
 
-# 748, 749
+
+# Binary space partition
+def bsp_path_parser(bsp_path, second_half_indicator_char):
+	size = pow(2, len(bsp_path))
+	assert len(set(bsp_path)) <= 2 , set(bsp_path)
+	pos = 0
+	divisor = size
+	for c in bsp_path:
+		if c == second_half_indicator_char:
+			pos += divisor / 2
+		divisor /= 2
+	return pos
+
+
+# 748, 749, 747
 if __name__ == '__main__':
+	# Example
+	assert bsp_path_parser('FBFBBFF', 'B') == 44
+	assert bsp_path_parser('RLR', 'R') == 5
+
 	input_file = open('input.txt','r')
 	lines = [line.strip() for line in input_file.readlines()]
-	print('Lines: {}'.format(len(lines)))
 
 	rows = 128
 	cols = 8
-	max_val = 0
+	max_seat = 0
 	all_rows = set()
 	all_seats = set()
-	for line in lines: # ['FBFBBFFRLR']:# lines:
-		row = line[0:7]
-		col = line[-3:]
+	for line in lines:
+		row_data = line[0:7]
+		col_data = line[-3:]
 
-		# print(row, col)
+		curr_row = bsp_path_parser(row_data, 'B')
+		curr_col = bsp_path_parser(col_data, 'R')
 
-		# print(row)
-		row_divisor = 128
-		curr_row = 0
-		for r in row:
-			if r == 'F':
-				curr_row += 0
-			else:
-				curr_row += row_divisor / 2
-			row_divisor /= 2
-			# print(curr_row, row_divisor)
-		# print(curr_row, row_divisor)
+		seat = curr_row * 8 + curr_col
+		assert seat == int(seat)
+		seat = int(seat)
 
-		# print(col)
-		col_divisor = 8
-		curr_col = 0
-		for c in col:
-			if c == 'L':
-				curr_col += 0
-			else:
-				curr_col += col_divisor / 2
-			col_divisor /= 2
-			# print(curr_col, col_divisor)
-		# print(curr_col, col_divisor)
-
-		seat = curr_row * cols + curr_col
 		all_rows.add(curr_row)
 		all_seats.add(seat)
-		# print(seat)
-		if seat > max_val:
-			max_val = seat
+		if seat > max_seat:
+			max_seat = seat
 	
-	# print(max_val)
-	# print(sorted(list(all_rows)))
-	# prev_val = 0
-	# for val in sorted(list(all_rows)):
-	# 	if (val - prev_val) != 1:
-	# 		print(val)
-	# 	prev_val = val
-
-	prev_val = 0
-	for val in sorted(list(all_seats)):
-		print(val)
-		# if (val - prev_val) != 1:
-			# print(val)
-		prev_val = val
-
-
-
+	print('Highest seat:', max_seat)
+	print('Row range:', min(all_rows), '-', max(all_rows))
+	print('Row gaps:', gaps_in_list(list(all_rows)))
+	seat_gaps = gaps_in_list(list(all_seats))
+	print('Seat gaps:', seat_gaps, 'i.e.', seat_gaps[0][0] + 1)
