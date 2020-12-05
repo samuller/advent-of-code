@@ -27,11 +27,21 @@ def bsp_path_parser(bsp_path, second_half_indicator_char):
 	return pos
 
 
+def parse_seat(full_path):
+	row_data = full_path[0:7]
+	col_data = full_path[-3:]
+	curr_row = bsp_path_parser(row_data, 'B')
+	curr_col = bsp_path_parser(col_data, 'R')
+	return curr_row, curr_col
+
+
 # 748, 749, 747
 if __name__ == '__main__':
 	# Example
 	assert bsp_path_parser('FBFBBFF', 'B') == 44
 	assert bsp_path_parser('RLR', 'R') == 5
+	assert parse_seat('FFFFFFFLLL') == (0, 0)
+	assert parse_seat('BBBBBBBRRR') == (127, 7)
 
 	input_file = open('input.txt','r')
 	lines = [line.strip() for line in input_file.readlines()]
@@ -42,16 +52,11 @@ if __name__ == '__main__':
 	all_rows = set()
 	all_seats = set()
 	for line in lines:
-		row_data = line[0:7]
-		col_data = line[-3:]
-
-		curr_row = bsp_path_parser(row_data, 'B')
-		curr_col = bsp_path_parser(col_data, 'R')
-
+		curr_row, curr_col = parse_seat(line)
 		seat = curr_row * 8 + curr_col
 		assert seat == int(seat)
 		seat = int(seat)
-
+		
 		all_rows.add(curr_row)
 		all_seats.add(seat)
 		if seat > max_seat:
