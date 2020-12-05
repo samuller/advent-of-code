@@ -30,7 +30,7 @@ class Pos2D:
 	# 	p.wrap(5, 6, wrap=True)
 	# 	p.wrap(5, 6, wrap=(True, False))
 	# 	"""
-	# 	assert(isinstance(shape, tuple))
+	# 	assert isinstance(shape, tuple)
 	# 	if isinstance(wrap, bool):
 	# 		wrap = (wrap, wrap)
 	# 	if wrap[0]:
@@ -85,10 +85,10 @@ class Map2D:
 		self.validate()
 
 	def validate(self):
-		assert(self.rows > 0)
+		assert self.rows > 0
 		first_row_len = self.cols
 		for row in self.map_data:
-			assert(len(row) == first_row_len)
+			assert len(row) == first_row_len
 
 	@property
 	def rows(self):
@@ -155,9 +155,9 @@ class Map2D:
 		if isinstance(key, numbers.Integral):
 			key = (key, slice(None, None, None))
 
-		assert(isinstance(key, tuple))
-		assert(len(key) == 2)
-		# assert(all(isinstance(i, numbers.Integral) for i in key))
+		assert isinstance(key, tuple)
+		assert len(key) == 2
+		# assert all(isinstance(i, numbers.Integral) for i in key)
 		row, col = key
 		return self.map_data[row][col]
 

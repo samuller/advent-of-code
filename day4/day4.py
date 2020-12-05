@@ -53,7 +53,7 @@ def cid(val):
 
 def check_field_value(key, val):
 	global all_valid_fields
-	assert(key in all_valid_fields)
+	assert key in all_valid_fields
 	# Dirty switch-case/dict-to-func workaround
 	if not eval(key + '(val)'):
 		return False
@@ -99,10 +99,10 @@ if __name__ == '__main__':
 		else:
 			# Add fields to current passport
 			for field in line.split(' '):
-				assert(len(field.split(':')) == 2)
+				assert len(field.split(':')) == 2
 				key, val = field.split(':')
-				assert(len(key) == 3)
-				assert(key not in curr_passport)
+				assert len(key) == 3
+				assert key not in curr_passport
 				curr_passport[key] = val
 	# Handle last value that is missed because we look only at separator
 	if check_passport(curr_passport):
