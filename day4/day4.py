@@ -104,7 +104,7 @@ if __name__ == '__main__':
 				assert(len(key) == 3)
 				assert(key not in curr_passport)
 				curr_passport[key] = val
-	# Handle last value that is missed because we use an empty line as separator
+	# Handle last value that is missed because we look only at separator
 	if check_passport(curr_passport):
 		valid_passports += 1
 	print(valid_passports)
