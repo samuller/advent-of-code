@@ -4,6 +4,8 @@ from lib import prod, Map2D
 
 
 def grouped(lines):
+	"""Separate list of lines into groups of consecutive non-empty lines.
+	"""
 	group = []
 	for line in lines:
 		if line.strip() == '':
@@ -12,6 +14,9 @@ def grouped(lines):
 			group = []
 		else:
 			group.append(line.strip())
+	# Handle final group in case there's no ending separator
+	# Alternative is to add separator at the end: lines.append('')
+	# but this requires modifying or copying the input
 	if len(group) > 0:
 		yield group
 
