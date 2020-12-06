@@ -23,14 +23,15 @@ a
 b
 	"""
 	# 6567, 6585 (server @ 7:11, @ 7:14) / 3264 (0729), 3276
-	# part 1: internet connection... and then missed seeing part 2
-	# part 2: missed 1 line long groups
+	# part 1: miscounted last group because of appending '\n' which wasn't stripped
+	#         internet connection... and then missed seeing part 2
+	# part 2: missed-counted groups with no matches, missed 1 line long groups
+	#         testing took longer because of appending '\n' which wasn't stripped
 	lines = [line.strip() for line in input_file.readlines()] #test]
 	# lines = test.split('\n')
 	lines.append('')
 	print('Lines: {}'.format(len(lines)))
 	
-
 	count_valid = 0
 	curr_group = set()
 	curr_group_2 = set()
@@ -42,31 +43,21 @@ b
 		if line == '':
 			# new group
 			# print('[1]:', curr_group, len(curr_group), total_quest)
-			curr_ques_count = len(curr_group)
-			total_quest += curr_ques_count
+			total_quest += len(curr_group)
 			curr_group = set()
 
-			# print('end', ''.join(sorted(curr_group_2)))
 			# print('[2]:', curr_group_2, len(curr_group_2), total_quest_2)
 			total_quest_2 += len(curr_group_2)
 			line_in_group = 0		
 			curr_group_2 = set()
 		else:
 			curr_group = curr_group.union(set(line))
-			tmp_curr_group_2 = set(line)
-			if len(curr_group_2) == 0 and line_in_group == 0:
-				curr_group_2 = tmp_curr_group_2
+			if line_in_group == 0:
+				curr_group_2 = set(line)
 			else:
-				curr_group_2 = curr_group_2.intersection(tmp_curr_group_2)
+				curr_group_2 = curr_group_2.intersection(set(line))
 			line_in_group += 1
-	curr_ques_count = len(curr_group)
-	total_quest += curr_ques_count
-	# print(curr_group, len(curr_group), total_quest)
 	print(total_quest)
-
-	total_quest_2 += len(curr_group_2)
-	# print('end-fin', ''.join(sorted(curr_group_2)))
-	# print('[2]:', curr_group_2, len(curr_group_2), total_quest_2)
 	print(total_quest_2)
 
 
