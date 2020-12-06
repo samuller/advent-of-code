@@ -42,20 +42,15 @@ b
 	#         testing took longer because of appending '\n' which wasn't stripped
 	lines = [line.strip() for line in input_file.readlines()] #test]
 	# lines = test.split('\n')
-	lines.append('')
 	print('Lines: {}'.format(len(lines)))
 	
-	count_valid = 0
-	curr_group = set()
-	curr_group_2 = set()
-	line_in_group = 0
-	total_quest = 0
-	total_quest_2 = 0
+	total_yes_quests = 0
+	total_common_yes_quests = 0
 	for group in grouped(lines):
 		curr_group = set()
 		for line in group:
 			curr_group = curr_group.union(set(line))
-		total_quest += len(curr_group)
+		total_yes_quests += len(curr_group)
 
 		curr_group_2 = set()
 		for idx, line in enumerate(group):
@@ -63,9 +58,7 @@ b
 				curr_group_2 = set(line)
 			else:
 				curr_group_2 = curr_group_2.intersection(set(line))
-		total_quest_2 += len(curr_group_2)
+		total_common_yes_quests += len(curr_group_2)
 
-	print(total_quest)
-	print(total_quest_2)
-
-
+	print('Total yes questions:', total_yes_quests)
+	print('Total common yes questions:', total_common_yes_quests)
