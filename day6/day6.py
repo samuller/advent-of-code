@@ -8,12 +8,12 @@ def grouped(lines):
 	"""
 	group = []
 	for line in lines:
-		if line.strip() == '':
+		if line == '':
 			if len(group) > 0:
 				yield group
 			group = []
 		else:
-			group.append(line.strip())
+			group.append(line)
 	# Handle final group in case there's no ending separator
 	# Alternative is to add separator at the end: lines.append('')
 	# but this requires modifying or copying the input
