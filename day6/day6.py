@@ -3,6 +3,19 @@ import sys; sys.path.append("..")
 from lib import prod, Map2D
 
 
+def grouped(lines):
+	group = []
+	for line in lines:
+		if line.strip() == '':
+			if len(group) > 0:
+				yield group
+			group = []
+		else:
+			group.append(line.strip())
+	if len(group) > 0:
+		yield group
+
+
 if __name__ == '__main__':
 	input_file = open('input.txt','r')
 	test = """
@@ -38,25 +51,20 @@ b
 	line_in_group = 0
 	total_quest = 0
 	total_quest_2 = 0
-	for line in lines:
-		# print(''.join(sorted(line)))
-		if line == '':
-			# new group
-			# print('[1]:', curr_group, len(curr_group), total_quest)
-			total_quest += len(curr_group)
-			curr_group = set()
-
-			# print('[2]:', curr_group_2, len(curr_group_2), total_quest_2)
-			total_quest_2 += len(curr_group_2)
-			line_in_group = 0		
-			curr_group_2 = set()
-		else:
+	for group in grouped(lines):
+		curr_group = set()
+		for line in group:
 			curr_group = curr_group.union(set(line))
-			if line_in_group == 0:
+		total_quest += len(curr_group)
+
+		curr_group_2 = set()
+		for idx, line in enumerate(group):
+			if idx == 0:
 				curr_group_2 = set(line)
 			else:
 				curr_group_2 = curr_group_2.intersection(set(line))
-			line_in_group += 1
+		total_quest_2 += len(curr_group_2)
+
 	print(total_quest)
 	print(total_quest_2)
 
