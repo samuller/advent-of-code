@@ -22,7 +22,6 @@ def grouped(lines):
 
 
 if __name__ == '__main__':
-	input_file = open('input.txt','r')
 	test = """
 abc
 
@@ -45,7 +44,9 @@ b
 	#         internet connection... and then missed seeing part 2
 	# part 2: missed-counted groups with no matches, missed 1 line long groups
 	#         testing took longer because of appending '\n' which wasn't stripped
-	lines = [line.strip() for line in input_file.readlines()] #test]
+	lines = []
+	with open('input.txt', 'r') as input_file:
+		lines = [line.strip() for line in input_file.readlines()]
 	# lines = test.split('\n')
 	print('Lines: {}'.format(len(lines)))
 	

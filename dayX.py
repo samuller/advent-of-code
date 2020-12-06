@@ -13,8 +13,9 @@ def function(input):
 
 
 if __name__ == '__main__':
-	input_file = open('input.txt','r')
-	lines = [line.strip() for line in input_file.readlines()]
+	lines = []
+	with open('input.txt', 'r') as input_file:
+		lines = [line.strip() for line in input_file.readlines()]
 	print('Lines: {}'.format(len(lines)))
 
 	count_valid = 0
