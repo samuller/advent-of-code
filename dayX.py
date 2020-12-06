@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+import fileinput
 import sys; sys.path.append("..")
 from lib import prod, Map2D
 
@@ -13,9 +14,7 @@ def function(input):
 
 
 if __name__ == '__main__':
-	lines = []
-	with open('input.txt', 'r') as input_file:
-		lines = [line.strip() for line in input_file.readlines()]
+	lines = [line.strip() for line in fileinput.input('input.txt')]
 	print('Lines: {}'.format(len(lines)))
 
 	count_valid = 0

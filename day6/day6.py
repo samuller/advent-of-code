@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+import fileinput
 import sys; sys.path.append("..")
 from lib import prod, Map2D
 
@@ -44,9 +45,7 @@ b
 	#         internet connection... and then missed seeing part 2
 	# part 2: missed-counted groups with no matches, missed 1 line long groups
 	#         testing took longer because of appending '\n' which wasn't stripped
-	lines = []
-	with open('input.txt', 'r') as input_file:
-		lines = [line.strip() for line in input_file.readlines()]
+	lines = [line.strip() for line in fileinput.input(files=['input.txt'])]
 	# lines = test.split('\n')
 	print('Lines: {}'.format(len(lines)))
 	
