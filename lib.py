@@ -5,6 +5,24 @@ import numbers
 # from copy import deepcopy
 
 
+def grouped(lines):
+	"""Separate list of lines into groups of consecutive non-empty lines.
+	"""
+	group = []
+	for line in lines:
+		if line == '':
+			if len(group) > 0:
+				yield group
+			group = []
+		else:
+			group.append(line)
+	# Handle final group in case there's no ending separator
+	# Alternative is to add separator at the end: lines.append('')
+	# but this requires modifying or copying the input
+	if len(group) > 0:
+		yield group
+
+
 def prod(iterable):
 	# operator.mul
     return functools.reduce(lambda a,b,: a*b, iterable, 1)
