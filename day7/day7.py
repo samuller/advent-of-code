@@ -4,24 +4,20 @@ import sys; sys.path.append("..")
 from lib import *
 
 
-def look_for(tree, iwant, known_containers=None):
-	# print('look_for( tree,', iwant + ',', known_containers, ')')
-	if known_containers is None:
-		known_containers = set()
-
+def look_for(tree, iwant):
+	# print('look_for( tree,', iwant, ')')
 	containers = set()
-	for big in tree:
-		inside = tree[big]
-
+	for big, inside in tree.items():
 		for ins in inside:
-			if iwant in ins[1]:
+			_, desc = ins
+			if iwant in desc:
 				containers.add(big)
 
 	if len(containers) == 0:
 		return []
 
 	for new_want in containers:
-		super_containers = look_for(tree, new_want, containers)
+		super_containers = look_for(tree, new_want)
 		containers = containers.union(super_containers)
 	return containers
 
@@ -31,13 +27,13 @@ def count_inside(tree, look_inside):
 	containers = set()
 	total_count = 0
 	bigs = set()
-	for big in tree:
-		inside = tree[big]
+	for big, inside in tree.items():
 		counts = [ins[0] for ins in inside]
 		if big == look_inside:
 			total_count += sum(counts)
 			for ins in inside:
-				if ins[0] > 0:
+				count, _ = ins
+				if count > 0:
 					containers.add(ins)
 		assert big not in bigs, big
 		bigs.add(big)
@@ -75,9 +71,9 @@ def parse_tree(input_lines):
 	return bags
 
 
-# 93873 @ 7:50, 158493 @ 8:12
 # part 1: infinite recursion -> reduction -> previously seen values
 # part 2: multiplication, forgot "bag."
+# 93873 @ 7:50, 158493 @ 8:12
 if __name__ == '__main__':
 	lines = """light red bags contain 1 bright white bag, 2 muted yellow bags.
 dark orange bags contain 3 bright white bags, 4 muted yellow bags.
