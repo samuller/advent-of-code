@@ -12,11 +12,11 @@ def look_for(tree, iwant):
 			_, desc = ins
 			if iwant in desc:
 				containers.add(big)
-
+	# Base case
 	if len(containers) == 0:
 		return []
-
 	for new_want in containers:
+		# Recursion (reduction only needed if tree has loops)
 		super_containers = look_for(tree, new_want)
 		containers = containers.union(super_containers)
 	return containers
@@ -26,24 +26,20 @@ def count_inside(tree, look_inside):
 	# print('look_for( tree,', look_inside, ')')
 	containers = set()
 	total_count = 0
-	bigs = set()
-	for big, inside in tree.items():
-		counts = [ins[0] for ins in inside]
-		if big == look_inside:
-			total_count += sum(counts)
-			for ins in inside:
-				count, _ = ins
-				if count > 0:
-					containers.add(ins)
-		assert big not in bigs, big
-		bigs.add(big)
 
-	for inss in containers:
-		count = inss[0]
-		new_look = inss[1]
-		sub_count = count_inside(tree, new_look)
-		# print(look_inside, total_count, '+ (', sub_count, '*', count, new_look, ')')
+	inside = tree[look_inside]
+	counts = [ins[0] for ins in inside]
+	total_count += sum(counts)
+
+	for ins in inside:
+		count, desc = ins
+		# Partial base case (we assume no loops)
+		if count <= 0:
+			continue
+		# Recursion
+		sub_count = count_inside(tree, desc)
 		total_count += (count * sub_count)
+		# print(look_inside, total_count, '+ (', sub_count, '*', count, new_look, ')')
 	# print(look_inside, 'total:', total_count)
 	return total_count
 
@@ -60,7 +56,8 @@ def parse_tree(input_lines):
 		big, inside = fields
 		# Drop last word of description (either 'bag' or 'bags')
 		big = ' '.join(big.split(' ')[:-1])
-
+		# Double-check input doesn't duplicate bags
+		assert big not in bags, big
 		bags[big] = []
 		for ins in inside.split(', '):
 			words = ins.split(' ')
