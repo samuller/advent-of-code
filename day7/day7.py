@@ -8,8 +8,7 @@ def look_for(tree, iwant):
 	# print('look_for( tree,', iwant, ')')
 	containers = set()
 	for big, inside in tree.items():
-		for ins in inside:
-			_, desc = ins
+		for (_, desc) in inside:
 			if iwant in desc:
 				containers.add(big)
 	# Base case
@@ -24,15 +23,10 @@ def look_for(tree, iwant):
 
 def count_inside(tree, look_inside):
 	# print('look_for( tree,', look_inside, ')')
-	containers = set()
-	total_count = 0
-
 	inside = tree[look_inside]
 	counts = [ins[0] for ins in inside]
-	total_count += sum(counts)
-
-	for ins in inside:
-		count, desc = ins
+	total_count = sum(counts)
+	for (count, desc) in inside:
 		# Partial base case (we assume no loops)
 		if count <= 0:
 			continue
