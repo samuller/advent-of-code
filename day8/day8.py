@@ -18,11 +18,12 @@ def run_code(instructions):
 			looped = ptr
 			break
 		already_run.append(ptr)
-		
-		ptr += 1
+		# Always increment to next instruction
+		ptr += 1  # UNDO if instruction changes ptr
 		if op == 'nop':
 			continue
 		if op == 'jmp':
+			# Undo pre-increment
 			ptr -= 1
 			ptr += args
 			continue
@@ -31,6 +32,19 @@ def run_code(instructions):
 			continue
 	
 	return ptr, acc, looped
+
+
+def parse_instructions(lines):
+	instructions = []
+	for line in lines:
+		if line == '':
+			continue
+		fields = line.split(' ')
+		op = fields[0]
+		args = int(fields[1])
+		# print(fields, args)
+		instructions.append((op, args))
+	return instructions
 
 
 if __name__ == '__main__':
@@ -49,21 +63,16 @@ acc +6
 	print('Lines: {}'.format(len(lines)))
 	# print(lines)
 
-	instructions = []
-	for line in lines:
-		if line == '':
-			continue
-		fields = line.split(' ')
-		op = fields[0]
-		args = int(fields[1])
-		# print(fields, args)
-		instructions.append((op, args))
-	
+	# Part 1
+	instructions = parse_instructions(lines)
 	# print(instructions)
 	ptr, acc, looped = run_code(instructions)
+	print('END with', acc, '\n')
+
+	# Part 2
+	print('Part2:')
 	for idx, (op, args) in enumerate(instructions):
-		# print(idx, op, args)
-		print(idx)
+		# print(idx)
 		new_op = None
 		if op == 'nop':
 			new_op = 'jmp'
@@ -74,10 +83,9 @@ acc +6
 			new_instructions[idx] = (new_op, args)
 			ptr, acc, looped = run_code(new_instructions)
 			if looped is None:
-				print('loop broken at ', idx, op, args)
+				print('loop broken at', idx, op, args)
 				break
 
 	# ptr, acc, looped = run_code(instructions)
-	print('\nlooped at', looped)
-	print('\nEND at', ptr, 'with', acc)
-
+	print('looped at', looped)
+	print('END at', ptr, 'with', acc)
