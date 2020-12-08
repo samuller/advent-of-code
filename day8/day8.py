@@ -9,15 +9,16 @@ def run_code(instructions):
 	acc = 0
 	ptr = 0
 	looped = None
-	already_run = []
-	while ptr < len(instructions):
+	already_run = set()
+	while 0 <= ptr < len(instructions):
 		(op, args) = instructions[ptr]
 		# print(ptr, op, args)
+		assert op in ['nop', 'jmp', 'acc']
 
 		if ptr in already_run:
 			looped = ptr
 			break
-		already_run.append(ptr)
+		already_run.add(ptr)
 		# Always increment to next instruction
 		ptr += 1  # UNDO if instruction changes ptr
 		if op == 'nop':
