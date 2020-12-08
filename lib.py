@@ -38,53 +38,9 @@ def wrap(value, limit):
 	return value % limit
 
 
-class Pos2D:
-	def __init__(self, row, col):
-		self.row = row
-		self.col = col
-
-	# def wrap(self, row, col, shape, wrap=False):
-	# 	"""
-	# 	p.wrap(5, 6, wrap=True)
-	# 	p.wrap(5, 6, wrap=(True, False))
-	# 	"""
-	# 	assert isinstance(shape, tuple)
-	# 	if isinstance(wrap, bool):
-	# 		wrap = (wrap, wrap)
-	# 	if wrap[0]:
-	# 		row = row % self.rows
-	# 	if wrap[1]:
-	# 		col = col % self.cols
-	# 	return row, col
-
-	@property
-	def r(self):
-		return self.row
-
-	@property
-	def c(self):
-		return self.col
-
-	@property
-	def x(self):
-		return self.col
-
-	@property
-	def y(self):
-		return self.row
-
-	@property
-	def h(self):
-		return self.row
-
-	@property
-	def w(self):
-		return self.col
-
-
 class Map2D:
 	"""
-	A 2D map based on a list of strings. Has wrapping capabilities.
+	A 2D map based on a list of strings.
 	"""
 
 	def __init__(self):
@@ -144,12 +100,12 @@ class Map2D:
 		whole_row = self.map_data[row]
 		self.map_data[row] = set_char(whole_row, col, value)
 
-	def traverse(self, row_jmp, col_jmp, wrap=False, row_start=0, col_start=0):
+	def move_slope(self, row_jmp, col_jmp, wrap=False, row_start=0, col_start=0):
 		"""
 		Generator to move across map at a constant rate until out of bounds.
 
-		m.traverse(5,6,wrap=True)
-		m.traverse(5,6,wrap=(True, False))
+		m.move_slope(5,6,wrap=True)
+		m.move_slope(5,6,wrap=(True, False))
 		"""
 		if isinstance(wrap, bool):
 			wrap = (wrap, wrap)

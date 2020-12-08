@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	print(mappy)
 
 	trees_found = 0
-	for value, r, c in mappy.traverse(1, 3, wrap=(False, True)):
+	for value, r, c in mappy.move_slope(1, 3, wrap=(False, True)):
 		if value == '#':
 			trees_found += 1
 	print(trees_found)
