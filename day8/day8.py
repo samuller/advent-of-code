@@ -5,6 +5,21 @@ from lib import *
 from copy import deepcopy
 
 
+def run_cmd(cmds, ptr, acc):
+	op, args = cmds[ptr]
+	# Always increment to next instruction
+	ptr += 1  # UNDO if instruction changes ptr
+	if op == 'nop':
+		pass
+	elif op == 'jmp':
+		# Undo pre-increment
+		ptr -= 1
+		ptr += args
+	elif op == 'acc':
+		acc += args
+	return ptr, acc
+
+
 def run_code(instructions):
 	acc = 0
 	ptr = 0
@@ -19,18 +34,8 @@ def run_code(instructions):
 			looped = ptr
 			break
 		already_run.add(ptr)
-		# Always increment to next instruction
-		ptr += 1  # UNDO if instruction changes ptr
-		if op == 'nop':
-			continue
-		if op == 'jmp':
-			# Undo pre-increment
-			ptr -= 1
-			ptr += args
-			continue
-		if op == 'acc':
-			acc += args
-			continue
+
+		ptr, acc = run_cmd(instructions, ptr, acc)
 	
 	return ptr, acc, looped
 
