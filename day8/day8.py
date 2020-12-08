@@ -43,8 +43,6 @@ def run_code(instructions):
 def parse_instructions(lines):
 	instructions = []
 	for line in lines:
-		if line == '':
-			continue
 		fields = line.split(' ')
 		op = fields[0]
 		args = int(fields[1])
@@ -63,11 +61,11 @@ jmp -3
 acc -99
 acc +1
 jmp -4
-acc +6
-"""
+acc +6"""
 	# lines = test.split('\n')
 	print('Lines: {}'.format(len(lines)))
 	# print(lines)
+	assert '' not in lines
 
 	# Part 1
 	instructions = parse_instructions(lines)
