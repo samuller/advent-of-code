@@ -6,6 +6,8 @@ from copy import deepcopy
 
 
 def run_cmd(cmds, ptr, acc):
+	"""Run one command/instruction and return new state.
+	"""
 	op, args = cmds[ptr]
 	# Always increment to next instruction
 	ptr += 1  # UNDO if instruction changes ptr
@@ -20,7 +22,9 @@ def run_cmd(cmds, ptr, acc):
 	return ptr, acc
 
 
-def run_code(instructions):
+def run_code_once(instructions):
+	"""Run instructions, but keep track and stop if the same instructions are ever run.
+	"""
 	acc = 0
 	ptr = 0
 	looped = None
@@ -70,7 +74,7 @@ acc +6"""
 	# Part 1
 	instructions = parse_instructions(lines)
 	# print(instructions)
-	ptr, acc, looped = run_code(instructions)
+	ptr, acc, looped = run_code_once(instructions)
 	print('END with', acc, '\n')
 
 	# Part 2
@@ -85,11 +89,10 @@ acc +6"""
 		if new_op is not None:
 			new_instructions = deepcopy(instructions)
 			new_instructions[idx] = (new_op, args)
-			ptr, acc, looped = run_code(new_instructions)
+			ptr, acc, looped = run_code_once(new_instructions)
 			if looped is None:
 				print('loop broken at', idx, op, args)
 				break
 
-	# ptr, acc, looped = run_code(instructions)
 	print('looped at', looped)
 	print('END at', ptr, 'with', acc)

@@ -57,6 +57,7 @@ def parse_tree(input_lines):
 			words = ins.split(' ')
 			count = 0 if words[0] == 'no' else int(words[0])
 			# Get descriptive adjectives (ignoring last word which is 'bag' or 'bags')
+			assert words[-1] in ['bag', 'bags']
 			desc = ' '.join(words[1:-1])
 			bags[big].append((count, desc))
 	return bags
