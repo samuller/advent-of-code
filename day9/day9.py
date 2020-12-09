@@ -4,6 +4,23 @@ import sys; sys.path.append("..")
 from lib import *
 import itertools
 
+
+def find_sum_of_portion(listy, sum_value):
+	"""Find a contiguous set of at least two numbers in the list
+	that sum to the given value.
+	"""
+	found_portion = False
+	min_len = 2
+	for start in range(0, len(lines) - min_len):
+		# Range needs to go to len + 1 since we'll be using it as end of slice
+		for end in range(start + min_len, len(lines)+1):
+			portion = lines[start:end]
+			# print(len(portion), start, end)
+			# print(portion)
+			if sum(portion) == num:
+				return portion, start, end
+
+
 # Part 1: didn't realise preamble moves
 # Part 2: thought sum was in preamble
 if __name__ == '__main__':
@@ -51,20 +68,7 @@ if __name__ == '__main__':
 				break
 		if not matches:
 			print(num)
-			# print(preamble)
-			found_portion = False
-			for start in range(0, len(lines)-2):
-				for end in range(start + 2, len(lines)+1):
-					portion = lines[start:end]
-					# print(len(portion), start, end)
-					# print(portion)
-					if sum(portion) == num:
-						print(portion)
-						print(min(portion), '+', max(portion), '=',  min(portion) + max(portion))
-						break
-				if found_portion:
-					break
+			portion, start_idx, end_idx = find_sum_of_portion(lines, num)
+			print(portion)
+			print(min(portion), '+', max(portion), '=',  min(portion) + max(portion))
 			break
-			
-			
-
