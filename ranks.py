@@ -18,7 +18,7 @@ with open(json_fn) as f:
   data = json.load(f)
 
 
-show_day = 8
+show_day = 9
 last_day = show_day + 1
 
 print('\nSubmission times for day {}:'.format(show_day))
