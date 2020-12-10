@@ -9,8 +9,9 @@ def find_max_utilization_arrangement(adapters, debug=False):
 	assert adapters == sorted(adapters)
 	adapters = np.array(adapters)
 	diffs = adapters[1:] - adapters[:-1]
+	# If we can assume that no differences exceed the max, then the whole list
+	# can be used/utilized in the maximum arrangement
 	assert max(diffs) == 3
-
 	return adapters, diffs
 
 
@@ -119,8 +120,8 @@ if __name__ == '__main__':
 	chosen_order, diffs = find_max_utilization_arrangement(lines)
 	print(chosen_order)
 	print(diffs)
-	ones = len([l for l in diffs if l == 1])
-	threes = len([l for l in diffs if l == 3])
+	ones = np.count_nonzero(diffs == 1)
+	threes = np.count_nonzero(diffs == 3)
 	print(ones, threes, '=', ones * threes)
 	
 	# Part 2
