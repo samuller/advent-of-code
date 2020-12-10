@@ -5,32 +5,14 @@ from lib import *
 import numpy as np
 
 
-def can_connect(main, others):
-	valid = []
-	idxs = []
-	for idx, other in enumerate(others):
-		if 0 < (other - main) <= 3: #in [1, 3]:
-			valid.append(other)
-			idxs.append(idx)
-	return valid, idxs
-
-
 def find_max_utilization_arrangement(adapters, debug=False):
-	adapters = list(adapters)
-	curr_adapter = adapters[0]
-	adapters.remove(curr_adapter)
-	chosen_order = []
-	diffs = []
-	while len(adapters) > 0:
-		found, _ = can_connect(curr_adapter, adapters)
-		if debug:
-			print(found)
-		chosen = min(found)
-		diffs.append(chosen - curr_adapter)
-		adapters.remove(chosen)
-		curr_adapter = chosen
-		chosen_order.append(chosen)
-	return chosen_order, diffs
+	assert adapters == sorted(adapters)
+	adapters = np.array(adapters)
+	diffs = adapters[1:] - adapters[:-1]
+	assert max(diffs) == 3
+
+	return adapters, diffs
+
 
 #
 # Analyze possible configurations/arrangements
