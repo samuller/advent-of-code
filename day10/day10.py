@@ -32,7 +32,23 @@ def find_max_utilization_arrangement(adapters, debug=False):
 		chosen_order.append(chosen)
 	return chosen_order, diffs
 
-
+#
+# Analyze possible configurations/arrangements
+#
+# # print(dynamic_programming(list(range(1,7))))
+# # exit()
+# # PART 2Y - brute force smalls
+# for i in range(2, 10):
+# 	whole = list(range(1,i))
+# 	# Adding this value doesn't change the result, but makes
+# 	# clear that the result is applicable to subsets of the problem
+# 	# i.e. sequences with differences of 1 followed by a difference of 3
+# 	whole.append(whole[-1]+3)
+# 	# print(whole)
+# 	memoization = {}
+# 	print(len(whole), '=', dynamic_programming(whole))
+# exit()
+#
 # _13 to _111113 (as 'a' to 'abcde'):
 # a => a					(has to end in a) 1
 # ab => b, ab				(has to end in b) 2
@@ -64,6 +80,7 @@ def dynamic_programming(adapters, start_idx=0):
 #        first considered groups with sum greater than 3, before realising it's actually
 #        the length of one sequences that needs to be considered (for possibilities).
 #        variable length variations.
+# Consider dynamic programming whenever there are combinations with different lengths?
 if __name__ == '__main__':
 	lines = [line.strip() for line in fileinput.input('input.txt')]
 	test1 = """16
@@ -114,22 +131,9 @@ if __name__ == '__main__':
 	lines = sorted([int(l) for l in lines])
 	lines = [0] + lines  # include charging outlet
 	lines.append(3 + max(lines))  # add built-in adapter
-	# print(lines)
-
-	# # print(find_recursive(list(range(1,7))))
-	# # exit()
-	# # PART 2Y - brute force smalls
-	# for i in range(2, 10):
-	# 	whole = list(range(1,i))
-	# 	# Adding this value doesn't change the result, but makes
-	# 	# clear that the result is applicable to subsets of the problem
-	# 	# i.e. sequences with differences of 1 followed by a difference of 3
-	# 	# whole.append(whole[-1]+3)
-	# 	# print(whole)
-	# 	print(len(whole), '=', find_recursive(whole))
+	print(lines)
 
 	# Part 1
-
 	chosen_order, diffs = find_max_utilization_arrangement(lines)
 	print(chosen_order)
 	print(diffs)
