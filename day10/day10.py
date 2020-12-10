@@ -105,10 +105,14 @@ def count_routes(adapters):
 		else:
 			ones.append(seq_of_ones)
 			seq_of_ones = 0
+	ones.append(seq_of_ones)
+	# Zeroes occur for each 3,3
+	ones = [n for n in ones if n != 0]
 	print(ones)
 
-	vals = [l if l <= 2 else find_recursive(list(range(1,l+1+1))) for l in ones]
-	possible_routes = prod([v for v in vals if v != 0])
+	# +1 to be inclusive, +1 to include ending digit
+	vals = [find_recursive(list(range(1,l+1+1))) for l in ones]
+	possible_routes = prod(vals)
 	return possible_routes
 
 
@@ -163,8 +167,8 @@ if __name__ == '__main__':
 3"""
 	# lines = test2.split('\n')
 	print('Lines: {}'.format(len(lines)))
-	lines = sorted([int(l) for l in lines])
 
+	lines = sorted([int(l) for l in lines])
 	extra_adapter = 3 + max(lines)
 	lines.append(extra_adapter)
 	# print(lines)
