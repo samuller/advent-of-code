@@ -33,22 +33,17 @@ def find_max_utilization_arrangement(adapters, debug=False):
 	return chosen_order, diffs
 
 
-# [1, 1, 3, 2, 1, 1, 2, 1, 1, 1, 1, 1] = 
-# 3*2*2 = 12
-# 567, 57, 67, 7
+# _13 to _111113 (as 'a' to 'abcde'):
+# a => a					(has to end in a) 1
+# ab => b, ab				(has to end in b) 2
+# abc => c, ac, bc, abc		(has to end in c) 4
+# abcd => ad,bd,cd, abd,acd,bcd, abcd (not d)
+# 							(has to end in d, and contain at least one of abc) 7
+# abcde => be,ce,de, abe,ace,ade,bce,bde,cde, bcde,acde,abde,abce, abcde (not ae, de)
+# 							(has to end in e, and contain at least one of bcd... or ad) 13
+# 							at least one of bc... or ad / at least one of bcd... but not only d!
+# TODO: consider these cases if their were diffs of 2
 #
-# 2: skip zero or 1st (or 2nd if next allows it?)
-# 3: skip zero (skip zero or first), 1st or first 2
-#
-# 3-1 (diff3): 4 options (123, 23, 3, 13, 1, 2)
-# 3-2
-# 3-3: 4 options (1, 2, 3, 123, 23, 3, 13, 1, 2)
-#
-# 3: 7 options: 1,2,3,12,23,13,123
-#    3 alternatives (valid endings): 1, 2,12, 3,23,13,123
-#    all 7, or 6, or 4
-# 2: 3 options: 1,2,12
-#    2 alternatives: 1, 2,12
 def find_recursive(adapters, start_idx=0, chosen_order=None, route_options=None):
 	# Assume sorted
 	# adapters = sorted(adapters)
@@ -110,7 +105,7 @@ def count_routes(adapters):
 	ones = [n for n in ones if n != 0]
 	print(ones)
 
-	# +1 to be inclusive, +1 to include ending digit
+	# +1 to be inclusive, another +1 to include ending digit
 	vals = [find_recursive(list(range(1,l+1+1))) for l in ones]
 	possible_routes = prod(vals)
 	return possible_routes
@@ -173,9 +168,15 @@ if __name__ == '__main__':
 	lines.append(extra_adapter)
 	# print(lines)
 
+	# # print(find_recursive(list(range(1,7))))
+	# # exit()
 	# # PART 2Y - brute force smalls
 	# for i in range(2, 10):
 	# 	whole = list(range(1,i))
+	# 	# Adding this value doesn't change the result, but makes
+	# 	# clear that the result is applicable to subsets of the problem
+	# 	# i.e. sequences with differences of 1 followed by a difference of 3
+	# 	# whole.append(whole[-1]+3)
 	# 	# print(whole)
 	# 	print(len(whole), '=', find_recursive(whole))
 
