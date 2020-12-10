@@ -9,7 +9,6 @@ def can_connect(main, others):
 	valid = []
 	idxs = []
 	for idx, other in enumerate(others):
-		# print(other - main)
 		if 0 < (other - main) <= 3: #in [1, 3]:
 			valid.append(other)
 			idxs.append(idx)
@@ -18,7 +17,8 @@ def can_connect(main, others):
 
 def find_max_utilization_arrangement(adapters, debug=False):
 	adapters = list(adapters)
-	curr_adapter = 0
+	curr_adapter = adapters[0]
+	adapters.remove(curr_adapter)
 	chosen_order = []
 	diffs = []
 	while len(adapters) > 0:
@@ -164,8 +164,8 @@ if __name__ == '__main__':
 	print('Lines: {}'.format(len(lines)))
 
 	lines = sorted([int(l) for l in lines])
-	extra_adapter = 3 + max(lines)
-	lines.append(extra_adapter)
+	lines = [0] + lines  # include charging outlet
+	lines.append(3 + max(lines))  # add built-in adapter
 	# print(lines)
 
 	# # print(find_recursive(list(range(1,7))))
@@ -181,6 +181,7 @@ if __name__ == '__main__':
 	# 	print(len(whole), '=', find_recursive(whole))
 
 	# Part 1
+	
 	chosen_order, diffs = find_max_utilization_arrangement(lines)
 	print(chosen_order)
 	print(diffs)
@@ -189,6 +190,6 @@ if __name__ == '__main__':
 	print(ones, threes, '=', ones * threes)
 
 	# Part 2
-	lines = [0] + lines
+	
 	possible_routes = count_routes(lines)
 	print(possible_routes)
