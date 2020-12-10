@@ -44,71 +44,19 @@ def find_max_utilization_arrangement(adapters, debug=False):
 # 							at least one of bc... or ad / at least one of bcd... but not only d!
 # TODO: consider these cases if their were diffs of 2
 #
-def find_recursive(adapters, start_idx=0, chosen_order=None, route_options=None):
-	# Assume sorted
-	# adapters = sorted(adapters)
 
-	if chosen_order is None:
-		chosen_order = []
-	if route_options is None:
-		route_options = []
-
-	# if start_idx != 0:
-	# 	print(start_idx)
-	# 	# return 0
-	curr_idx = start_idx
-	curr_adapter = adapters[start_idx]
-	chosen_order.append(curr_adapter)
-	total_routes = 0
-	while curr_idx <= len(adapters):
-		found, idxs = can_connect(curr_adapter, adapters)
-		# print(curr_idx, found, idxs)
-		if len(idxs) == 0:
-			break
-		route_options.append(len(idxs))
-		# curr_adapter = min(found)
-		# curr_idx = adapters.index(curr_adapter)
-
-		# print(curr_adapter, curr_idx)
-		if len(idxs) == 1:
-			curr_idx = idxs[0]
-			curr_adapter = adapters[curr_idx]
-			chosen_order.append(curr_adapter)
-		else:
-			# Take first route
-			curr_idx = idxs[0]
-			curr_adapter = adapters[curr_idx]
-			# Test alternatives
-			for idx in idxs[1:]:
-				total_routes += find_recursive(adapters, idx, list(chosen_order), list(route_options))
-			chosen_order.append(curr_adapter)
-	# print(start_idx, chosen_order, '\n ', route_options)
-	# print(start_idx, chosen_order)
-	return 1 + total_routes
-
-
-def count_routes(adapters):
-	adapters = np.array(adapters)
-	diffs = adapters[1:] - adapters[:-1]
-	print(diffs)
-
-	seq_of_ones = 0
-	ones = []
-	for diff in diffs:
-		if diff == 1:
-			seq_of_ones += 1
-		else:
-			ones.append(seq_of_ones)
-			seq_of_ones = 0
-	ones.append(seq_of_ones)
-	# Zeroes occur for each 3,3
-	ones = [n for n in ones if n != 0]
-	print(ones)
-
-	# +1 to be inclusive, another +1 to include ending digit
-	vals = [find_recursive(list(range(1,l+1+1))) for l in ones]
-	possible_routes = prod(vals)
-	return possible_routes
+memoization = {}
+def dynamic_programming(adapters, start_idx=0):
+	if start_idx == len(adapters)-1:
+		return 1
+	if start_idx in memoization:
+		return memoization[start_idx]
+	count = 0
+	for idx in range(start_idx+1, len(adapters)):
+		if (adapters[idx] - adapters[start_idx]) <= 3:
+			count += dynamic_programming(adapters, idx)
+	memoization[start_idx] = count
+	return count
 
 
 # Part1: misunderstood lower as I was thinking in other direction (not adapter-to-source)
@@ -181,15 +129,14 @@ if __name__ == '__main__':
 	# 	print(len(whole), '=', find_recursive(whole))
 
 	# Part 1
-	
+
 	chosen_order, diffs = find_max_utilization_arrangement(lines)
 	print(chosen_order)
 	print(diffs)
 	ones = len([l for l in diffs if l == 1])
 	threes = len([l for l in diffs if l == 3])
 	print(ones, threes, '=', ones * threes)
-
-	# Part 2
 	
-	possible_routes = count_routes(lines)
+	# Part 2
+	possible_routes = dynamic_programming(lines)
 	print(possible_routes)
