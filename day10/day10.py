@@ -16,23 +16,21 @@ def can_connect(main, others):
 	return valid, idxs
 
 
-def find_arrangement(adapters):
+def find_max_utilization_arrangement(adapters, debug=False):
 	adapters = list(adapters)
 	curr_adapter = 0
 	chosen_order = []
 	diffs = []
-	options = []
 	while len(adapters) > 0:
 		found, _ = can_connect(curr_adapter, adapters)
-		# print(found)
-		options.append(len(found))
-		print(found)
+		if debug:
+			print(found)
 		chosen = min(found)
 		diffs.append(chosen - curr_adapter)
 		adapters.remove(chosen)
 		curr_adapter = chosen
 		chosen_order.append(chosen)
-	return chosen_order, diffs, options
+	return chosen_order, diffs
 
 
 # [1, 1, 3, 2, 1, 1, 2, 1, 1, 1, 1, 1] = 
@@ -94,19 +92,24 @@ def find_recursive(adapters, start_idx=0, chosen_order=None, route_options=None)
 	return 1 + total_routes
 
 
-def possibilities(variant):
-	# 13, 31, 1111, 1113
-	# 13, 113, 111_, 21_, 12_
-	# 111/abc -> abc, bc, c
-	# 1111/abc -> abc, bc, c,
-	assert sum(variant) > 3, sum(variant)
-	if variant == [1, 1, 3]:
-		return 2
-	if variant == [1, 1, 1, 3]:
-		return 4
-	if variant == [1, 1, 1, 1]:
-		return 6
-	return 1
+def count_routes(adapters):
+	adapters = np.array(adapters)
+	diffs = adapters[1:] - adapters[:-1]
+	print(diffs)
+
+	seq_of_ones = 0
+	ones = []
+	for diff in diffs:
+		if diff == 1:
+			seq_of_ones += 1
+		else:
+			ones.append(seq_of_ones)
+			seq_of_ones = 0
+	print(ones)
+
+	vals = [l if l <= 2 else find_recursive(list(range(1,l+1+1))) for l in ones]
+	possible_routes = prod([v for v in vals if v != 0])
+	return possible_routes
 
 
 # Part1: misunderstood lower as I was thinking in other direction (not adapter-to-source)
@@ -158,7 +161,7 @@ if __name__ == '__main__':
 34
 10
 3"""
-	lines = test2.split('\n')
+	# lines = test2.split('\n')
 	print('Lines: {}'.format(len(lines)))
 	lines = sorted([int(l) for l in lines])
 
@@ -166,61 +169,21 @@ if __name__ == '__main__':
 	lines.append(extra_adapter)
 	# print(lines)
 
-	# PART 2Y - brute force smalls
-	for i in range(2, 10):
-		whole = list(range(1,i))
-		# print(whole)
-		print(len(whole), '=', find_recursive(whole))
-
-	lines = [0] + lines
-	lines = np.array(lines)
-	diffs = lines[1:] - lines[:-1]
-	print(diffs)
-
-	seq_of_ones = 0
-	ones = []
-	for diff in diffs:
-		if diff == 1:
-			seq_of_ones += 1
-		else:
-			ones.append(seq_of_ones)
-			seq_of_ones = 0
-	print(ones)
-
-	vals = [l if l <= 2 else find_recursive(list(range(1,l+1+1))) for l in ones]
-	print(prod([v for v in vals if v != 0]))
-	exit()
-
-	# # Part 2
-	# lines = [0] + lines
-	# # print(lines)
-	# lines = sorted(lines)
-	# route_count = find_recursive(lines)
-	# print(route_count)
-	# exit()
-
-	# curr_adapter = 0
-	# lines = np.array(lines)
-	# print(lines)
-	# # print(lines[lines > 3])
-	# while curr_adapter < max(lines):
-	# 	print(curr_adapter, curr_adapter - lines)
-	# 	found = can_connect(curr_adapter, lines)
-
-	# 	exit()
+	# # PART 2Y - brute force smalls
+	# for i in range(2, 10):
+	# 	whole = list(range(1,i))
+	# 	# print(whole)
+	# 	print(len(whole), '=', find_recursive(whole))
 
 	# Part 1
-	chosen_order, diffs, options = find_arrangement(lines)
-
+	chosen_order, diffs = find_max_utilization_arrangement(lines)
 	print(chosen_order)
 	print(diffs)
 	ones = len([l for l in diffs if l == 1])
 	threes = len([l for l in diffs if l == 3])
 	print(ones, threes, '=', ones * threes)
 
-	print(options)
-	routes = [l if l != 3 else 4 for l in options if l > 1]
-	print(routes)
-	print(sum(routes))
-	print(1 + sum([l for l in options if l > 1]))
-	print(prod([l for l in options if l > 1]))
+	# Part 2
+	lines = [0] + lines
+	possible_routes = count_routes(lines)
+	print(possible_routes)
