@@ -10,6 +10,36 @@ def sk_nones_last(x):
 def sort_nones_last(listy):
     return sorted(l, key=lambda x: sk_nones_last(x))
 
+def print_submission_times(json_data, day):
+    member_times = {}
+    for member_id, member in sorted(data['members'].items()):
+        print()
+        print(member['name'], '({})'.format(member['local_score']))
+        days = sorted(member['completion_day_level'].keys())
+        for day in days:
+            day_data = member['completion_day_level'][day]
+            for part in sorted(day_data.keys()):
+                ts = int(day_data[part]['get_star_ts'])
+                # Local time (use utcfromtimestamp for UTC)
+                time_str = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+                if int(day) == show_day:
+                    print(day, '.', part, '=', time_str)
+
+        times = []
+        for num in range(1, last_day):
+            part1_time = member['completion_day_level'].get(str(num), {}).get(
+                '1', {}).get('get_star_ts', None)
+            part2_time = member['completion_day_level'].get(str(num), {}).get(
+                '2', {}).get('get_star_ts', None)
+
+            times.append(int(part1_time) if part1_time is not None else None)
+        member_times[member_id] = times
+        # print(times)
+    return member_times
+
+
+# def get_times
+
 
 # Find first JSON file in current folder
 json_fn = [f for f in os.listdir(".") if f.endswith('json')][0]
@@ -18,37 +48,11 @@ with open(json_fn) as f:
   data = json.load(f)
 
 
-show_day = 9
+show_day = 10
 last_day = show_day + 1
 
 print('\nSubmission times for day {}:'.format(show_day))
-member_times = {}
-for member_id, member in sorted(data['members'].items()):
-    print()
-    print(member['name'], '({})'.format(member['local_score']))
-    days = sorted(member['completion_day_level'].keys())
-    for day in days:
-        day_data = member['completion_day_level'][day]
-        for part in sorted(day_data.keys()):
-            ts = int(day_data[part]['get_star_ts'])
-            # Local time (use utcfromtimestamp for UTC)
-            time_str = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-            if int(day) == show_day:
-                print(day, '.', part, '=', time_str)
-
-    times = []
-    for num in range(1, last_day):
-        if str(num) not in member['completion_day_level']:
-            times.append(None)
-            continue
-
-        part1_time = member['completion_day_level'][str(num)].get(
-            '1', {}).get('get_star_ts', None)
-        part2_time = member['completion_day_level'][str(num)].get(
-            '2', {}).get('get_star_ts', None)
-        times.append(int(part1_time))
-    member_times[member_id] = times
-    # print(times)
+member_times = print_submission_times(data, show_day)
 
 print()
 puzzle_times = {}
