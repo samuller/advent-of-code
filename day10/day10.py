@@ -109,7 +109,11 @@ def possibilities(variant):
 	return 1
 
 
-# Part2 @ 9:15... ?
+# Part1: misunderstood lower as I was thinking in other direction (not adapter-to-source)
+# Part2: wasn't looking at diffs. still unsure why no 2's appear.
+#        first considered groups with sum greater than 3, before realising it's actually
+#        the length of one sequences that needs to be considered (for possibilities).
+#        variable length variations.
 if __name__ == '__main__':
 	lines = [line.strip() for line in fileinput.input('input.txt')]
 	test1 = """16
@@ -154,7 +158,7 @@ if __name__ == '__main__':
 34
 10
 3"""
-	# lines = test2.split('\n')
+	lines = test2.split('\n')
 	print('Lines: {}'.format(len(lines)))
 	lines = sorted([int(l) for l in lines])
 
@@ -167,45 +171,11 @@ if __name__ == '__main__':
 		whole = list(range(1,i))
 		# print(whole)
 		print(len(whole), '=', find_recursive(whole))
-	# exit()
 
-	# Part 2X - diffs
-	# 13 -> 13
-	# 31 -> 3???
-	# 21 -> 21, _1
-	# 11 -> 
-	# 
-
-	diffs = []
-	running = [0]
 	lines = [0] + lines
-	print(lines)
-	for idx in range(len(lines)-1):
-		diff = lines[idx+1] - lines[idx]
-		diffs.append(diff)
-		running.append(running[-1] + diff)
+	lines = np.array(lines)
+	diffs = lines[1:] - lines[:-1]
 	print(diffs)
-
-	total = 0
-	total_vals = []
-	poss = []
-	idx = 0
-	while idx < len(diffs):
-		curr = diffs[idx]
-		total += curr
-		total_vals.append(curr)
-		if total > 3:
-			print(total_vals, possibilities(total_vals))
-			poss.append(possibilities(total_vals))
-			total_vals = []
-			total = 0
-			idx -= 1
-		idx += 1
-		# print(curr, end=' ')
-	print()
-	# print(poss)
-	# print(prod(poss))
-	# exit()
 
 	seq_of_ones = 0
 	ones = []
@@ -216,10 +186,9 @@ if __name__ == '__main__':
 			ones.append(seq_of_ones)
 			seq_of_ones = 0
 	print(ones)
-	# print(1 + sum(ones))
-	# print(1 + sum([l for l in ones]))
+
 	vals = [l if l <= 2 else find_recursive(list(range(1,l+1+1))) for l in ones]
-	print(prod([v for v in vals  if v != 0]))
+	print(prod([v for v in vals if v != 0]))
 	exit()
 
 	# # Part 2
