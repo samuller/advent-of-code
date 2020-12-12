@@ -52,7 +52,7 @@ assert rotate90s((-4, 10), 90) == rotate([0,0],(-4,10),90), \
 
 
 def part1(lines):
-	rc = (0,0) # (NS v, WE ->)
+	xy = (0,0)
 	facing = 90  # N = 0, start at E, clockwise
 	for line in lines:
 		action = line[0]
@@ -70,15 +70,15 @@ def part1(lines):
 				print('ERROR:', line)
 				break
 
-		rc_amt = (0,0)
+		xy_amt = (0,0)
 		if action == 'N':
-			rc_amt = (-amt, 0)
+			xy_amt = (0, +amt)
 		elif action == 'S':
-			rc_amt = (+amt, 0)
+			xy_amt = (0, -amt)
 		elif action == 'E':
-			rc_amt = (0, +amt)
+			xy_amt = (+amt, 0)
 		elif action == 'W':
-			rc_amt = (0, -amt)
+			xy_amt = (-amt, 0)
 		elif action == 'L':
 			facing -= amt
 		elif action == 'R':
@@ -89,44 +89,48 @@ def part1(lines):
 		facing = facing % 360
 		if facing < 0:
 			facing = 360 - facing
-		rc = (rc[0] + rc_amt[0], rc[1] + rc_amt[1])
+		xy = (xy[0] + xy_amt[0], xy[1] + xy_amt[1])
 		# print(line, ':', facing, action, ship_rc, wp_rc)
-	return facing, rc
+	return facing, xy
 
 
 def part2(lines):
-	ship_rc = (0,0) # (NS v, WE ->)
-	wp_rc = (-1,10) # (NS v, WE ->)
+	ship_xy = (0,0) # (NS v, WE ->)
+	wp_xy = (10, 1) # (NS v, WE ->)
 	for line in lines:
 		action = line[0]
 		amt = int(line[1:])
 		# dir_amt = (amt, amt)
 		if action == 'F':
-			# print(wp_rc[0] - ship_rc[0])
-			# print(wp_rc[1] - ship_rc[1])
-			new_r = ship_rc[0] + amt*(wp_rc[0])
-			new_c = ship_rc[1] + amt*(wp_rc[1])
-			ship_rc = (new_r, new_c)
+			# print(wp_xy[0] - ship_xy[0])
+			# print(wp_xy[1] - ship_xy[1])
+			new_x = ship_xy[0] + amt*(wp_xy[0])
+			new_y = ship_xy[1] + amt*(wp_xy[1])
+			ship_xy = (new_x, new_y)
 
-		rc_amt = (0,0)
+		xy_amt = (0,0)
 		if action == 'N':
-			rc_amt = (-amt, 0)
+			xy_amt = (0, +amt)
 		elif action == 'S':
-			rc_amt = (+amt, 0)
+			xy_amt = (0, -amt)
 		elif action == 'E':
-			rc_amt = (0, +amt)
+			xy_amt = (+amt, 0)
 		elif action == 'W':
-			rc_amt = (0, -amt)
+			xy_amt = (-amt, 0)
 		elif action == 'L':
-			wp_rc = rotate90s(wp_rc, -amt)
+			wp_xy = -wp_xy[1], wp_xy[0]
+			r, c = rotate90s(wp_xy, -amt)
+			wp_xy = c, -r
 		elif action == 'R':
-			wp_rc = rotate90s(wp_rc, +amt)
+			wp_xy = -wp_xy[1], wp_xy[0]
+			r, c = rotate90s(wp_xy, +amt)
+			wp_xy = c, -r
 		elif action != 'F':
 			print('ERROR2:', line)
 			break
-		wp_rc = (wp_rc[0] + rc_amt[0], wp_rc[1] + rc_amt[1])
-		# print(line, ':', action, ship_rc, wp_rc)
-	return ship_rc, wp_rc
+		wp_xy = (wp_xy[0] + xy_amt[0], wp_xy[1] + xy_amt[1])
+		# print(line, ':', action, ship_xy, wp_xy)
+	return ship_xy, wp_xy
 
 
 # 422 @ 7:09, -27 7:12 -> 445, 66969 @ 7:46
