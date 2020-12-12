@@ -51,6 +51,19 @@ assert rotate90s((-4, 10), 90) == rotate([0,0],(-4,10),90), \
 	'{} != {}'.format(rotate90s((-4, 10), 90), rotate([0,0],(-4,10),90))
 
 
+def move_direction(dir, amt):
+	xy_amt = (0,0)
+	if dir == 'N':
+		xy_amt = (0, +amt)
+	elif dir == 'S':
+		xy_amt = (0, -amt)
+	elif dir == 'E':
+		xy_amt = (+amt, 0)
+	elif dir == 'W':
+		xy_amt = (-amt, 0)
+	return xy_amt
+
+
 def part1(lines):
 	xy = (0,0)
 	facing = 90  # N = 0, start at E, clockwise
@@ -71,14 +84,8 @@ def part1(lines):
 				break
 
 		xy_amt = (0,0)
-		if action == 'N':
-			xy_amt = (0, +amt)
-		elif action == 'S':
-			xy_amt = (0, -amt)
-		elif action == 'E':
-			xy_amt = (+amt, 0)
-		elif action == 'W':
-			xy_amt = (-amt, 0)
+		if action in 'NSEW':
+			xy_amt = move_direction(action, amt)
 		elif action == 'L':
 			facing -= amt
 		elif action == 'R':
@@ -109,22 +116,12 @@ def part2(lines):
 			ship_xy = (new_x, new_y)
 
 		xy_amt = (0,0)
-		if action == 'N':
-			xy_amt = (0, +amt)
-		elif action == 'S':
-			xy_amt = (0, -amt)
-		elif action == 'E':
-			xy_amt = (+amt, 0)
-		elif action == 'W':
-			xy_amt = (-amt, 0)
+		if action in 'NSEW':
+			xy_amt = move_direction(action, amt)
 		elif action == 'L':
-			wp_xy = -wp_xy[1], wp_xy[0]
-			r, c = rotate90s(wp_xy, -amt)
-			wp_xy = c, -r
+			wp_xy = rotate90s(wp_xy, -amt)
 		elif action == 'R':
-			wp_xy = -wp_xy[1], wp_xy[0]
-			r, c = rotate90s(wp_xy, +amt)
-			wp_xy = c, -r
+			wp_xy = rotate90s(wp_xy, +amt)
 		elif action != 'F':
 			print('ERROR2:', line)
 			break
