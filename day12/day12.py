@@ -5,19 +5,54 @@ from lib import *
 import math
 
 
-class Classy:
-	def __init__(self):
-		pass
+def rotate90s(point, degree):
+	# 90 degree rotations basically swap the x-y axes
+	# and then negates one axis
+	p1, p2 = point
+	# +R -> +D -> -L -> -U, +D -> -L -> -U -> +R
+	# -L -> +U -> +R -> +D, -U -> +R -> +D -> -L
+	# (-4, 10) -> (10,_4) -> (4, _-10) -> (-10 ,_-4) -> (-4, 10)
+	negative = True if degree < 0 else False
+	if degree < 0:
+		degree = 360 + degree
+	times = round(abs(degree) / 90)
+	# print(p1, p2)
+	for t in range(times):
+		p1, p2 = p2, p1
+		# if p1*p2 > 0:
+		# 	p1 = -p1
+		# else:
+		p2 = -p2
+		# print(p1, p2)
+	return p1, p2
+assert rotate90s((-4, 10), 90) == (10, 4)
+assert rotate90s((-4, 10), 180) == (4, -10)
+assert rotate90s((-4, 10), 270) == (-10, -4)
+assert rotate90s((-4, 10), 360) == (-4, 10)
+assert rotate90s((-4, 10), -270) == (10, 4)
+assert rotate90s((-4, 10), -180) == (4, -10)
+assert rotate90s((-4, 10), -90) == (-10, -4)
+assert rotate90s((-4, 10), -360) == (-4, 10)
 
 
 def rotate(center, point, degree):
+	degree = -degree
 	angle = math.radians(degree)
+	# https://stackoverflow.com/questions/34372480/rotate-point-about-another-point-in-degrees-python
 	ox, oy = center
 	px, py = point
 
 	qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
 	qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
 	return int(round(qx)), int(round(qy))
+assert rotate90s((-4, 10), 90) == rotate([0,0],(-4,10),90), \
+	'{} != {}'.format(rotate90s((-4, 10), 90), rotate([0,0],(-4,10),90))
+assert rotate90s((-4, 10), 180) == rotate([0,0],(-4,10),180), \
+	'{} != {}'.format(rotate90s((-4, 10), 180), rotate([0,0],(-4,10),180))
+assert rotate90s((-4, 10), 270) == rotate([0,0],(-4,10),270), \
+	'{} != {}'.format(rotate90s((-4, 10), 270), rotate([0,0],(-4,10),270))
+assert rotate90s((-4, 10), 90) == rotate([0,0],(-4,10),90), \
+	'{} != {}'.format(rotate90s((-4, 10), 90), rotate([0,0],(-4,10),90))
 
 
 def part1(lines):
@@ -87,9 +122,9 @@ def part2(lines):
 		elif action == 'W':
 			rc_amt = (0, -amt)
 		elif action == 'L':
-			wp_rc = rotate([0,0], wp_rc, +amt)
+			wp_rc = rotate90s(wp_rc, -amt)
 		elif action == 'R':
-			wp_rc = rotate([0,0], wp_rc, -amt)
+			wp_rc = rotate90s(wp_rc, +amt)
 		elif action != 'F':
 			print('ERROR2:', line)
 			break
