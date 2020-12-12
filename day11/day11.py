@@ -7,81 +7,32 @@ from copy import deepcopy
 
 def surroundings(mappy, row, col):
 	n = []
-	for c in range(col-1,1+col+1):
-		for r in range(row-1,1+row+1):
-			# print(c,r)
-			if 0 <= c < mappy.cols and 0 <= r < mappy.rows and (r,c) != (row, col):
+	for dc in [-1,0,1]:
+		for dr in [-1,0,1]:
+			if dc == 0 and dr == 0:
+				continue
+			r = row + dr
+			c = col + dc
+			if 0 <= c < mappy.cols and 0 <= r < mappy.rows:
 				n.append(mappy.get(r,c))
-	assert len(n) in [3, 5, 7, 8], len(n)
+	assert len(n) in [3, 5, 8], len(n)
 	return n
 
 def count_far_surroundings(mappy, row, col):
 	count = 0
-	# Right row
-	for c in range(col+1, mappy.cols):
-		val = mappy.get(row,c)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-	# Left row
-	for c in range(col-1, -1, -1):
-		val = mappy.get(row,c)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-	# Top
-	for r in range(row-1, -1, -1):
-		val = mappy.get(r,col)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-	# Bottom
-	for r in range(row+1, mappy.rows):
-		val = mappy.get(r,col)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-	# Left-top
-	rc = 1
-	while mappy.in_bounds(row-rc, col-rc):
-		val = mappy.get(row - rc,col - rc)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-		rc += 1
-	# Left-bottom
-	rc = 1
-	while mappy.in_bounds(row+rc, col-rc):
-		val = mappy.get(row + rc,col - rc)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-		rc += 1
-	# Right-top
-	rc = 1
-	while mappy.in_bounds(row-rc, col+rc):
-		val = mappy.get(row - rc,col + rc)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-		rc += 1
-	# Right-bottom
-	rc = 1
-	while mappy.in_bounds(row+rc, col+rc):
-		val = mappy.get(row + rc,col + rc)
-		if val == '#':
-			count += 1
-		if val in ['#', 'L']:
-			break
-		rc += 1
+	for dc in [-1,0,1]:
+		for dr in [-1,0,1]:
+			if dc == 0 and dr == 0:
+				continue
+			r = row + dr
+			c = col + dc
+			while mappy.in_bounds(r, c) and mappy.get(r,c) == '.':
+				r += dr
+				c += dc
+			if mappy.in_bounds(r, c) and mappy.get(r,c) == '#':
+				count += 1
 	return count
+
 
 def count_taken_seats(mappy):
 	total_count = 0
@@ -164,6 +115,7 @@ L.LLLLL.LL"""
 				# 		count += 1
 				# Part 2
 				count = count_far_surroundings(prev_mappy, r, c)
+
 				# print(count, nhs)
 				if count == 0:
 					next_mappy.set(r,c, '#')
@@ -171,6 +123,6 @@ L.LLLLL.LL"""
 					next_mappy.set(r,c, 'L')
 		curr_count = count_taken_seats(next_mappy)
 		loops += 1
-		print(loops)
+		# print(loops)
 	print(next_mappy)
 	print(count_taken_seats(next_mappy))
