@@ -5,30 +5,28 @@ from lib import *
 import math
 
 
-def rotate90s(point, degree):
+def rotate90s(point, times):
 	# 90 degree rotations basically swap the x-y axes
-	# and then negates one axis
+	# and then negates one axis (depending on direction)
 	# +R -> +D -> -L -> -U, +D -> -L -> -U -> +R
 	# -L -> +U -> +R -> +D, -U -> +R -> +D -> -L
 	p1, p2 = point
-	times = round(abs(degree) / 90)
-	# print(p1, p2)
-	for t in range(times):
+	for t in range(abs(times)):
 		p1, p2 = p2, p1
-		if degree > 0:
+		if times > 0:
 			p2 = -p2
 		else:
 			p1 = -p1
 	return p1, p2
 # (-4, 10) -> (10,_4) -> (4, _-10) -> (-10 ,_-4) -> (-4, 10)
-assert rotate90s((-4, 10), 90) == (10, 4)
-assert rotate90s((-4, 10), 180) == (4, -10)
-assert rotate90s((-4, 10), 270) == (-10, -4)
-assert rotate90s((-4, 10), 360) == (-4, 10)
-assert rotate90s((-4, 10), -270) == (10, 4)
-assert rotate90s((-4, 10), -180) == (4, -10)
-assert rotate90s((-4, 10), -90) == (-10, -4)
-assert rotate90s((-4, 10), -360) == (-4, 10)
+assert rotate90s((-4, 10), 1) == (10, 4)
+assert rotate90s((-4, 10), 2) == (4, -10)
+assert rotate90s((-4, 10), 3) == (-10, -4)
+assert rotate90s((-4, 10), 4) == (-4, 10)
+assert rotate90s((-4, 10), -3) == (10, 4)
+assert rotate90s((-4, 10), -2) == (4, -10)
+assert rotate90s((-4, 10), -1) == (-10, -4)
+assert rotate90s((-4, 10), -4) == (-4, 10)
 
 
 def rotate(center, point, degree):
@@ -41,14 +39,14 @@ def rotate(center, point, degree):
 	qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
 	qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
 	return int(round(qx)), int(round(qy))
-assert rotate90s((-4, 10), 90) == rotate([0,0],(-4,10),90), \
-	'{} != {}'.format(rotate90s((-4, 10), 90), rotate([0,0],(-4,10),90))
-assert rotate90s((-4, 10), 180) == rotate([0,0],(-4,10),180), \
-	'{} != {}'.format(rotate90s((-4, 10), 180), rotate([0,0],(-4,10),180))
-assert rotate90s((-4, 10), 270) == rotate([0,0],(-4,10),270), \
-	'{} != {}'.format(rotate90s((-4, 10), 270), rotate([0,0],(-4,10),270))
-assert rotate90s((-4, 10), 90) == rotate([0,0],(-4,10),90), \
-	'{} != {}'.format(rotate90s((-4, 10), 90), rotate([0,0],(-4,10),90))
+assert rotate90s((-4, 10), 1) == rotate([0,0],(-4,10),90), \
+	'{} != {}'.format(rotate90s((-4, 10), 1), rotate([0,0],(-4,10),90))
+assert rotate90s((-4, 10), 2) == rotate([0,0],(-4,10),180), \
+	'{} != {}'.format(rotate90s((-4, 10), 2), rotate([0,0],(-4,10),180))
+assert rotate90s((-4, 10), 3) == rotate([0,0],(-4,10),270), \
+	'{} != {}'.format(rotate90s((-4, 10), 3), rotate([0,0],(-4,10),270))
+assert rotate90s((-4, 10), 1) == rotate([0,0],(-4,10),90), \
+	'{} != {}'.format(rotate90s((-4, 10), 1), rotate([0,0],(-4,10),90))
 
 
 def move_direction(dir, amt):
@@ -108,9 +106,9 @@ def part2(lines):
 		if action in 'NSEW':
 			xy_amt = move_direction(action, amt)
 		elif action == 'L':
-			wp_xy = rotate90s(wp_xy, -amt)
+			wp_xy = rotate90s(wp_xy, -amt//90)
 		elif action == 'R':
-			wp_xy = rotate90s(wp_xy, +amt)
+			wp_xy = rotate90s(wp_xy, +amt//90)
 		elif action != 'F':
 			print('ERROR2:', line)
 			break
