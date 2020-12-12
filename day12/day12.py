@@ -66,38 +66,27 @@ def move_direction(dir, amt):
 
 def part1(lines):
 	xy = (0,0)
-	facing = 90  # N = 0, start at E, clockwise
+	# NESW = 0123
+	face_dir = 'NESW'
+	facing = 1
 	for line in lines:
 		action = line[0]
 		amt = int(line[1:])
 		if action == 'F':
-			if facing == 0:
-				action = 'N'
-			elif facing == 90:
-				action = 'E'
-			elif facing == 180:
-				action = 'S'
-			elif facing == 270:
-				action = 'W'
-			else:
-				print('ERROR:', line)
-				break
+			action = face_dir[facing]
 
-		xy_amt = (0,0)
 		if action in 'NSEW':
 			xy_amt = move_direction(action, amt)
+			xy = (xy[0] + xy_amt[0], xy[1] + xy_amt[1])
 		elif action == 'L':
-			facing -= amt
+			facing += (4-amt//90)
 		elif action == 'R':
-			facing += amt
+			facing += amt//90
 		else:
 			print('ERROR2:', line)
 			break
-		facing = facing % 360
-		if facing < 0:
-			facing = 360 - facing
-		xy = (xy[0] + xy_amt[0], xy[1] + xy_amt[1])
-		# print(line, ':', facing, action, ship_rc, wp_rc)
+		facing = facing % 4
+		# print(line, ':', facing, xy, action)
 	return facing, xy
 
 
