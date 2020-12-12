@@ -8,23 +8,19 @@ import math
 def rotate90s(point, degree):
 	# 90 degree rotations basically swap the x-y axes
 	# and then negates one axis
-	p1, p2 = point
 	# +R -> +D -> -L -> -U, +D -> -L -> -U -> +R
 	# -L -> +U -> +R -> +D, -U -> +R -> +D -> -L
-	# (-4, 10) -> (10,_4) -> (4, _-10) -> (-10 ,_-4) -> (-4, 10)
-	negative = True if degree < 0 else False
-	if degree < 0:
-		degree = 360 + degree
+	p1, p2 = point
 	times = round(abs(degree) / 90)
 	# print(p1, p2)
 	for t in range(times):
 		p1, p2 = p2, p1
-		# if p1*p2 > 0:
-		# 	p1 = -p1
-		# else:
-		p2 = -p2
-		# print(p1, p2)
+		if degree > 0:
+			p2 = -p2
+		else:
+			p1 = -p1
 	return p1, p2
+# (-4, 10) -> (10,_4) -> (4, _-10) -> (-10 ,_-4) -> (-4, 10)
 assert rotate90s((-4, 10), 90) == (10, 4)
 assert rotate90s((-4, 10), 180) == (4, -10)
 assert rotate90s((-4, 10), 270) == (-10, -4)
@@ -129,7 +125,7 @@ def part2(lines):
 			print('ERROR2:', line)
 			break
 		wp_rc = (wp_rc[0] + rc_amt[0], wp_rc[1] + rc_amt[1])
-		print(line, ':', action, ship_rc, wp_rc)
+		# print(line, ':', action, ship_rc, wp_rc)
 	return ship_rc, wp_rc
 
 
