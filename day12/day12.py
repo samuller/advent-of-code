@@ -116,7 +116,7 @@ def part2(lines):
 			break
 		wp_xy = (wp_xy[0] + xy_amt[0], wp_xy[1] + xy_amt[1])
 		# print(line, ':', action, ship_xy, wp_xy)
-	return ship_xy, wp_xy
+	return ship_xy
 
 
 # 422 @ 7:09, -27 7:12 -> 445, 66969 @ 7:46
@@ -133,16 +133,10 @@ F11"""
 	print('Lines: {}'.format(len(lines)))
 
 	# Part 1
-	facing, rc = part1(lines)
-	print('END:', facing, rc)
-	x = abs(rc[0])
-	y = abs(rc[1])
-	print(x + y)
+	facing, xy = part1(lines)
+	x,y = xy
+	print(abs(x) + abs(y))
 
 	# Part 2
-	ship_rc, wp_rc = part2(lines)
-	print('END:', ship_rc, wp_rc)
-	x = abs(ship_rc[0])
-	y = abs(ship_rc[1])
-	print(x + y)
-	# print(sum(ship_rc))
+	x,y = part2(lines)
+	print(abs(x) + abs(y))
