@@ -23,7 +23,6 @@ def rotate(center, point, degree):
 def part1(lines):
 	rc = (0,0) # (NS v, WE ->)
 	facing = 90  # N = 0, start at E, clockwise
-	count_valid = 0
 	for line in lines:
 		action = line[0]
 		amt = int(line[1:])
@@ -40,14 +39,15 @@ def part1(lines):
 				print('ERROR:', line)
 				break
 
+		rc_amt = (0,0)
 		if action == 'N':
-			rc = (rc[0]-amt, rc[1])
+			rc_amt = (-amt, 0)
 		elif action == 'S':
-			rc = (rc[0]+amt, rc[1])
+			rc_amt = (+amt, 0)
 		elif action == 'E':
-			rc = (rc[0], rc[1]+amt)
+			rc_amt = (0, +amt)
 		elif action == 'W':
-			rc = (rc[0], rc[1]-amt)
+			rc_amt = (0, -amt)
 		elif action == 'L':
 			facing -= amt
 		elif action == 'R':
@@ -58,6 +58,7 @@ def part1(lines):
 		facing = facing % 360
 		if facing < 0:
 			facing = 360 - facing
+		rc = (rc[0] + rc_amt[0], rc[1] + rc_amt[1])
 		# print(line, ':', facing, action, ship_rc, wp_rc)
 	return facing, rc
 
@@ -76,14 +77,15 @@ def part2(lines):
 			new_c = ship_rc[1] + amt*(wp_rc[1])
 			ship_rc = (new_r, new_c)
 
+		rc_amt = (0,0)
 		if action == 'N':
-			wp_rc = (wp_rc[0]-amt, wp_rc[1])
+			rc_amt = (-amt, 0)
 		elif action == 'S':
-			wp_rc = (wp_rc[0]+amt, wp_rc[1])
+			rc_amt = (+amt, 0)
 		elif action == 'E':
-			wp_rc = (wp_rc[0], wp_rc[1]+amt)
+			rc_amt = (0, +amt)
 		elif action == 'W':
-			wp_rc = (wp_rc[0], wp_rc[1]-amt)
+			rc_amt = (0, -amt)
 		elif action == 'L':
 			wp_rc = rotate([0,0], wp_rc, +amt)
 		elif action == 'R':
@@ -91,7 +93,8 @@ def part2(lines):
 		elif action != 'F':
 			print('ERROR2:', line)
 			break
-		# print(line, ':', action, ship_rc, wp_rc)
+		wp_rc = (wp_rc[0] + rc_amt[0], wp_rc[1] + rc_amt[1])
+		print(line, ':', action, ship_rc, wp_rc)
 	return ship_rc, wp_rc
 
 
