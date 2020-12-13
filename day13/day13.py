@@ -100,6 +100,16 @@ def bus_dict(bus_list):
 	return bus_offsets
 
 
+def run_tests(lines):
+	for idx, line in enumerate(lines):
+		ans, input = line.split('\t')
+		ans = int(ans)
+		busses = bus_dict(input.split(','))
+		calc = calc_time_fast(busses)
+		print(calc)
+		assert calc == ans, 'failed test {} with {} instead of {}'.format(idx, calc, ans)
+
+
 # 5057105 @ 07:16, 640856202464571 @ 10:23, 11:34
 if __name__ == '__main__':
 	# extended_gcd(8400,11)
@@ -113,30 +123,12 @@ if __name__ == '__main__':
 	# print(calc_time("17,x,13,19".split(',')))
 	# exit()
 
-	lines = [line.strip() for line in fileinput.input('input.txt')]
-# 	test1 = """939
-# 7,13,x,x,59,x,31,19"""
-	tests = ["7,13,x,x,59,x,31,19", "17,x,13,19", "67,7,59,61", "67,x,7,59,61",
-			 "67,7,x,59,61", "1789,37,47,1889"]
-	test_ans = [1068781, 3417, 754018, 779210, 1261476, 1202161486]
-	for idx, test in enumerate(tests):
-		busses = bus_dict(test.split(','))
-		calc = calc_time_fast(busses)
-		print(calc)
-		assert calc == test_ans[idx], idx
-# 	exit()
-
-	# test_idx = None
-	# if test_idx is not None:
-	# 	lines = test[test_idx].split('\n')
+	lines = [line.strip() for line in fileinput.input()]
 	print('Lines: {}'.format(len(lines)))
-
-	# Part 2
-	busses = bus_dict(lines[1].split(','))
-	# print(confirm_value(busses, 640856202464571))
-	print(confirm_value(busses, 640856202464541))
-	print(calc_time_fast(busses))
-	exit()
+	if len(lines) != 2:
+		run_tests(lines)
+		print('Tests passed')
+		exit()
 
 	# Part 1
 	time = int(lines[0])
@@ -159,5 +151,11 @@ if __name__ == '__main__':
 			first_bus = b
 			first_time = bus_earliest
 
-	print(first_time, '= +', first_time - time)
+	# print(first_time, '= +', first_time - time)
 	print(first_bus * (first_time - time))
+
+	# Part 2
+	busses = bus_dict(lines[1].split(','))
+	# print(confirm_value(busses, 640856202464571))
+	# print(confirm_value(busses, 640856202464541))
+	print(calc_time_fast(busses))
