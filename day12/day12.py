@@ -96,23 +96,20 @@ def part2(lines):
 		amt = int(line[1:])
 		# dir_amt = (amt, amt)
 		if action == 'F':
-			# print(wp_xy[0] - ship_xy[0])
-			# print(wp_xy[1] - ship_xy[1])
 			new_x = ship_xy[0] + amt*(wp_xy[0])
 			new_y = ship_xy[1] + amt*(wp_xy[1])
 			ship_xy = (new_x, new_y)
 
-		xy_amt = (0,0)
 		if action in 'NSEW':
 			xy_amt = move_direction(action, amt)
+			wp_xy = (wp_xy[0] + xy_amt[0], wp_xy[1] + xy_amt[1])
 		elif action == 'L':
 			wp_xy = rotate90s(wp_xy, -amt//90)
 		elif action == 'R':
 			wp_xy = rotate90s(wp_xy, +amt//90)
 		elif action != 'F':
 			print('ERROR2:', line)
-			break
-		wp_xy = (wp_xy[0] + xy_amt[0], wp_xy[1] + xy_amt[1])
+			break		
 		# print(line, ':', action, ship_xy, wp_xy)
 	return ship_xy
 
