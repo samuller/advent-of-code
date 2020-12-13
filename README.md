@@ -1,3 +1,7 @@
+# Advent of Code 2020
+
+My attempts and solutions for Advent of Code 2020. These are often refactored and cleaned up a bit, but I'll usually make a commit of my much messier code directly after I've solved the problem.
+
 Setup:
 
     python3 -m venv .venv
