@@ -24,6 +24,22 @@ def extended_gcd(a, b):
 		old_s += b
 	return old_s
 
+
+def confirm_value(busses, value):
+	invalid = False
+	for offset, bus in busses.items(): 
+		if (value + offset) % bus != 0:
+			invalid = True
+	return not invalid
+
+
+def calc_time_slow(busses):
+	for i in range(10000000):
+		if confirm_value(busses, i):
+			return i
+	return None
+
+
 # Chinese remainder theorem @ 9:03
 # 0 mod 17
 # 2 mod 13
@@ -37,17 +53,9 @@ def extended_gcd(a, b):
 # = 4199-3417 ?
 # != 3417
 def calc_time(busses):
-	bus_offsets = {}
-	for offset, bus in enumerate(busses):
-		if bus != 'x':
-			# bus_offsets.append((offset, int(bus)))
-			bus_offsets[offset] = int(bus)
-	# print(bus_offsets)
-	# print(bus_offsets.items())
-	
-	M = prod(list(bus_offsets.values()))
+	M = prod(list(busses.values()))
 	x = 0
-	for a_i, m_i in bus_offsets.items():
+	for a_i, m_i in busses.items():
 		# print(a_i, m_i)
 		b_i = M/m_i
 		# The multiple of b_i that gives 1 in mod m_i space
@@ -57,57 +65,18 @@ def calc_time(busses):
 		b_i_prime = b_i_inv # % m_i
 		# print(a_i, b_i, b_i_prime)
 		x += a_i * b_i * b_i_prime
-	print(x, M)
-	print(M - (x % M))
-	return M - (x % M)
-	# exit()
+	# print(x, M)
+	# print(M - (x % M))
+	return int(M - (x % M))
 
-	# (17x - 0) == (13y - 2) == (19z - 3)
 
-	# x,y,z = 201,263,180
-	#           == 2 + 4y
-	#
-	# 17, 34, 51, 68, 85, 102
-	# 13, 26, 39, 52, 65, 78
-	# 19, 38, 57
-	#
-	# 2 * 13 - 17 = 9
-	# (17-13) + 13x = 4 + 13x
-	# 2 * 17 - 2 * 13 = 2 * (17-13) = 8
-	#
-	# 3 * 17 - 2 * 13 =  25
-	# 17x - 13y = 25
-	# 17x - 25 = 13y
-	# (17x - 25)/13 = y
-	# 17/13 x - 25/13 = y
-	# 1.5x = y
-	#
-	# 17x == 13y - 2
-	# 2 == (17-13) + 13u = 4 + 13u = 
-	#
-	# 17,x,13,19 -> 3417 (201,x,263,180)
-	# diff: 0,x,-4,2
-	# idx:  0,x,2,3
-	# 0,x,-8,6
-	#
-	# 
-	# 19 * 180 = 3420
-	# 17 * 180 = 3060
-	#             360  (360 / 2 = 180)
-	# 201 = 1, 3, 67, 201
-	# 263 = 1, 263
-	# 180 = 1, 2, 3, 4, 5, 6, 9, 10, 12, 15, 18, 20, 30, 36, 45, 60, 90, 180
-	# 3417 = 1, 3, 17, 51, 67, 201, 1139, 3417
-	for offset, bus in bus_offsets.items():
-		offset
-	# for i in range(10000000):
-	# 	invalid = False
-	# 	for offset, bus in bus_offsets: 
-	# 		if (i + offset) % bus != 0:
-	# 			invalid = True
-	# 	if not invalid:
-	# 		return i
-	return None
+def bus_dict(bus_list):
+	bus_offsets = {}
+	for offset, bus in enumerate(bus_list):
+		if bus != 'x':
+			bus_offsets[offset] = int(bus)
+	return bus_offsets
+
 
 # 5057105 @ 07:16, 640856202464571 @ 10:23
 if __name__ == '__main__':
@@ -129,7 +98,7 @@ if __name__ == '__main__':
 			 "67,7,x,59,61", "1789,37,47,1889"]
 	test_ans = [1068781, 3417, 754018, 779210, 1261476, 1202161486]
 	for idx, test in enumerate(tests):
-		busses = test.split(',')
+		busses = bus_dict(test.split(','))
 		calc = calc_time(busses)
 		print(calc)
 		assert calc == test_ans[idx], idx
@@ -140,12 +109,14 @@ if __name__ == '__main__':
 	# 	lines = test[test_idx].split('\n')
 	print('Lines: {}'.format(len(lines)))
 
-	busses = lines[1].split(',')
+	# Part 2
+	busses = bus_dict(lines[1].split(','))
 	print(calc_time(busses))
-	exit()
 
-	busses = [int(b) for b in busses if b != 'x']
-	print(busses)
+	# Part 1
+	time = int(lines[0])
+	busses = [int(b) for b in lines[1].split(',') if b != 'x']
+	# print(busses)
 	first_time = None
 	first_bus = None
 	for b in busses:
@@ -158,23 +129,10 @@ if __name__ == '__main__':
 			break
 
 		bus_earliest = first_time_on_or_before + b
-		print(b, ':', bus_earliest)
+		# print(b, ':', bus_earliest)
 		if first_time is None or bus_earliest < first_time:
 			first_bus = b
 			first_time = bus_earliest
 
 	print(first_time, '= +', first_time - time)
 	print(first_bus * (first_time - time))
-
-	# sched = lines[1].split(',')
-	# print(sched)
-	# schedules = []
-	# curr_sched = []
-	# for s in sched:
-	# 	if s[0] in '0123456789':
-	# 		schedules.append(curr_sched)
-	# 		curr_sched = [int(s)]
-	# 	else:
-	# 		curr_sched.append(s)
-	# schedules.remove([])
-	# print(schedules)
