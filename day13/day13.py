@@ -19,7 +19,7 @@ def extended_gcd(a, b):
     
 	# print("Bézout coefficients:", (old_s, old_t))
 	# print("quotients by the gcd:", (t, s))
-	assert old_r == 1, 'greatest common divisor = ' + old_r
+	assert old_r == 1, 'greatest common divisor = {}'.format(old_r)
 	if old_s < 0:
 		old_s += b
 	return old_s
@@ -34,10 +34,28 @@ def confirm_value(busses, value):
 
 
 def calc_time_slow(busses):
-	for i in range(10000000):
+	for i in range(1000000000000000):
 		if confirm_value(busses, i):
 			return i
 	return None
+
+
+# Based on:
+# https://www.reddit.com/r/adventofcode/comments/kc60ri/2020_day_13_can_anyone_give_me_a_hint_for_part_2/gfnnfm3/?utm_source=reddit&utm_medium=web2x&context=3
+# https://paste.debian.net/plainh/f6796bee
+def calc_time_fast(busses):
+	curr_value = 0
+	bus_list = list(busses.items())
+	curr_offset, curr_bus = bus_list[0]
+	curr_busses = { curr_offset: curr_bus }
+	for idx, (next_offset, next_bus) in enumerate(bus_list[1:]):
+		M = prod(list(curr_busses.values()))
+		while True:
+			curr_value += M
+			curr_busses[next_offset] = next_bus
+			if confirm_value(curr_busses, curr_value):
+				break
+	return curr_value
 
 
 # Chinese remainder theorem @ 9:03
@@ -65,9 +83,13 @@ def calc_time(busses):
 		b_i_prime = b_i_inv # % m_i
 		# print(a_i, b_i, b_i_prime)
 		x += a_i * b_i * b_i_prime
-	# print(x, M)
-	# print(M - (x % M))
-	return int(M - (x % M))
+	print(x, M)
+	# print(extended_gcd(x, M))
+	answer = int(M - (x % M))
+	# answer = abs(int((x % M) - M))
+	# print(answer)
+	assert confirm_value(busses, answer), answer
+	return answer
 
 
 def bus_dict(bus_list):
@@ -78,7 +100,7 @@ def bus_dict(bus_list):
 	return bus_offsets
 
 
-# 5057105 @ 07:16, 640856202464571 @ 10:23
+# 5057105 @ 07:16, 640856202464571 @ 10:23, 11:34
 if __name__ == '__main__':
 	# extended_gcd(8400,11)
 	# assert extended_gcd(8400,11) == 8
@@ -99,7 +121,7 @@ if __name__ == '__main__':
 	test_ans = [1068781, 3417, 754018, 779210, 1261476, 1202161486]
 	for idx, test in enumerate(tests):
 		busses = bus_dict(test.split(','))
-		calc = calc_time(busses)
+		calc = calc_time_fast(busses)
 		print(calc)
 		assert calc == test_ans[idx], idx
 # 	exit()
@@ -111,7 +133,10 @@ if __name__ == '__main__':
 
 	# Part 2
 	busses = bus_dict(lines[1].split(','))
-	print(calc_time(busses))
+	# print(confirm_value(busses, 640856202464571))
+	print(confirm_value(busses, 640856202464541))
+	print(calc_time_fast(busses))
+	exit()
 
 	# Part 1
 	time = int(lines[0])
