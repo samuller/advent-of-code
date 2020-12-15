@@ -4,51 +4,41 @@ import fileinput
 
 
 def build_history(history, curr_number, curr_pos):
-	if curr_number in history:
-		# Remember only last 2 numbers
-		prev_numbers = history[curr_number]
-		history[curr_number][0] = prev_numbers[-1]
-		history[curr_number][1] = curr_pos
-	else:
-		# Store our only value as second/last number, then we only
-		# need to remember the last number in the future
-		history[curr_number] = [None, curr_pos]
+	history[curr_number] = curr_pos
 	return history
 
 
 def first_in_history(history, curr_number):
-	assert curr_number in history
-	return history[curr_number][0] is None
+	return curr_number not in history
 
 
-def diffs_in_history_pos(history, curr_number):
-	prev_numbers = history[curr_number]
-	return prev_numbers[-1] - prev_numbers[-2]
+def diffs_in_history_pos(history, curr_pos, curr_number):
+	return curr_pos - history[curr_number]
 
 
 def play_game(first_numbers, end_count):
-	times_spoken = {}
-	for idx, number in enumerate(first_numbers):
+	last_spoken = {}
+	for idx, number in enumerate(first_numbers[:-1]):
 		pos = idx + 1
-		history = build_history(times_spoken, number, pos)
-	# print(times_spoken)
+		history = build_history(last_spoken, number, pos)
+	# print(last_spoken)
 
 	count = len(first_numbers) + 1
 	last_number = first_numbers[-1]
 	while count < end_count+1:
-		speak_number = None
-		if first_in_history(times_spoken, last_number):
-			speak_number = 0
+		next_number = None
+		if first_in_history(last_spoken, last_number):
+			next_number = 0
 		else:
-			speak_number = diffs_in_history_pos(history, last_number)
+			next_number = diffs_in_history_pos(history, count-1, last_number)
 
-		# print('last:', last_number, times_spoken[last_number])
-		# print(count, speak_number) #, times_spoken)
-		history = build_history(times_spoken, speak_number, count)
-		last_number = speak_number
+		# print(count, next_number, last_spoken, last_number)
+		history = build_history(last_spoken, last_number, count-1)
+		# print('last:', last_number, last_spoken[last_number])
+		last_number = next_number
 		count += 1
-	# print(count-1, speak_number) #, times_spoken)
-	return speak_number
+	# print(count-1, next_number) #, last_spoken)
+	return next_number
 
 
 def run_tests(lines):
