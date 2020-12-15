@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import fileinput
-import sys; sys.path.append("..")
-from lib import *
+# import sys; sys.path.append("..")
+# from lib import *
 
 
 class Classy:
@@ -14,7 +14,7 @@ def function(input):
 
 
 if __name__ == '__main__':
-	lines = [line.strip() for line in fileinput.input('input.txt')]
+	lines = [line.strip() for line in fileinput.input()]
 	print('Lines: {}'.format(len(lines)))
 
 	count_valid = 0
