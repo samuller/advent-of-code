@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import fileinput
-from collections import defaultdict
+# from collections import defaultdict
 
 
 def build_history(history, curr_number, curr_pos):
@@ -11,6 +11,15 @@ def build_history(history, curr_number, curr_pos):
 	else:
 		history[curr_number] = [curr_pos]
 	return history
+
+
+def first_in_history(history, curr_number):
+	return len(history[curr_number]) <= 1
+
+
+def diffs_in_history_pos(history, curr_number):
+	prev_numbers = history[curr_number]
+	return prev_numbers[-1] - prev_numbers[-2]
 
 
 def play_game(first_numbers, end_count):
@@ -24,11 +33,10 @@ def play_game(first_numbers, end_count):
 	last_number = first_numbers[-1]
 	while count < end_count+1:
 		speak_number = None
-		if len(times_spoken[last_number]) <= 1:
+		if first_in_history(times_spoken, last_number):
 			speak_number = 0
 		else:
-			prev_numbers = times_spoken[last_number]
-			speak_number = prev_numbers[-1] - prev_numbers[-2]
+			speak_number = diffs_in_history_pos(history, last_number)
 
 		# print('last:', last_number, times_spoken[last_number])
 		# print(count, speak_number) #, times_spoken)
@@ -62,6 +70,5 @@ if __name__ == '__main__':
 		exit()
 
 	numbers = [int(n) for n in lines[0].split(',')]
-
 	print(play_game(numbers, 2020))
 	print(play_game(numbers, 30000000))
