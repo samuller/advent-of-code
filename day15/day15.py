@@ -3,41 +3,22 @@ import fileinput
 # from collections import defaultdict
 
 
-def build_history(history, curr_number, curr_pos):
-	history[curr_number] = curr_pos
-	return history
-
-
-def first_in_history(history, curr_number):
-	return curr_number not in history
-
-
-def diffs_in_history_pos(history, curr_pos, curr_number):
-	return curr_pos - history[curr_number]
-
-
 def play_game(first_numbers, end_count):
-	last_spoken = {}
-	for idx, number in enumerate(first_numbers[:-1]):
-		pos = idx + 1
-		history = build_history(last_spoken, number, pos)
-	# print(last_spoken)
+	last_spoken = {num: idx+1 for idx, num in enumerate(first_numbers)}
 
 	count = len(first_numbers) + 1
 	last_number = first_numbers[-1]
 	while count < end_count+1:
 		next_number = None
-		if first_in_history(last_spoken, last_number):
+		if last_number not in last_spoken:
 			next_number = 0
 		else:
-			next_number = diffs_in_history_pos(history, count-1, last_number)
+			next_number = count-1 - last_spoken[last_number]
 
-		# print(count, next_number, last_spoken, last_number)
-		history = build_history(last_spoken, last_number, count-1)
-		# print('last:', last_number, last_spoken[last_number])
+		last_spoken[last_number] = count-1
 		last_number = next_number
 		count += 1
-	# print(count-1, next_number) #, last_spoken)
+
 	return next_number
 
 
