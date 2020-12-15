@@ -7,14 +7,18 @@ def build_history(history, curr_number, curr_pos):
 	if curr_number in history:
 		# Remember only last 2 numbers
 		prev_numbers = history[curr_number]
-		history[curr_number] = [prev_numbers[-1], curr_pos]
+		history[curr_number][0] = prev_numbers[-1]
+		history[curr_number][1] = curr_pos
 	else:
-		history[curr_number] = [curr_pos]
+		# Store our only value as second/last number, then we only
+		# need to remember the last number in the future
+		history[curr_number] = [None, curr_pos]
 	return history
 
 
 def first_in_history(history, curr_number):
-	return len(history[curr_number]) <= 1
+	assert curr_number in history
+	return history[curr_number][0] is None
 
 
 def diffs_in_history_pos(history, curr_number):
