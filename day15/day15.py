@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 import fileinput
+from collections import defaultdict
+
+
+def build_history(history, curr_number, curr_pos):
+	if curr_number in history:
+		# Remember only last 2 numbers
+		prev_numbers = history[curr_number]
+		history[curr_number] = [prev_numbers[-1], curr_pos]
+	else:
+		history[curr_number] = [curr_pos]
+	return history
 
 
 def play_game(first_numbers, end_count):
 	times_spoken = {}
 	for idx, number in enumerate(first_numbers):
 		pos = idx + 1
-		# print(pos, number)
-		if number in times_spoken:
-			times_spoken[number].append(pos)
-		else:
-			times_spoken[number] = [pos]
+		history = build_history(times_spoken, number, pos)
 	# print(times_spoken)
 
 	count = len(first_numbers) + 1
@@ -21,16 +28,11 @@ def play_game(first_numbers, end_count):
 			speak_number = 0
 		else:
 			prev_numbers = times_spoken[last_number]
-			# print(prev_numbers)
 			speak_number = prev_numbers[-1] - prev_numbers[-2]
-		
+
 		# print('last:', last_number, times_spoken[last_number])
 		# print(count, speak_number) #, times_spoken)
-		# print(speak_number in times_spoken)
-		if speak_number in times_spoken:
-			times_spoken[speak_number].append(count)
-		else:
-			times_spoken[speak_number] = [count]
+		history = build_history(times_spoken, speak_number, count)
 		last_number = speak_number
 		count += 1
 	# print(count-1, speak_number) #, times_spoken)
@@ -39,6 +41,7 @@ def play_game(first_numbers, end_count):
 
 def run_tests(lines):
 	end_count = int(lines[0])
+	print('Running tests till {}...'.format(end_count))
 	lines = lines[1:]
 	for idx, line in enumerate(lines):
 		ans, input = line.split('\t')
