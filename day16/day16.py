@@ -87,6 +87,12 @@ def get_all_valid_constraints_per_field(all_field_values, constraints):
 
 
 def find_unique_valid_constraints(valid_cons):
+	"""
+	Assumes there is only one possible set of valid constraints, i.e.
+	no two or more fields that could be confused with one another.
+	This function will loop forever if that is the case (but an 'non-change'
+	check would fix that).
+	"""
 	# pruning?
 	only_valid_cons = [[] for _ in range(len(valid_cons))]
 	while max_length(valid_cons) > 0:
@@ -101,10 +107,6 @@ def find_unique_valid_constraints(valid_cons):
 		# print(consider_field, consider_field_idx)
 		only_valid_cons[consider_field_idx].append(consider_field)
 		for idx in range(len(valid_cons)):
-			# if idx == consider_field_idx:
-			# 	continue
-			# print(consider_field)
-			# print(valid_cons[idx])
 			if consider_field in valid_cons[idx]:
 				valid_cons[idx].remove(consider_field)
 	# print(valid_cons)
