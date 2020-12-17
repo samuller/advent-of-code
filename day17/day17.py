@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 import fileinput
 from copy import deepcopy
-# import sys; sys.path.append("..")
-# from lib import *
+import itertools
 
 
 def count_neighbours(sparse, w,z,r,c):
 	count = 0
-	for dw in [-1,0,1]:
-		for dz in [-1,0,1]:
-			for dr in [-1,0,1]:
-				for dc in [-1,0,1]:
-					if (dw, dz, dr, dc) == (0,0,0,0):
-						continue
-					if (w+dw,z+dz,r+dr,c+dc) in sparse:
-						count += 1
+	for dw,dz,dr,dc in itertools.product(
+		[-1,0,1],[-1,0,1],[-1,0,1],[-1,0,1]):
+		if (dw, dz, dr, dc) == (0,0,0,0):
+			continue
+		if (w+dw,z+dz,r+dr,c+dc) in sparse:
+			count += 1
 	return count
 
 
@@ -24,37 +21,41 @@ def count_all(sparse):
 
 def print_grid(sparse, debug=False):
 	ws, zs, rs, cs = list(zip(*sparse))
-	for w in range(min(ws), 1+max(ws)):
-		for z in range(min(zs), 1+max(zs)):
+	for w,z,r,c in itertools.product(
+		range(min(ws), 1+max(ws)),
+		range(min(zs), 1+max(zs)),
+		range(min(rs), 1+max(rs)),
+		range(min(cs), 1+max(cs))):
+		if (r,c) == (min(rs),min(cs)):
 			print('z =',z,'w=',w)
-			for r in range(min(rs), 1+max(rs)):
-				for c in range(min(cs), 1+max(cs)):
-					if debug:
-						print(count_neighbours(sparse,w,z,r,c),end='')
-						continue
-					if (w,z,r,c) in sparse:
-						print('#',end='')
-					else:
-						print('.',end='')					
-				print()
+		if debug:
+			print(count_neighbours(sparse,w,z,r,c),end='')
+			continue
+		if (w,z,r,c) in sparse:
+			print('#',end='')
+		else:
+			print('.',end='')
+		if c == max(cs):
+			print()
 
 
 def change_states(sparse):
 	new_sparse = set()
 	ws, zs, rs, cs = list(zip(*sparse))
-	for w in range(min(ws)-1, 2+max(ws)):
-		for z in range(min(zs)-1, 2+max(zs)):
-			for r in range(min(rs)-1, 2+max(rs)):
-				for c in range(min(cs)-1, 2+max(cs)):
-					count = count_neighbours(sparse, w,z,r,c)
-					if (w,z,r,c) in sparse and count in [2,3]:
-						new_sparse.add((w,z,r,c))
-					elif (w,z,r,c) not in sparse and count in [3]:
-						new_sparse.add((w,z,r,c))
+	for w,z,r,c in itertools.product(
+		range(min(ws)-1, 1+1+max(ws)),
+		range(min(zs)-1, 1+1+max(zs)),
+		range(min(rs)-1, 1+1+max(rs)),
+		range(min(cs)-1, 1+1+max(cs))):
+		count = count_neighbours(sparse, w,z,r,c)
+		if (w,z,r,c) in sparse and count in [2,3]:
+			new_sparse.add((w,z,r,c))
+		elif (w,z,r,c) not in sparse and count in [3]:
+			new_sparse.add((w,z,r,c))
 	return new_sparse
 
-# Part 1 - Forgot to count outside of grid, didn't use sparse data set
-# 
+# Part 1 - Forgot to count outside of grid
+# Part 2 - Didn't use sparse data set (always would've helped in part 1)
 if __name__ == '__main__':
 	lines = [line.strip() for line in fileinput.input()]
 	print('Lines: {}'.format(len(lines)))
@@ -69,20 +70,6 @@ if __name__ == '__main__':
 
 	print(sparse)
 	print(list(zip(*sparse)))
-
-	# print_grid(sparse)
-	# print_grid(change_states(sparse))
-	# exit()
-	# print(count_all(grid))
-
-	# grid = increase_size(grid)
-	# print(grid)
-	# print_grid(grid)
-
-	# grid = increase_size(grid)
-	# print(grid)
-	# print_grid(grid)
-	# exit()
 
 	for i in range(6):
 		print('After {} cycles:'.format(i))
