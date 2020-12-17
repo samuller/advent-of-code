@@ -5,15 +5,16 @@ from copy import deepcopy
 # from lib import *
 
 
-def count_neighbours(sparse, z,r,c):
+def count_neighbours(sparse, w,z,r,c):
 	count = 0
-	for dz in [-1,0,1]:
-		for dr in [-1,0,1]:
-			for dc in [-1,0,1]:
-				if (dz, dr, dc) == (0,0,0):
-					continue
-				if (z+dz,r+dr,c+dc) in sparse:
-					count += 1
+	for dw in [-1,0,1]:
+		for dz in [-1,0,1]:
+			for dr in [-1,0,1]:
+				for dc in [-1,0,1]:
+					if (dw, dz, dr, dc) == (0,0,0,0):
+						continue
+					if (w+dw,z+dz,r+dr,c+dc) in sparse:
+						count += 1
 	return count
 
 
@@ -22,32 +23,34 @@ def count_all(sparse):
 
 
 def print_grid(sparse, debug=False):
-	zs, rs, cs = list(zip(*sparse))
-	for z in range(min(zs), 1+max(zs)):
-		print('z =',z)
-		for r in range(min(rs), 1+max(rs)):
-			for c in range(min(cs), 1+max(cs)):
-				if debug:
-					print(count_neighbours(sparse,z,r,c),end='')
-					continue
-				if (z,r,c) in sparse:
-					print('#',end='')
-				else:
-					print('.',end='')					
-			print()
+	ws, zs, rs, cs = list(zip(*sparse))
+	for w in range(min(ws), 1+max(ws)):
+		for z in range(min(zs), 1+max(zs)):
+			print('z =',z,'w=',w)
+			for r in range(min(rs), 1+max(rs)):
+				for c in range(min(cs), 1+max(cs)):
+					if debug:
+						print(count_neighbours(sparse,w,z,r,c),end='')
+						continue
+					if (w,z,r,c) in sparse:
+						print('#',end='')
+					else:
+						print('.',end='')					
+				print()
 
 
 def change_states(sparse):
 	new_sparse = set()
-	zs, rs, cs = list(zip(*sparse))
-	for z in range(min(zs)-1, 2+max(zs)):
-		for r in range(min(rs)-1, 2+max(rs)):
-			for c in range(min(cs)-1, 2+max(cs)):
-				count = count_neighbours(sparse, z,r,c)
-				if (z,r,c) in sparse and count in [2,3]:
-					new_sparse.add((z,r,c))
-				elif (z,r,c) not in sparse and count in [3]:
-					new_sparse.add((z,r,c))
+	ws, zs, rs, cs = list(zip(*sparse))
+	for w in range(min(ws)-1, 2+max(ws)):
+		for z in range(min(zs)-1, 2+max(zs)):
+			for r in range(min(rs)-1, 2+max(rs)):
+				for c in range(min(cs)-1, 2+max(cs)):
+					count = count_neighbours(sparse, w,z,r,c)
+					if (w,z,r,c) in sparse and count in [2,3]:
+						new_sparse.add((w,z,r,c))
+					elif (w,z,r,c) not in sparse and count in [3]:
+						new_sparse.add((w,z,r,c))
 	return new_sparse
 
 # Part 1 - Forgot to count outside of grid, didn't use sparse data set
@@ -62,7 +65,7 @@ if __name__ == '__main__':
 	for r in range(dim):
 		for c in range(dim):
 			if tmp_grid[r][c] == '#':
-				sparse.add((0,r,c))
+				sparse.add((0,0,r,c))
 
 	print(sparse)
 	print(list(zip(*sparse)))
