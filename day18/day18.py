@@ -6,10 +6,6 @@ import re
 def calc_op(op_str):
 	assert re.match(r'^\d+ [+*\-] \d+$', op_str) is not None, op_str
 	return eval(op_str)
-	# for s in symbols:
-	# 	if 
-	# for i, c in enumerate(input):
-	# 	if c in '0123456789':
 
 
 def calc_str(op_str):
@@ -27,32 +23,34 @@ def calc_str(op_str):
 	return result
 
 
-def parse_and_replace(rg, input, remove_brackets=False,
-	replace_with=calc_str):
-	look = re.search(rg, input)
+def parse_and_replace(pattern, input, replace_with=calc_str):
+	"""
+	Find string matching regex pattern and then replace it
+	(or the first capture group) with the value returned by
+	replace_with() which is given the matching string as input.
+	"""
+	look = re.search(pattern, input)
 	while look is not None: # :=
-		# print(input)
 		span = look.span()
-		substr = look.group()
-		# print(substr, span)
-		if remove_brackets:
-			substr = substr[1:-1]
-		result = replace_with(substr)
-		input = input[:span[0]] + '{}'.format(result) + input[span[1]:]
+		substr = look.group(0)
+		if len(look.groups()) >= 1:
+			substr = look.group(1)
+		# print(substr)
+		input = input[:span[0]] + '{}'.format(replace_with(substr)) + input[span[1]:]
 		# print(input)
-		look = re.search(rg, input)
+		look = re.search(pattern, input)
 	return input
 
 
 def parse_and_calc(input):
 	# Recursively process parentheses
-	input = parse_and_replace(r'\([^()]+\)', input, True)
+	# while re.search(pattern, input)
+
+	input = parse_and_replace(r'\(([^()]+)\)', input)
 	# print(input)
 	# input = parse_and_replace(r'\d+ [+*\-] \d+', input, False)
 	input = calc_str(input)
 	return int(input)
-
-
 
 
 if __name__ == '__main__':
