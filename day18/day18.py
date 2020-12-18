@@ -5,13 +5,13 @@ import re
 
 def calc_op(op_str):
 	assert re.match(r'^\d+ [+*\-] \d+$', op_str) is not None, op_str
-	return eval(op_str)
+	return str(eval(op_str))
 
 
 def calc_str(op_str):
 	# Enable for part 2
-	op_str = parse_and_replace(r'\d+ \+ \d+', op_str, replace_with=calc_op)
-	op_str = parse_and_replace(r'\d+ \* \d+', op_str, replace_with=calc_op)
+	op_str = subrec(r'\d+ \+ \d+', lambda m: calc_op(m.group(0)), op_str)
+	op_str = subrec(r'\d+ \* \d+', lambda m: calc_op(m.group(0)), op_str)
 	# Part 1
 	symbols = op_str.split(' ')
 	assert len(symbols) % 2 == 1
@@ -23,30 +23,18 @@ def calc_str(op_str):
 	return result
 
 
-def parse_and_replace(pattern, input, replace_with=calc_str):
-	"""
-	Find string matching regex pattern and then replace it
-	(or the first capture group) with the value returned by
-	replace_with() which is given the matching string as input.
-	"""
-	look = re.search(pattern, input)
-	while look is not None: # :=
-		span = look.span()
-		substr = look.group(0)
-		if len(look.groups()) >= 1:
-			substr = look.group(1)
-		# print(substr)
-		input = input[:span[0]] + '{}'.format(replace_with(substr)) + input[span[1]:]
-		# print(input)
-		look = re.search(pattern, input)
-	return input
+def subrec(pattern, repl, string):
+	"""Substitute recursively"""
+	string, subs = re.subn(pattern, repl, string)
+	while subs != 0:
+		string, subs = re.subn(pattern, repl, string)
+	return string
 
 
 def parse_and_calc(input):
 	# Recursively process parentheses
-	# while re.search(pattern, input)
+	input = subrec(r'\(([^()]+)\)', lambda m: calc_str(m.group(1)), input)
 
-	input = parse_and_replace(r'\(([^()]+)\)', input)
 	# print(input)
 	# input = parse_and_replace(r'\d+ [+*\-] \d+', input, False)
 	input = calc_str(input)
