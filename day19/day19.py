@@ -57,7 +57,11 @@ def replace_literals(specs):
 		lit_key, lit_val = find_literal(specs)
 		lit_val = lit_val.replace('"', '')
 		for key in specs.keys():
-			specs[key] = specs[key].replace(str(lit_key), lit_val)
+			symbols = specs[key].split(' ')
+			if str(lit_key) in symbols:
+				idx = symbols.index(str(lit_key))
+				symbols[idx] = lit_val
+				specs[key] = ' '.join(symbols)
 		# Remove/ignore literal
 		specs[lit_key] = ''
 	return specs
