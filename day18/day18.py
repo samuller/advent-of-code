@@ -4,15 +4,22 @@ import re
 
 
 def calc_op(op_str):
+	"""Perform actual operation without using str(eval(op_str))"""
 	assert re.match(r'^\d+ [+*\-] \d+$', op_str) is not None, op_str
-	return str(eval(op_str))
+	val1, op, val2 = op_str.split(' ')
+	val1, val2 = int(val1), int(val2)
+	if op == '*':
+		return str(val1*val2)
+	if op == '+':
+		return str(val1+val2)
+	return None
 
 
 def calc_boam(op_str):
 	# Part 2 - brackets-of-addition-multiplication (not BODMAS)
 	op_str = subrec(r'\d+ \+ \d+', lambda m: calc_op(m.group(0)), op_str)
 	op_str = subrec(r'\d+ \* \d+', lambda m: calc_op(m.group(0)), op_str)
-	return str(eval(op_str))
+	return op_str
 
 
 def calc_bo(op_str):
