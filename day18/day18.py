@@ -12,22 +12,19 @@ def calc_str(op_str):
 	# Enable for part 2
 	op_str = subrec(r'\d+ \+ \d+', lambda m: calc_op(m.group(0)), op_str)
 	op_str = subrec(r'\d+ \* \d+', lambda m: calc_op(m.group(0)), op_str)
+	# return str(eval(op_str))
 	# Part 1
-	symbols = op_str.split(' ')
-	assert len(symbols) % 2 == 1
-	result = symbols[0]
-	for i in range(1,len(symbols), 2):
-		to_calc = '{} '.format(result) + ' '.join(symbols[i:1+i+1])
-		result = calc_op(to_calc)
-		# print(to_calc)
-	return result
+	# We count=1 so that we successively replace the first value from the left
+	# (otherwise all non-overlapping matches are handled simultaneously)
+	op_str = subrec(r'\d+ [*+] \d+', lambda m: calc_op(m.group(0)), op_str, count=1)
+	return op_str
 
 
-def subrec(pattern, repl, string):
+def subrec(pattern, repl, string, count=0):
 	"""Substitute recursively"""
-	string, subs = re.subn(pattern, repl, string)
+	string, subs = re.subn(pattern, repl, string, count)
 	while subs != 0:
-		string, subs = re.subn(pattern, repl, string)
+		string, subs = re.subn(pattern, repl, string, count)
 	return string
 
 
