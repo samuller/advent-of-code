@@ -26,18 +26,18 @@ def matches_rec(specs, input, root_spec): #spec_key='0'):
 			chars_matching = matches_rec(specs, input, specs[symbols[0]])
 			longest_match = max(longest_match, chars_matching)
 			continue
-		assert len(symbols) == 2, symbols
-		sym1, sym2 = symbols
 
-		n = matches_rec(specs, input, specs[sym1])
-		chars_matching = n
-		if n == 0:
-			continue
-		# Else continue to symbol 2
-		n2 = matches_rec(specs, input[n:], specs[sym2])
-		chars_matching += n2
-		# if chars_matching == len(input):
-		# 	return chars_matching
+		chars_matching = 0
+		for sym in symbols:
+			n = matches_rec(specs, input[chars_matching:], specs[sym])
+			chars_matching += n
+			# Make sure something matches (not sure if needed and wouldn't generalise
+			# to specs with dead-ends)
+			if n == 0:
+				break
+		# Small optimization
+		if chars_matching == len(input):
+			return chars_matching
 
 		longest_match = max(longest_match, chars_matching)
 
