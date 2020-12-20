@@ -35,7 +35,7 @@ def match_sides(side_idx, tblr_sides, other_tblr_sides):
 	
 	if rev_side in other_tblr_sides:
 		idx = other_tblr_sides.index(rev_side)
-		return 'flip-' + side_key[side_idx] + '-' + side_key[idx]
+		return side_key[side_idx] + '-' + side_key[idx] + '-flip'
 	return None
 
 
@@ -122,6 +122,8 @@ def find_pairings(tiles):
 			if match:
 				# print(tile_key1, tile_key2, match)
 				pairings[(tile_key1, tile_key2)] = match
+				set_match = set(match.split('-')[0:2])
+				# assert set_match.issubset({'bottom', 'top'}) or set_match.issubset({'left', 'right'}), match
 	return pairings
 
 
@@ -160,16 +162,54 @@ def print_dict(dic):
 	print()
 
 
+def rotation_required(curr_side, new_side):
+	sides = ['top', 'right', 'bottom', 'left']
+	curr_idx = sides.index(curr_side)
+	new_idx = sides.index(new_side)
+	if curr_idx == new_idx:
+		return 0
+	if curr_idx > new_idx:
+		return 360 + (new_idx - curr_idx)*90
+	return (new_idx - curr_idx)*90
+assert rotation_required('top', 'bottom') == 180, rotation_required('top', 'bottom')
+assert rotation_required('bottom', 'top') == 180, rotation_required('bottom', 'top')
+assert rotation_required('left', 'right') == 180, rotation_required('left', 'right')
+assert rotation_required('right', 'left') == 180, rotation_required('right', 'left')
+assert rotation_required('left', 'top') == 90, rotation_required('left', 'top')
+assert rotation_required('top', 'left') == 270, rotation_required('top', 'left')
+assert rotation_required('right', 'bottom') == 90, rotation_required('right', 'bottom')
+assert rotation_required('bottom', 'right') == 270, rotation_required('bottom', 'right')
+
+
 def get_orientation(pairings, tile, friend, friend_pos):
-	rotate = 0
-	flip = 0
+	our_key = sorted([tile, friend])
+	pos_key = {
+		(-1, 0): 'top',
+		( 1, 0): 'bottom',
+		( 0,-1): 'left',
+		( 0, 1): 'right'
+	}
+	friend_side = pos_key[tuple(friend_pos)]
+
+	rotate = 0  # 0, 90, 180, 270
+	flip = False  # True for vertical/left-right (horizontal vs vertical affects rotation)
 	for key, match in pairings.items():
-		t1, t2 = key
-		if (tile, friend) == key:
-			print(tile, friend, match)
-		elif (friend, tile) == key:
-			print(tile, friend, match)
-	# print(pairings)
+		match = match.split('-')
+		if our_key == list(key):
+			main_side = match[key.index(tile)]
+			rotate = rotation_required(main_side, friend_side)
+			if len(match) == 3 and match[2] == 'flip':
+				flip = True
+				# Rotate 180 if flip is horizontal instead of vertical
+				rotate = (rotate+180) % 360 if main_side in ['left', 'right'] else rotate
+				# Assumes correct rotations
+				#'horz' if match[0] in ['left', 'right'] else 'vert'
+			print(tile, friend, friend_side, key.index(tile), match, (rotate, flip))
+			return (rotate, flip)
+		elif our_key == list(reversed(key)):
+			print(tile, friend, 'opposite ' + match)
+			# TODO: oppposite order
+			return (rotate, flip)
 	return (rotate, flip)
 
 
@@ -190,7 +230,7 @@ def get_full_tiling(tiles, pairings):
 	corners = get_corners(pairings)
 	name = corners[0]
 	tiling[0][0] = corners[0]
-	tile_orientation = {}
+	used = set([corners[0]])
 	iterations = 0
 	while count_missing_tiles(tiling) != 0:
 		for r,c in itertools.product(range(side_len), range(side_len)):
@@ -198,23 +238,45 @@ def get_full_tiling(tiles, pairings):
 			if cell is None:
 				continue
 			friends = list(neighbours[cell])
+			# Drop tiles that have already been placed
+			for s in used:
+				if s in friends:
+					friends.remove(s)
 			for dr,dc in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
+				if len(friends) == 0:
+					break
 				if not 0 <= r+dr < side_len or not 0 <= c+dc < side_len:
 					continue
 				if tiling[r+dr][c+dc] is None:
 					friend = friends.pop()
-					tile_orientation[friend] = get_orientation(pairings, cell, friend, (dr,dc))
 					tiling[r+dr][c+dc] = friend
-				if len(friends) == 0:
-					break
+					used.add(friend)
 		iterations += 1
-		# print(tiling)
-		# if iterations == 2:
-		# 	exit()
+		# TODO: backtracking
+		print(tiling)
+		if iterations == 2:
+			exit()
+			break
 
 	print('Tiling:')
 	for line in tiling:
 		print('   '.join([str(l) for l in line]))
+
+	tile_orientation = {}
+	for r,c in itertools.product(range(side_len), range(side_len)):
+		cell = tiling[r][c]
+		for dr,dc in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
+			if not 0 <= r+dr < side_len or not 0 <= c+dc < side_len:
+					continue
+			friend = tiling[r+dr][c+dc]
+			orient = get_orientation(pairings, cell, friend, (dr,dc))
+			if cell in tile_orientation:
+				assert tile_orientation[cell] == orient, '{} != {}'.format(
+					tile_orientation[cell], orient
+				)
+			else:
+				tile_orientation[cell] = orient
+
 	return tiling, tile_orientation
 
 
@@ -311,7 +373,7 @@ if __name__ == '__main__':
 	# exit()
 
 	pairings = find_pairings(tiles)
-	# print(pairings)
+	print_dict(pairings)
 	# assert len(pairings) == 12
 	corners = get_corners(pairings)
 	print(corners)
