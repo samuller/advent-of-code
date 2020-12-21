@@ -13,10 +13,14 @@ def function(input):
 	return False
 
 
-if __name__ == '__main__':
+def main():
 	lines = [line.strip() for line in fileinput.input()]
 	print('Lines: {}'.format(len(lines)))
 
 	count_valid = 0
 	for line in lines:
 		fields = line.split(' ')
+
+
+if __name__ == '__main__':
+	main()
