@@ -162,12 +162,6 @@ def empty_tiling(side_len):
 	return [[None for _ in range(side_len)] for _ in range(side_len)]
 
 
-def print_dict(dic):
-	for key in sorted(dic.keys()):
-		print(key, dic[key])
-	print()
-
-
 def rotation_required(curr_side, new_side):
 	sides = ['top', 'right', 'bottom', 'left']
 	curr_idx = sides.index(curr_side)

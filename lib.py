@@ -23,6 +23,12 @@ def grouped(lines):
 		yield group
 
 
+def print_dict(dic):
+	for key in sorted(dic.keys()):
+		print(key, dic[key])
+	print()
+
+
 def prod(iterable):
 	# operator.mul
     return functools.reduce(lambda a,b,: a*b, iterable, 1)
