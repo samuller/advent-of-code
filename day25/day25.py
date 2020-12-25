@@ -4,6 +4,8 @@ from collections import defaultdict
 
 
 def transform(subject_num, loop_size, start_loop=0, start_value=1):
+	# return pow(subject_num, loop_size, 20201227)
+	# return pow(subject_num, loop_size) % 20201227
 	value = start_value
 	for _ in range(start_loop, loop_size):
 		value = value * subject_num
@@ -15,8 +17,8 @@ def find_transform(subject_num, result_num):
 	trans = 1
 	loop = 1
 	while True:
-		if loop % 10_000_000 == 0:
-			print('Progress... {}'.format(loop))
+		# if loop % 10_000_000 == 0:
+		# 	print('Progress... {}'.format(loop))
 		trans = transform(subject_num, loop, start_loop=loop-1, start_value=trans)
 		if trans == result_num:
 			return loop
@@ -26,9 +28,6 @@ def find_transform(subject_num, result_num):
 
 def main():
 	lines = [line.strip() for line in fileinput.input()]
-
-	# card_pub = transform(7)
-	# door_pub = transform(7)
 
 	# # Test
 	# card_pub = 5764801
@@ -46,14 +45,15 @@ def main():
 	card_pub = int(lines[0]) # 15628416
 	door_pub = int(lines[1]) # 11161639
 
-	card_loops = find_transform(7, card_pub)
 	door_loops = find_transform(7, door_pub)
-	print(card_loops, door_loops)
-
 	card_enc_key = transform(card_pub, door_loops)
+	# Print answer early
+	print(card_enc_key)
+	# Do confirmation steps later
+	card_loops = find_transform(7, card_pub)
 	door_enc_key = transform(door_pub, card_loops)
 	assert card_enc_key == door_enc_key, '{} != {}'.format(card_enc_key, door_enc_key)
-	print(card_enc_key)
+	print('Confirmed:',card_loops, door_loops)
 
 
 if __name__ == '__main__':
