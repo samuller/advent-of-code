@@ -39,7 +39,7 @@ def subrec(pattern, repl, string, count=0):
 
 
 def parse_and_calc(input, parse_func=calc_bo):
-	# Recursively process parentheses
+	# Recursively process parentheses first
 	input = subrec(r'\(([^()]+)\)', lambda m: parse_func(m.group(1)), input)
 	input = parse_func(input)
 	return int(input)

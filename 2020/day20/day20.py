@@ -336,6 +336,7 @@ def get_full_tiling(tiles, pairings):
 				print_tile(tiling)
 				assert len(curr_perm) == 0, curr_perm
 				# Check validity of placement order for all rotations & flips
+				# TODO: also consider neighbour count and valid positions
 				assert len(list(itertools.product([0, 90, 180, 270], [False, True]))) == 8
 				for rot, flip in itertools.product([0, 90, 180, 270], [False, True]):
 					orient = (rot, flip)
@@ -358,6 +359,7 @@ def get_full_tiling(tiles, pairings):
 						# print('   ASUCCESCS')
 						break
 				# If no valid orientation found, roll-back and try next permutation
+				# TODO: back-tracking necessary?
 				if cell not in tile_orientation:
 					tiling = backup_tiling
 					used = get_used(tiling)
