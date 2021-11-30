@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import fileinput
-# import sys; sys.path.append("..")
+# import sys; sys.path.append("../..")
 # from lib import *
 
 
