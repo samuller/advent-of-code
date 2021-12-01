@@ -1,6 +1,6 @@
-# Advent of Code 2020
+# Advent of Code
 
-My attempts and solutions for Advent of Code 2020. These are often refactored and cleaned up a bit, but I'll usually make a commit of my much messier code directly after I've solved the problem.
+My attempts and solutions for Advent of Code 2020 & 2021. These are often refactored and cleaned up a bit, but I'll usually make a commit of my much messier code directly after I've solved the problem.
 
 Setup:
 
