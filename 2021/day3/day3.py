@@ -18,7 +18,14 @@ def keep_only_with_val(report, val, idx):
             new_report.append(line)
     return new_report
 
-# def transpose1
+def transpose(report):
+    if len(report) == 0:
+        return []
+    transpose = ['' for _ in range(len(report[0]))]
+    for line in report:
+        for idx, char in enumerate(line):
+            transpose[idx] += char
+    return transpose
 
 
 def main():
@@ -27,18 +34,14 @@ def main():
 
     gamma = 0
     epsilon = 0
-    transpose = ['' for _ in range(len(report[0]))]
-    # print(transpose)
-    for line in report:
-        for idx, char in enumerate(line):
-            transpose[idx] += char
+    trans = transpose(report)
     # print(report)
-    # print(transpose)
+    # print(trans)
 
     # Part 1
     gamma_bin = ''
     epsilon_bin = ''
-    for line in transpose:
+    for line in trans:
         cnt = Counter(line)
         if cnt['1'] > cnt['0']:
             gamma_bin += '1'
@@ -48,27 +51,31 @@ def main():
             epsilon_bin += '1'
     # Part 2
     ox_report = report
-    co2_report = report
     final_ox_report = ox_report
-    final_co2_report = co2_report
     for idx in range(len(report[0])):
-        cnt = Counter(transpose[idx])
+        trans = transpose(ox_report)
+        cnt = Counter(trans[idx])
         print(cnt)
-        if cnt['1'] > cnt['0']:
+        if cnt['1'] >= cnt['0']:
             ox_report = keep_only_with_val(ox_report, '1', idx)
         else:
             ox_report = keep_only_with_val(ox_report, '0', idx)
+        if len(ox_report) == 1:
+            final_ox_report = ox_report
+            break
 
-        cnt = Counter(transpose[idx])
-        if cnt['1'] > cnt['0']:
+    co2_report = report
+    final_co2_report = co2_report
+    for idx in range(len(report[0])):
+        trans = transpose(co2_report)
+        cnt = Counter(trans[idx])
+        if cnt['1'] >= cnt['0']:
             co2_report = keep_only_with_val(co2_report, '0', idx)
         else:
             co2_report = keep_only_with_val(co2_report, '1', idx)
-
-        if len(ox_report) == 1:
-            final_ox_report = ox_report
         if len(co2_report) == 1:
             final_co2_report = co2_report
+            break
 
     print(final_ox_report)
     assert len(final_ox_report) == 1
