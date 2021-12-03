@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 import fileinput
 from collections import Counter
-# import sys; sys.path.append("../..")
-# from lib import *
-
-
-class Classy:
-    def __init__(self):
-        pass
 
 
 def keep_only_with_val(report, val, idx):
@@ -18,82 +11,58 @@ def keep_only_with_val(report, val, idx):
             new_report.append(line)
     return new_report
 
-def transpose(report):
-    if len(report) == 0:
-        return []
-    transpose = ['' for _ in range(len(report[0]))]
+
+def bit_criteria_filter(report, prefer_common_bits= True):
+    major_bit = '0'
+    minor_bit = '1'
+    if prefer_common_bits:
+        major_bit = '1'
+        minor_bit = '0'        
+
+    new_report = report
+    for idx in range(len(report[0])):
+        one_counts = count_ones(new_report)
+        if one_counts[idx] >= (len(new_report)/2):
+            new_report = keep_only_with_val(new_report, major_bit, idx)
+        else:
+            new_report = keep_only_with_val(new_report, minor_bit, idx)
+        if len(new_report) == 1:
+            break
+    return new_report
+
+
+def count_ones(report):
+    one_counts = [0]*len(report[0])
     for line in report:
         for idx, char in enumerate(line):
-            transpose[idx] += char
-    return transpose
+            if char == '1':
+                one_counts[idx] += 1
+    return one_counts
 
 
 def main():
     report = [line.strip() for line in fileinput.input()]
     print('Lines: {}'.format(len(report)))
 
-    gamma = 0
-    epsilon = 0
-    trans = transpose(report)
-    # print(report)
-    # print(trans)
-
     # Part 1
-    gamma_bin = ''
-    epsilon_bin = ''
-    for line in trans:
-        cnt = Counter(line)
-        if cnt['1'] > cnt['0']:
-            gamma_bin += '1'
-            epsilon_bin += '0'
-        else:
-            gamma_bin += '0'
-            epsilon_bin += '1'
-    # Part 2
-    ox_report = report
-    final_ox_report = ox_report
-    for idx in range(len(report[0])):
-        trans = transpose(ox_report)
-        cnt = Counter(trans[idx])
-        print(cnt)
-        if cnt['1'] >= cnt['0']:
-            ox_report = keep_only_with_val(ox_report, '1', idx)
-        else:
-            ox_report = keep_only_with_val(ox_report, '0', idx)
-        if len(ox_report) == 1:
-            final_ox_report = ox_report
-            break
-
-    co2_report = report
-    final_co2_report = co2_report
-    for idx in range(len(report[0])):
-        trans = transpose(co2_report)
-        cnt = Counter(trans[idx])
-        if cnt['1'] >= cnt['0']:
-            co2_report = keep_only_with_val(co2_report, '0', idx)
-        else:
-            co2_report = keep_only_with_val(co2_report, '1', idx)
-        if len(co2_report) == 1:
-            final_co2_report = co2_report
-            break
-
-    print(final_ox_report)
-    assert len(final_ox_report) == 1
-    print(final_co2_report)
-    assert len(final_co2_report) == 1
-    oxy = int(final_ox_report[0], 2)
-    co2 = int(final_co2_report[0], 2)
-
-    print(gamma_bin)
-    print(epsilon_bin)
+    one_counts = count_ones(report)
+    common_vals = ['1' if o > (len(report)/2) else '0' for o in one_counts]
+    # gamma & epsilon are inverses...
+    gamma_bin = ''.join(common_vals)
+    epsilon_bin = gamma_bin.replace('0','_').replace('1','0').replace('_','1')
     gamma = int(gamma_bin, 2)
     epsilon = int(epsilon_bin, 2)
+    print('Part 1:', gamma * epsilon)
 
-    print(gamma, epsilon)
-    print(gamma * epsilon)
-
-    print(oxy, co2)
-    print(oxy * co2)
+    # Part 2
+    oxy_report = bit_criteria_filter(report, True)
+    co2_report = bit_criteria_filter(report, False)
+    assert len(oxy_report) == 1
+    assert len(co2_report) == 1
+    oxy = int(oxy_report[0], 2)
+    co2 = int(co2_report[0], 2)
+    print('Part 2:', oxy, co2)
+    print('Part 2:', oxy * co2)
 
 
 if __name__ == '__main__':
