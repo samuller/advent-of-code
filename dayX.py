@@ -15,7 +15,7 @@ def function(input):
 
 def main():
     lines = [line.strip() for line in fileinput.input()]
-    print('Lines: {}'.format(len(lines)))
+    print(f'Lines: {len(lines)}')
 
     count_valid = 0
     for line in lines:
