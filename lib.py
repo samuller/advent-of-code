@@ -4,6 +4,19 @@ import functools
 import numbers
 # from copy import deepcopy
 
+"""
+Commonly used functions from 2020:
+
+from fileinput import input
+from itertools import combinations, permutations, product, islice
+from functools import reduce
+from collections import Counter, defaultdict, deque
+from re import match, subn, findall
+from copy import deepcopy
+from numpy import array, count_nonzero
+from math import sqrt, pow, radians, sin, cos, tan
+"""
+
 
 def grouped(lines):
     """Separate list of lines into groups of consecutive non-empty lines.
