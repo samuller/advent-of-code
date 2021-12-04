@@ -1,7 +1,24 @@
 #!/usr/bin/env python3
 import fileinput
 import sys; sys.path.append("../..")
-from lib import grouped
+from lib import grouped, ANSIColor
+
+
+def print_boards(boards, markers=None, highlight=None):
+    width = 2 # if markers is None else 4
+    for board_idx, board in enumerate(boards):
+        for row_idx, row in enumerate(board):
+            for col_idx, val in enumerate(row):
+                if highlight is not None and highlight(board_idx, row_idx, col_idx):
+                    print(f'{ANSIColor.YELLOW}{val:>{width}}{ANSIColor.END} ', end='')
+                elif markers is not None and (board_idx, row_idx, col_idx) in markers:
+                    # box = f'[{val}]'
+                    # print(f'{box:>{width}} ', end='')
+                    print(f'{ANSIColor.RED}{val:>{width}}{ANSIColor.END} ', end='')
+                else:
+                    print(f'{val:>{width}} ', end='')
+            print()
+        print()
 
 
 def main():
@@ -11,13 +28,12 @@ def main():
     balls = [int(num) for num in lines[0].split(',')]
     print(balls)
     boards = list(grouped(lines[2:]))
-    print(boards)
     # Convert to numbers
     for board_idx, board in enumerate(boards):
         # Have to pipe input to remove extra spaces, e.g.
         #     cat test.txt | tr -s ' ' | ./day4.py
         boards[board_idx] = [[int(val) for val in row.split(' ')] for row in board]
-    print(boards)
+    print_boards(boards)
 
     markers = []
     bingo_board_idx = None
@@ -26,7 +42,8 @@ def main():
     bingo_boards = set()
     last_new_added = None
     for ball in balls:
-        print(ball)
+        print(f'Pull {ball}')
+        # Mark matching locations
         for board_idx, board in enumerate(boards):
             for row_idx, row in enumerate(board):
                 values = row # [num for num in row.split(' ')]  
@@ -34,6 +51,8 @@ def main():
                     if val == ball:
                         markers.append((board_idx, row_idx, col_idx))
         # print(markers)
+        print_boards(boards, markers)
+        # Find BINGO
         for board_idx, _ in enumerate(boards):
             board_marks = [mark for mark in markers if mark[0] == board_idx]
 
@@ -71,13 +90,14 @@ def main():
             break
 
     print(f'Bingo on {bingo_board_idx}!')
-    print(boards[bingo_board_idx])
     if bingo_row_idx is not None:
-        bingo_markers = [(b,r,c) for (b,r,c) in markers if b == bingo_board_idx and r == bingo_row_idx]
-        print(bingo_markers)
+        # bingo_markers = [(b,r,c) for (b,r,c) in markers if b == bingo_board_idx and r == bingo_row_idx]
+        # print(bingo_markers)
+        print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: r == bingo_row_idx)
     if bingo_col_idx is not None:
-        bingo_markers = [(b,r,c) for (b,r,c) in markers if b == bingo_board_idx and c == bingo_col_idx]
-        print(bingo_markers)
+        # bingo_markers = [(b,r,c) for (b,r,c) in markers if b == bingo_board_idx and c == bingo_col_idx]
+        # print(bingo_markers)
+        print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: c == bingo_col_idx)
 
     summ = 0
     for row in range(5):
