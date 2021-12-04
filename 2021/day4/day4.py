@@ -14,6 +14,8 @@ def main():
     print(boards)
     # Convert to numbers
     for board_idx, board in enumerate(boards):
+        # Have to pipe input to remove extra spaces, e.g.
+        #     cat test.txt | tr -s ' ' | ./day4.py
         boards[board_idx] = [[int(val) for val in row.split(' ')] for row in board]
     print(boards)
 
