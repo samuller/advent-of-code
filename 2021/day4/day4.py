@@ -2,6 +2,19 @@
 import fileinput
 import sys; sys.path.append("../..")
 from lib import grouped, ANSIColor
+from collections import namedtuple
+
+
+BOARD_SIZE = 5
+BingoMatch = namedtuple('BingoMatch', ['board_idx', 'row_matches', 'col_matches'])
+
+
+def parse_boards(lines):
+    boards = list(grouped(lines))
+    for board_idx, board in enumerate(boards):
+        # Convert to numbers
+        boards[board_idx] = [[int(val) for val in row.split(' ') if val != ''] for row in board]
+    return boards
 
 
 def print_boards(boards, markers=None, highlight=None):
@@ -21,91 +34,103 @@ def print_boards(boards, markers=None, highlight=None):
         print()
 
 
+def find_bingos(boards, markers):
+    bingo_matches = []
+    for board_idx, _ in enumerate(boards):
+        # Count matches per column
+        col_matches = []
+        for col in range(BOARD_SIZE):
+            row_set = set([r for (b,r,c) in markers if b == board_idx and c == col])
+            col_matches.append(len(row_set))
+        # Count matches per row
+        row_matches = []
+        for row in range(BOARD_SIZE):
+            col_set = set([c for (b,r,c) in markers if b == board_idx and r == row])
+            row_matches.append(len(col_set))
+
+        if BOARD_SIZE in row_matches or BOARD_SIZE in col_matches:
+            bingo_matches.append(BingoMatch(board_idx, row_matches, col_matches))
+    return bingo_matches
+
+
+def mark_locations(boards, ball):
+    latest_markers = []
+    for board_idx, board in enumerate(boards):
+        for row_idx, row in enumerate(board):
+            for col_idx, val in enumerate(row):
+                if val == ball:
+                    latest_markers.append((board_idx, row_idx, col_idx))
+    # print(markers)
+    # print_boards(boards, markers)
+    return latest_markers
+
+
+def sum_unmarked(boards, winning_board_idx, markers):
+    summ = 0
+    for row in range(BOARD_SIZE):
+        for col in range(BOARD_SIZE):
+            if (winning_board_idx, row, col) in markers:
+                continue
+            summ += boards[winning_board_idx][row][col]
+            # print(boards[winning_board_idx][row][col])
+    return summ
+
+
+def print_winner(boards, markers, winning_board_match):
+    bingo_board_idx = winning_board_match.board_idx
+    print(f'Bingo on board {bingo_board_idx+1}!')
+    if BOARD_SIZE in winning_board_match.row_matches:
+        bingo_row_idx = winning_board_match.row_matches.index(BOARD_SIZE)
+        print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: r == bingo_row_idx)
+    if BOARD_SIZE in winning_board_match.col_matches:
+        bingo_col_idx = winning_board_match.col_matches.index(BOARD_SIZE)
+        print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: c == bingo_col_idx)
+
+
 def main():
     lines = [line.strip() for line in fileinput.input()]
     print(f'Lines: {len(lines)}')
 
     balls = [int(num) for num in lines[0].split(',')]
     print(balls)
-    boards = list(grouped(lines[2:]))
-    # Convert to numbers
-    for board_idx, board in enumerate(boards):
-        # Have to pipe input to remove extra spaces, e.g.
-        #     cat test.txt | tr -s ' ' | ./day4.py
-        boards[board_idx] = [[int(val) for val in row.split(' ')] for row in board]
+    boards = parse_boards(lines[2:])
     print_boards(boards)
 
     markers = []
-    bingo_board_idx = None
-    bingo_row_idx = None
-    bingo_col_idx = None
-    bingo_boards = set()
-    last_new_added = None
+    bingo_matches = []
     for ball in balls:
         print(f'Pull {ball}')
         # Mark matching locations
-        for board_idx, board in enumerate(boards):
-            for row_idx, row in enumerate(board):
-                values = row # [num for num in row.split(' ')]  
-                for col_idx, val in enumerate(values):
-                    if val == ball:
-                        markers.append((board_idx, row_idx, col_idx))
-        # print(markers)
-        print_boards(boards, markers)
-        # Find BINGO
-        for board_idx, _ in enumerate(boards):
-            board_marks = [mark for mark in markers if mark[0] == board_idx]
-
-            for col in range(5):
-                row_set = set([r for (b,r,c) in markers if b == board_idx and c == col])
-                if row_set == set(range(5)):
-                    print(f'Col bingo on board {board_idx} & col {col}')
-                    bingo_board_idx = board_idx
-                    bingo_col_idx = col
-                    break
-            
-            for row in range(5):
-                col_set = set([c for (b,r,c) in markers if b == board_idx and r == row])
-                if col_set == set(range(5)):
-                    print(f'Row bingo on board {board_idx} & row {row}')
-                    # print([(b,row,c) for (b,row,c) in markers if b == board_idx])
-                    bingo_board_idx = board_idx
-                    bingo_row_idx = row
-                    break
-
-            # Part 1
-            # if bingo_board_idx is not None:
-            #     break
-            # Part 2
-            if bingo_board_idx is not None:
-                if bingo_board_idx not in bingo_boards:
-                    last_new_added = bingo_board_idx
-                bingo_boards.add(bingo_board_idx)
+        latest_markers = mark_locations(boards, ball)
+        markers.extend(latest_markers)
+        # Find BINGOs (we re-add ALL bingos, not just newest ones)
+        bingo_matches.extend(find_bingos(boards, markers))
+        print(bingo_matches)
         # Part 1
-        # if bingo_board_idx is not None:
-        #     break
-        # Part 2
-        if len(bingo_boards) == len(boards):
-            bingo_board_idx = last_new_added
+        if len(bingo_matches) > 0:
             break
+        # Part 2
+        # uniq_bingo_boards = set([b.board_idx for b in bingo_matches])
+        # if len(uniq_bingo_boards) == len(boards):
+        #     break
 
-    print(f'Bingo on {bingo_board_idx}!')
-    if bingo_row_idx is not None:
-        # bingo_markers = [(b,r,c) for (b,r,c) in markers if b == bingo_board_idx and r == bingo_row_idx]
-        # print(bingo_markers)
-        print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: r == bingo_row_idx)
-    if bingo_col_idx is not None:
-        # bingo_markers = [(b,r,c) for (b,r,c) in markers if b == bingo_board_idx and c == bingo_col_idx]
-        # print(bingo_markers)
-        print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: c == bingo_col_idx)
+    # Part 1
+    winning_board_match = bingo_matches[0]
+    # Part 2
+    # win_boards = [b.board_idx for b in bingo_matches]
+    # last_added = None
+    # last_added_idx = None
+    # for idx, val in enumerate(win_boards):
+    #     if val not in win_boards[:idx]:
+    #         last_added = val
+    #         last_added_idx = idx
+    # print(win_boards, last_added)
+    # winning_board_match = bingo_matches[last_added_idx]
 
-    summ = 0
-    for row in range(5):
-        for col in range(5):
-            if (bingo_board_idx, row, col) in markers:
-                continue
-            summ += boards[bingo_board_idx][row][col]
-            # print(boards[bingo_board_idx][row][col])
+    print_winner(boards, markers, winning_board_match)
+
+    # Sum all unmarked values
+    summ = sum_unmarked(boards, winning_board_match.board_idx, markers)
     print(summ, ball)
     print(summ * ball)
 
