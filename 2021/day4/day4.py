@@ -87,9 +87,25 @@ def print_winner(boards, markers, winning_board_match):
         print_boards([boards[bingo_board_idx]], markers, highlight=lambda b,r,c: c == bingo_col_idx)
 
 
+def get_last_new_value_added(listy):
+    """Returns index of the last new value added.
+    
+    A "new" value is any value that has not been seen earlier in the list.
+    """
+    last_added = None
+    last_added_idx = None
+    for idx, val in enumerate(listy):
+        if val not in listy[:idx]:
+            last_added = val
+            last_added_idx = idx
+    return last_added_idx
+
+
 def main():
     lines = [line.strip() for line in fileinput.input()]
     print(f'Lines: {len(lines)}')
+
+    part1 = True
 
     balls = [int(num) for num in lines[0].split(',')]
     print(balls)
@@ -99,37 +115,35 @@ def main():
     markers = []
     bingo_matches = []
     for ball in balls:
-        print(f'Pull {ball}')
+        print(f'Pull {ANSIColor.BLUE}{ball}{ANSIColor.END}')
         # Mark matching locations
         latest_markers = mark_locations(boards, ball)
         markers.extend(latest_markers)
-        # Find BINGOs (we re-add ALL bingos, not just newest ones)
-        bingo_matches.extend(find_bingos(boards, markers))
-        print(bingo_matches)
-        # Part 1
-        if len(bingo_matches) > 0:
+        # Find BINGOs 
+        all_bingos = find_bingos(boards, markers)
+        if len(all_bingos) > 0:
+            print(*all_bingos, sep='\n')
+        # add bingos to track progress (although we re-add ALL bingos, not just newest ones)
+        bingo_matches.extend(all_bingos)
+        # Part 1 - stop at first win
+        if part1 and len(bingo_matches) > 0:
             break
-        # Part 2
-        # uniq_bingo_boards = set([b.board_idx for b in bingo_matches])
-        # if len(uniq_bingo_boards) == len(boards):
-        #     break
+        # Part 2 - stop once all boards have a win
+        uniq_bingo_boards = set([b.board_idx for b in bingo_matches])
+        if len(uniq_bingo_boards) == len(boards):
+            break
+    print()
 
     # Part 1
     winning_board_match = bingo_matches[0]
     # Part 2
-    # win_boards = [b.board_idx for b in bingo_matches]
-    # last_added = None
-    # last_added_idx = None
-    # for idx, val in enumerate(win_boards):
-    #     if val not in win_boards[:idx]:
-    #         last_added = val
-    #         last_added_idx = idx
-    # print(win_boards, last_added)
-    # winning_board_match = bingo_matches[last_added_idx]
+    if not part1:
+        win_boards = [b.board_idx for b in bingo_matches]
+        last_added_idx = get_last_new_value_added(win_boards)
+        last_added = win_boards[last_added_idx]
+        winning_board_match = bingo_matches[last_added_idx]
 
     print_winner(boards, markers, winning_board_match)
-
-    # Sum all unmarked values
     summ = sum_unmarked(boards, winning_board_match.board_idx, markers)
     print(summ, ball)
     print(summ * ball)
