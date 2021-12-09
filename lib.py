@@ -2,6 +2,8 @@
 # import numpy as np
 import functools
 import numbers
+from typing import List, Set, Tuple
+from collections import defaultdict
 # from copy import deepcopy
 
 """
@@ -27,6 +29,7 @@ class ANSIColor:
    GREEN = '\033[92m'
    YELLOW = '\033[93m'
    RED = '\033[91m'
+   GRAY = '\033[90m'
    BOLD = '\033[1m'
    UNDERLINE = '\033[4m'
    END = '\033[0m'
@@ -175,6 +178,35 @@ class Map2D:
         for row in self.map_data:
             stry += row + '\n'
         return stry
+    
+    def to_str_col(self, locs_per_color: List[Set[Tuple[int,int]]], colors: List[str]):
+        """Print map with some locations having specific colors."""
+        highlights_per_row = defaultdict(list)
+        for idx, locs in enumerate(locs_per_color):
+            color = colors[idx]
+            print(locs)
+            for row, col in locs:
+                highlights_per_row[row].append((col, color))
+        print(highlights_per_row)
+
+        stry = ''
+        for idx, row in enumerate(self.map_data):
+            if idx not in highlights_per_row:
+                stry += row + '\n'
+                continue
+            locs = highlights_per_row[idx]
+
+            new_row = list(row)
+            # Add in reverse order (from end) so starting index doesn't change
+            for col, color in sorted(locs, key=lambda cc: cc[0], reverse=True):
+                curr_value = row[col]
+                # Insert in reverse order as well (since each insert() pushes
+                # values to the end)
+                new_row[col] = ANSIColor.END
+                new_row.insert(col, curr_value)
+                new_row.insert(col, color)
+            stry += ''.join(new_row) + '\n'
+        return stry
 
     def to_str_partial(self, first=3, last=3):
         """Show string with only first and last few rows"""
@@ -188,7 +220,7 @@ class Map2D:
 
     def __str__(self):
         stry = 'Size: {}x{}\n'.format(self.rows, self.cols)    
-        if self.rows <= 10:
+        if self.rows <= 20:
             stry += self.to_str()
         else:
             stry += self.to_str_partial()

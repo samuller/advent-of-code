@@ -33,9 +33,9 @@ def main():
     
     map = Map2D()
     map.load_from_data(lines)
-    count = 0
+    p1 = 0
+    low_points = []
     basins = []
-    # print(map)
     # 513 @ 7:46 (start ~7:30)
     # 1568
     # 508 @ 7:52 (<=)
@@ -52,16 +52,27 @@ def main():
                         is_lowest = False
                     # print(map.get(r+dr, c+dc))
             if is_lowest:
+                low_points.append((r,c))
                 region = measure_basin(map, r,c)
-                basins.append(len(region))
+                basins.append(region)
                 # print(r,c,"=",len(region))
                 risk_level = height+1
                 # print(risk_level)
                 # print(r,c,":", height)
-                count += risk_level
-    print('p1:', count)
-    print('p2:', prod(sorted(basins)[-3:]))
-
+                p1 += risk_level
+    # print(low_points)
+    print('p1:', p1)
+    print('p2:', prod(sorted([len(b) for b in basins])[-3:]))
+    # Remove low points from basins so they can be colored separately
+    for b in basins:
+        for l in low_points:
+            if l in b:
+                b.remove(l)
+    map_str = map.to_str_col(
+        [low_points, *basins],
+        [ANSIColor.RED, *[ANSIColor.GRAY for _ in basins]]
+    )
+    print(map_str)
 
 
 if __name__ == '__main__':
