@@ -70,7 +70,8 @@ def main():
                 b.remove(l)
     map_str = map.to_str_col(
         [low_points, *basins],
-        [ANSIColor.RED, *[ANSIColor.GRAY for _ in basins]]
+        [ANSIColor.RED, *[ANSIColor.GRAY for _ in basins]],
+        replace_chars={'9': '█'}
     )
     print(map_str)
 

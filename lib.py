@@ -2,7 +2,7 @@
 # import numpy as np
 import functools
 import numbers
-from typing import List, Set, Tuple
+from typing import List, Set, Dict, Tuple, Optional
 from collections import defaultdict
 # from copy import deepcopy
 
@@ -179,8 +179,12 @@ class Map2D:
             stry += row + '\n'
         return stry
     
-    def to_str_col(self, locs_per_color: List[Set[Tuple[int,int]]], colors: List[str]):
+    def to_str_col(self, locs_per_color: List[Set[Tuple[int,int]]], colors: List[str],
+                   replace_chars: Optional[Dict[str, str]]=None):
         """Print map with some locations having specific colors."""
+        if replace_chars is None:
+            replace_chars = {}
+
         highlights_per_row = defaultdict(list)
         for idx, locs in enumerate(locs_per_color):
             color = colors[idx]
@@ -191,15 +195,17 @@ class Map2D:
 
         stry = ''
         for idx, row in enumerate(self.map_data):
-            if idx not in highlights_per_row:
-                stry += row + '\n'
-                continue
+            # if idx not in highlights_per_row:
+            #     stry += row + '\n'
+            #     continue
             locs = highlights_per_row[idx]
 
-            new_row = list(row)
+            new_row = list([replace_chars[r] if r in replace_chars else r for r in row])
             # Add in reverse order (from end) so starting index doesn't change
             for col, color in sorted(locs, key=lambda cc: cc[0], reverse=True):
                 curr_value = row[col]
+                if curr_value in replace_chars:
+                    curr_value = replace_chars[curr_value]
                 # Insert in reverse order as well (since each insert() pushes
                 # values to the end)
                 new_row[col] = ANSIColor.END
