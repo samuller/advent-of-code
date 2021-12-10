@@ -71,7 +71,18 @@ def main():
     map_str = map.to_str_col(
         [low_points, *basins],
         [ANSIColor.RED, *[ANSIColor.DARKCYAN for _ in basins]],
-        replace_chars={'9': '█'}
+        replace_chars={
+            '9': '█',
+            '8': '▓',
+            '7': '▓',
+            '6': '▒',
+            '5': '▒',
+            '4': '▒',
+            '3': '░',
+            '2': '░',
+            '1': '░',
+            '0': '.',
+        }
     )
     print(map_str)
 
