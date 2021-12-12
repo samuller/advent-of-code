@@ -22,6 +22,9 @@ def str_map(int_map):
     return '\n'.join([''.join([str(n) for n in row]) for row in int_map])
 
 
+# bugs:
+# - tried to do single pass
+# - new vs. newer -> forgot to continue on "in new_flashers"
 def step(map):
     R, C = len(map), len(map[0])
     flash_count = 0

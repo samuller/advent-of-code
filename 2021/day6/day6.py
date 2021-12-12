@@ -12,6 +12,7 @@ def main():
     part1 = True
 
     # Part 1
+    # # what are the possible correct orderings of these commands?
     # for i in range(256):
     #     # print(fish)
     #     zeroes = [idx for idx, num in enumerate(fish) if num == 0]
