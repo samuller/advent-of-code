@@ -87,11 +87,11 @@ def main():
     unique_paths(next_nodes, 'start', [], validation_func=part2_is_valid_path)
     print('P2:', len(all_paths))
     
+    # ./day12.py < test1.txt; ./day12.py < test2.txt; ./day12.py < test3.txt
     # Part 1
     # assert unique_paths(test1) == 10
     # assert unique_paths(test2) == 19
     # assert unique_paths(test3) == 226
-
     # Part 2
     # assert unique_paths(test1) == 36
     # assert unique_paths(test2) == 103
