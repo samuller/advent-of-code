@@ -27,9 +27,9 @@ def print_dots(dots):
     # for x in range(x_min,x_max+1):
     #     for y in range(y_min,y_max+1):
             if (x,y) in dots:
-                print('#',end="")
+                print('█',end="")
             else:
-                print('.',end="")
+                print(' ',end="")
         print()
     print()
 
