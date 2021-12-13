@@ -55,7 +55,7 @@ def fold_left(dots, x_axis):
     for idx, dot in enumerate(dots):
         x,y = dot
         assert x != x_axis
-        if x < x_axis:
+        if x > x_axis:
             diff = x-x_axis
             dots[idx] = (x_axis-diff,y)
             # print('XX:',x,y,'=>',x_axis-diff,y)
@@ -98,16 +98,6 @@ def main():
             exit()
     # print(sorted(list(dots)))
     # print(len(dots))
-
-    # missing folds?
-    x1,x2,_,_ = get_limits(dots)
-    dots = fold_left(dots, x1+(x2-x1)//2)
-    x1,x2,_,_ = get_limits(dots)
-    dots = fold_left(dots, x1+(x2-x1)//2)
-    x1,x2,_,_ = get_limits(dots)
-    dots = fold_left(dots, x1+(x2-x1)//2)
-    x1,x2,_,_ = get_limits(dots)
-    dots = fold_left(dots, x1+(x2-x1)//2)
 
     print_dots(dots)
 
