@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 import fileinput
-from collections import Counter
-
-
-def list_in_list(small_list, big_list):
-    print(''.join(small_list), '---', ''.join(big_list))
-    return ''.join(small_list) in ''.join(big_list)
+from copy import copy
+from collections import Counter, defaultdict
 
 
 def main():
@@ -25,55 +21,51 @@ def main():
         assert len(to) == 1
         assert frm not in steps
         steps[frm] = to
-        # steps.append((frm,to))
+
     print(polymer)
-    poly = []
+    last = polymer[-1]
+    poly = defaultdict(int)
     for i in range(len(polymer)-1):
-        poly.append(polymer[i:i+2])
+        poly[polymer[i:i+2]] += 1
     print(poly)
     print(len(poly)+1)
     print(steps)
+
     for i in range(40):
-        new_poly = list(poly)
-        for idx in range(len(poly)-1,0-1,-1):
-            p = poly[idx]
+        new_poly = copy(poly)
+        for p in poly:
+            count = poly[p]
+            if count <= 0:
+                continue
             if p in steps:
                 frm, to = p, steps[p]
-                becomes = [frm[0]+to, to+frm[1]]
-                new_poly = new_poly[:idx] + becomes + new_poly[idx+1:]
+                # Repeated counting 1s? smh
+                # for c in range(count):
+                    # print(f'{p} -> {to}')
+                new_poly[p] += -count
+                new_poly[frm[0]+to] += count
+                new_poly[to+frm[1]] += count
+
         poly = new_poly
-        # changes = []
-        # for step in steps:
-        #     frm, to = step
-        #     # frm = list(frm)
-        #     if frm in poly:  # list_in_list(frm, poly):
-        #         changes.append((poly.index(frm), step))
-        #         # print(step)
-        # # print('selected:', changes)
-        # for idx_step in sorted(changes, key=lambda c: c[0], reverse=True):
-        #     # print('___', idx_step)
-        #     idx, step = idx_step
-        #     frm, to = step
-        #     becomes = [frm[0]+to, to+frm[1]]
-        #     print('becomes', becomes)
-        #     poly = poly[:idx] + becomes + poly[idx+1:]
-
         # print(poly)
-        # polymer = ''
-        # for p in poly:
-        #     polymer += p[0]
-        # polymer += poly[-1][1]
-        # print(polymer)
-        print(f'step {i+1}: {len(poly)+1}')
-    polymer = ''
-    for p in poly:
-        polymer += p[0]
-    polymer += poly[-1][1]
-    print(polymer)
-    counts = Counter(polymer).most_common()
-    print(counts)
-    print(counts[0][1] - counts[-1][1])
+        print(len(poly))
+        print(f'step {i+1}: {sum(poly.values())+1}')
+        # exit()
 
+    # Crazy long!
+    # polymer = [p[0]*poly[p] for p in poly]
+    # polymer += last
+    # polymer = ''.join(polymer)
+    # # print(polymer)
+    # counts = Counter(polymer).most_common()
+    # print(counts[0][1] - counts[-1][1])
+
+    counts = defaultdict(int)
+    for p in poly:
+        counts[p[0]] += poly[p]
+    counts[last] += 1
+    print(counts)
+    print(max(counts.values()) - min(counts.values()))
 
 
 if __name__ == '__main__':
