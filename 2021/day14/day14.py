@@ -4,6 +4,9 @@ from copy import copy
 from collections import Counter, defaultdict
 
 
+# bugs:
+# - kept strings & order instead of just pair counts
+# - had loop counting down -1 (each with dictionary writes), instead of full subtraction
 def main():
     lines = [line.strip() for line in fileinput.input()]
     print(f'Lines: {len(lines)}')
@@ -39,26 +42,12 @@ def main():
                 continue
             if p in steps:
                 frm, to = p, steps[p]
-                # Repeated counting 1s? smh
-                # for c in range(count):
-                    # print(f'{p} -> {to}')
                 new_poly[p] += -count
                 new_poly[frm[0]+to] += count
                 new_poly[to+frm[1]] += count
 
         poly = new_poly
-        # print(poly)
-        print(len(poly))
         print(f'step {i+1}: {sum(poly.values())+1}')
-        # exit()
-
-    # Crazy long!
-    # polymer = [p[0]*poly[p] for p in poly]
-    # polymer += last
-    # polymer = ''.join(polymer)
-    # # print(polymer)
-    # counts = Counter(polymer).most_common()
-    # print(counts[0][1] - counts[-1][1])
 
     counts = defaultdict(int)
     for p in poly:

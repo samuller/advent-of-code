@@ -63,6 +63,9 @@ def fold_left(dots, x_axis):
 
 
 # 421 @ 7:28
+# bug:
+# - part 1: read question closely
+# - part 2: mixup letf-roiht
 def main():
     lines = [line.strip() for line in fileinput.input()]
     part1 = False
