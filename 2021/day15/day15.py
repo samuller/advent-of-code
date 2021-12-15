@@ -15,9 +15,12 @@ def heuristic(map, pos, goal_pos):
     dc = goal_pos[1] - pos[1]
     return math.sqrt(dr**2 + dc**2)
 
+
 def a_star(map, start_pos=(0,0), goal_pos=None):
+    R = len(map)
+    C = len(map[0])
     if goal_pos is None:
-        goal_pos = (map.rows-1, map.cols-1)
+        goal_pos = (R-1, C-1)
     start_node = EndLoc(len=1, pos=start_pos, cost=0)
     
     inf = float("inf")
@@ -40,9 +43,9 @@ def a_star(map, start_pos=(0,0), goal_pos=None):
         r, c = curr.pos
         for dr, dc in [(0,1),(1,0)]:
             rr, cc = r + dr, c + dc
-            if not map.in_bounds(rr, cc):
+            if not (0<=rr<R and 0<=cc<C):
                 continue
-            val = int(map[rr,cc])
+            val = map[rr][cc]
             near = EndLoc(len=curr.len+1, pos=(rr,cc), cost=curr.cost+val)
 
             guess = g_score.get(curr.pos, inf) + val
@@ -57,15 +60,24 @@ def a_star(map, start_pos=(0,0), goal_pos=None):
     assert False
 
 
+def print_map(map):
+    for r, row in enumerate(map):
+        for c, val in enumerate(row):
+            print(val, end="")
+        print()
+    print()
+
 def main():
     lines = [line.strip() for line in fileinput.input()]
     print(f'Lines: {len(lines)}')
 
-    map = Map2D()
-    map.load_from_data(lines)
+    # map = Map2D()
+    # map.load_from_data(lines)
+    map = [[int(c) for c in line] for line in lines]
+    R = len(map)
+    C = len(map[0])
 
 
-    # Third attempt
     print(a_star(map))
 
 
