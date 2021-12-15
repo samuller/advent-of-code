@@ -10,119 +10,6 @@ from lib import *
 EndLoc = namedtuple('EndLoc', ['len', 'cost', 'pos'])
 
 
-def full_path(map):
-    MIN_LEN = map.rows + map.cols + 1
-    END = (map.rows-1, map.cols-1)
-    curr = (int(map[0,0]), (0,0))
-    paths = [[curr]]
-    while True:
-        print(len(paths[0]), '->', len(paths))
-        new_paths = []
-        completed_paths = []
-        for path in paths:
-            # next = paths.pop()
-            # seen.add(next)
-            _, curr = path[-1]
-            if curr == END or len(path) > MIN_LEN:
-                completed_paths.append(path)
-                continue
-            r,c = curr
-            consider = []
-            for dr, dc in [(0,1),(1,0)]: #(-1,0), ,(0,-1)
-                # for dc in DC:
-                rr, cc = r + dr, c + dc
-                if not map.in_bounds(rr, cc):
-                    continue
-                val = int(map[rr,cc])
-                if (val, (rr,cc)) in path:
-                    continue
-                # print(rr,cc)
-                consider.append((val, (rr,cc)))
-                assert val < 10
-            consider.sort(key=lambda vrc: vrc[0], reverse=True)
-            for c in consider:
-                new_path = list(path)
-                new_path.append(c)
-                new_paths.append(new_path)           
-            # if len(path) > 11:
-            #     print(path)
-            #     print(sum([p[0] for p in path]))
-            #     exit()
-        if len(new_paths) == 0:
-            print('NO NEW')
-            break
-        paths = new_paths
-        print('done',len(completed_paths))
-        for path in completed_paths:
-            # print(path)
-            print(sum([p[0] for p in path]))
-        # for path in paths:
-        #     print(path)
-        #     print(sum([p[0] for p in path]))
-        # exit()
-    print(len(paths))
-    print('done',len(completed_paths))
-
-    least_risk = sum([p[0] for p in completed_paths[0]])
-    least_risk_path = completed_paths[0]
-    for path in completed_paths:
-        val, final_loc = path[-1]
-        if final_loc != END:
-            continue
-        # print(path)
-        risk = sum([p[0] for idx, p in enumerate(path) if idx != 0])
-        if risk < least_risk:
-            least_risk = risk
-            least_risk_path = path
-    print(least_risk)
-    print(least_risk_path)
-    # print(paths[0])
-    # print(completed_paths[0])
-
-
-
-def bfs(map):
-    assert map.rows == map.cols
-    MIN_LEN = map.rows + map.cols + 1
-    END = (map.rows-1, map.cols-1)
-    # start = (0,0)
-    curr = (int(map[0,0]), (0,0))
-    # DR = [-1,0,1,0]
-    # DC = [0,1,0,-1]
-    path_done = []
-    path_ends = deque()
-    start = EndLoc(len=1, pos=(0,0), cost=0)
-    path_ends.append(start)
-    seen = {(0,0): start}
-    while path_ends:
-        curr = path_ends.pop()
-        # print(curr, int(map[curr.pos]))
-        if curr.pos == END or curr.len > MIN_LEN:
-            path_done.append(curr)
-            print(len(path_done), len(path_ends))
-            continue
-        r,c = curr.pos
-        for dr, dc in [(0,1),(1,0)]:
-            rr, cc = r + dr, c + dc
-            if not map.in_bounds(rr, cc):
-                continue
-            val = int(map[rr,cc])
-            next = EndLoc(len=curr.len+1, pos=(rr,cc), cost=curr.cost+val)
-            if next.pos in seen:
-                visited = seen[next.pos]
-                if visited.cost < next.cost:
-                    seen[next.pos] = next
-            else:
-                path_ends.append(next)
-    print(len(path_done))
-    # print(seen)
-    lowest = path_done[0]
-    for end in path_done:
-        if end.cost < lowest.cost:
-            lowest = end
-    print(lowest)
-
-
 def heuristic(map, pos, goal_pos):
     dr = goal_pos[0] - pos[0]
     dc = goal_pos[1] - pos[1]
@@ -177,11 +64,6 @@ def main():
     map = Map2D()
     map.load_from_data(lines)
 
-    # First attempt
-    # full_path(map)
-
-    # Second attempt
-    # bfs(map)
 
     # Third attempt
     print(a_star(map))
