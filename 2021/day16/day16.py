@@ -109,10 +109,10 @@ P1 = 0
 def main():
     global P1
     lines = [line.strip() for line in fileinput.input()]
-    packets = "0x" + lines[0].strip()
+    packets = lines[0].strip()
 
     P1 = 0
-    bits = BitStream(packets)
+    bits = BitStream(hex=packets)
     P2 = packet(bits)
     print(P1)
     print(P2)
