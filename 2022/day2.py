@@ -6,53 +6,71 @@ import sys; sys.path.append("..")
 from lib import *
 
 
-# SCORE_RESULT = {0: 0, 1: 3, 2: 6}
+# CHOICE:
+ROCK = 0
+PAPER = 1
+SCISSORS = 2
 
+# RESULT:
+LOSE = 0
+DRAW = 1
+WIN = 2
 
-def me_win_rps(me, opp):
-    opp, me = ord(opp)-ord('A'), ord(me)-ord('X')
-    if opp == me:
-        return False
-    # 0 > 2, 1 > 0, 2 > 1
-    if (me, opp) in [(0, 2), (1, 0), (2, 1)]:
-        return True
-    return False
+SCORE_RESULT = {
+    LOSE: 0,
+    DRAW: 3,
+    WIN: 6
+}
 
 
 def get_rps_to_match(opp, action):
-    opp, action = ord(opp)-ord('A'), ord(action)-ord('X')
-    # Draw
-    if action == 1:
+    if action == DRAW:
         return opp
-    # Win
-    if action == 2:
+    if action == WIN:
         return {2: 0, 0: 1, 1: 2}[opp]
-    # Lose
-    return {0: 2, 1: 0, 2: 1}[opp]
+    if action == LOSE:
+        return {0: 2, 1: 0, 2: 1}[opp]
+    assert False
+
+
+def calc_result(opp, me):
+    if opp == me:
+        return DRAW
+    tier_list = [
+        (ROCK, SCISSORS),
+        (PAPER, ROCK),
+        (SCISSORS, PAPER)
+    ]
+    if (me, opp) in tier_list:
+        return WIN
+    return LOSE
 
 
 def main():
     lines = [line.strip() for line in fileinput.input()]
-    # rock, paper, sciss
-    # 0, 3, 6
-    score = {'A': 1, 'B': 2, 'C': 3, 'X': 1, 'Y': 2, 'Z': 3}
 
-    my_score = 0
+    part1 = 0
+    part2 = 0
     for game in lines:
-        opp, me = game.split()
-        print(game, opp, me)
-        action = me
-        me = chr(get_rps_to_match(opp, action) + ord('X'))
+        opp, unk = game.split()
+        # Convert to numeric
+        opp, unk = ord(opp) - ord('A'), ord(unk) - ord('X')
+        # Part 1 vs part 2
+        me1 = unk
+        me2 = get_rps_to_match(opp, unk)
 
-        my_score += score[me]
-        if me_win_rps(me, opp):
-            my_score += 6
-        opp, me = ord(opp)-ord('A'), ord(me)-ord('X')
-        if opp == me:
-            my_score += 3
-        print(my_score)
-    print(my_score)
+        # Choice score
+        part1 += (me1 + 1)
+        # Result score
+        res = calc_result(opp, me1)
+        part1 += SCORE_RESULT[res]
+
+        part2 += (me2 + 1)
+        res = calc_result(opp, me2)
+        part2 += SCORE_RESULT[res]
+    print(part1)
+    print(part2)
+
 
 if __name__ == '__main__':
-    print(me_win_rps('A', 'X'))
     main()
