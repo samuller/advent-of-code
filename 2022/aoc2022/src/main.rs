@@ -4,6 +4,9 @@ use std::path::Path;
 // Needed for read_to_string?
 use std::io::{prelude::*, BufReader};
 
+/**
+ * Generic helper functions.
+ */
 
 // https://stackoverflow.com/questions/30801031/read-a-file-and-get-an-array-of-strings
 fn get_lines(input_path: String) -> Vec<String> {
@@ -53,6 +56,9 @@ impl Iterator for Grouped<'_> {
     }
 }
 
+/**
+ * Experimentation.
+ */
 
 #[allow(dead_code)]
 fn day0(input_path: String) {
@@ -64,6 +70,9 @@ fn day0(input_path: String) {
     // }
 }
 
+/**
+ * Actual solutions (with their own helper functions).
+ */
 
 fn day1(input_path: String) {
     let lines = get_lines(input_path);
@@ -76,6 +85,7 @@ fn day1(input_path: String) {
     println!("{:?}", elves.last().unwrap());
     println!("{:?}", elves.iter().rev().take(3).sum::<i32>());
 }
+
 
 fn main() {
     // day1("../day1/test.txt".to_string());
