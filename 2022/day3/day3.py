@@ -34,7 +34,7 @@ def get_badge(group):
 # 8:07: 2788 - too low
 def main():
     lines = [line.strip() for line in fileinput.input()]
-    total = 0
+    total1 = 0
     total2 = 0
     for idx, bag in enumerate(lines):
         # print(line)
@@ -50,7 +50,7 @@ def main():
                 assert summ == 0
                 summ = get_priority(val)
         # print(summ)
-        total += summ
+        total1 += summ
         # Part 2
         if idx % 3 == 0 and idx != 0:
             group = lines[idx-3:idx]
@@ -59,8 +59,12 @@ def main():
     if idx % 3 == 0 and idx != 0:
         group = lines[idx-3:idx]
         total2 += get_badge(group)
-    print(total)
+    print(total1)
     print(total2)
+    assert total1 == 157
+    assert total2 == 70
+    # assert total1 == 8185
+    # assert total2 == 2817
 
 
 if __name__ == '__main__':
