@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 import fileinput
-from collections import Counter
 
-import sys; sys.path.append("..")
+import sys; sys.path.append("../..")
 from lib import *
 
 

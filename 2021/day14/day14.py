@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import fileinput
 from copy import copy
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 
 # bugs:
