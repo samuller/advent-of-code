@@ -10,6 +10,15 @@ from lib import *
 ROCK = 0
 PAPER = 1
 SCISSORS = 2
+# Wins it <- choice -> Loses against it
+TIER_LIST = [ROCK, PAPER, SCISSORS, ROCK]
+
+WIN_TIER_LIST = [
+    # (win, lose)
+    (ROCK, SCISSORS),
+    (PAPER, ROCK),
+    (SCISSORS, PAPER)
+]
 
 # RESULT:
 LOSE = 0
@@ -23,25 +32,21 @@ SCORE_RESULT = {
 }
 
 
-def get_rps_to_match(opp, action):
-    if action == DRAW:
+def get_choice_for_result(opp, result):
+    if result == DRAW:
         return opp
-    if action == WIN:
-        return {2: 0, 0: 1, 1: 2}[opp]
-    if action == LOSE:
-        return {0: 2, 1: 0, 2: 1}[opp]
+    if result == WIN:
+        # Find match we want, return only value from list ([0]), but only the other side of match-up ([1]).
+        return [match for match in WIN_TIER_LIST if match[0] == opp][0][1]
+    if result == LOSE:
+        return [match for match in WIN_TIER_LIST if match[1] == opp][0][0]
     assert False
 
 
 def calc_result(opp, me):
     if opp == me:
         return DRAW
-    tier_list = [
-        (ROCK, SCISSORS),
-        (PAPER, ROCK),
-        (SCISSORS, PAPER)
-    ]
-    if (me, opp) in tier_list:
+    if (me, opp) in WIN_TIER_LIST:
         return WIN
     return LOSE
 
@@ -57,7 +62,7 @@ def main():
         opp, unk = ord(opp) - ord('A'), ord(unk) - ord('X')
         # Part 1 vs part 2
         me1 = unk
-        me2 = get_rps_to_match(opp, unk)
+        me2 = get_choice_for_result(opp, unk)
 
         # Choice score
         part1 += (me1 + 1)
