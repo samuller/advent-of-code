@@ -1,4 +1,5 @@
 #![allow(clippy::needless_return)]
+#![allow(dead_code)]
 use std::fs::File;
 use std::path::Path;
 // Needed for read_to_string?
@@ -47,7 +48,7 @@ impl Iterator for Grouped<'_> {
         while self.curr_idx < self.list.len() {
             let line = &self.list[self.curr_idx];
             self.curr_idx += 1;
-            if line == "" {
+            if line.is_empty() {
                 break;
             }
             new_group.push(line.clone());
@@ -87,7 +88,39 @@ fn day1(input_path: String) {
 }
 
 
+fn day4(input_path: String) {
+    let lines = get_lines(input_path);
+
+    let mut part1 = 0;
+    let mut part2 = 0;
+    for line in lines {
+        let mut elves = line.split(',');
+        let (elf1_str, elf2_str) = (elves.next(), elves.next());
+        let elf1: [i32; 2] = elf1_str.unwrap().split('-').map(|n| n.parse::<i32>().unwrap()).collect::<Vec<_>>()
+            // convert Vec<i32> to [i32; 2]
+            .try_into().unwrap();
+        let elf2: [i32; 2] = elf2_str.unwrap().split('-').map(|n| n.parse::<i32>().unwrap()).collect::<Vec<_>>()
+            .try_into().unwrap();
+        // println!("{:?}, {:?}", elf1, elf2);
+
+        if (elf1[0] >= elf2[0] && elf1[1] <= elf2[1]) || (elf2[0] >= elf1[0] && elf2[1] <= elf1[1]){
+            part1 += 1;
+        }
+        if (elf2[0] <= elf1[0] && elf1[0] <= elf2[1])
+          || (elf2[0] <= elf1[1] && elf1[1] <= elf2[1])
+          || (elf1[0] <= elf2[0] && elf2[0] <= elf1[1])
+          || (elf1[0] <= elf2[1] && elf2[1] <= elf1[1]) {
+            part2 += 1;
+        }
+    }
+    println!("{}", part1);
+    println!("{}", part2);
+}
+
+
 fn main() {
     // day1("../day1/test.txt".to_string());
-    day1("../day1/input.txt".to_string());
+    // day1("../day1/input.txt".to_string());
+    // day4("../day4/test.txt".to_string());
+    day4("../day4/input.txt".to_string());
 }
