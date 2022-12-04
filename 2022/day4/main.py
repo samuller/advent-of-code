@@ -15,7 +15,7 @@ def main():
         elf1 = [int(n) for n in elf1.split("-")]
         elf2 = [int(n) for n in elf2.split("-")]
         # elf1 = list(range())
-        print(elf1, elf2)
+        # print(elf1, elf2)
 
         within = False
         if elf1[0] >= elf2[0] and elf1[1] <= elf2[1]:

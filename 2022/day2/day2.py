@@ -12,6 +12,7 @@ SCISSORS = 2
 # Wins it <- choice -> Loses against it
 TIER_LIST = [ROCK, PAPER, SCISSORS, ROCK]
 
+# Edges of a tier-graph.
 WIN_TIER_LIST = [
     # (win, lose)
     (ROCK, SCISSORS),
