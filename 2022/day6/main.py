@@ -6,16 +6,23 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
+def read_packet(data, size):
+    for idx in range(0, len(data)):
+        packet = data[idx:idx + size]
+        if len(set(packet)) == size:
+            return idx, packet
+    return None
+
+
 def main():
     lines = [line.replace("\n", "") for line in fileinput.input()]
     print(lines)
-    for line in lines:
-        for idx in range(0, len(line)):
-            packet = line[idx:idx+14]
-            if len(set(packet)) == 14:
-                print(packet)
-                print(idx+14)
-                break
+
+    for data in lines:
+        pos, _ = read_packet(data, 4)
+        print(pos + 4)
+        pos, _ = read_packet(data, 14)
+        print(pos + 14)
 
 
 if __name__ == '__main__':
