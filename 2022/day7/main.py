@@ -67,14 +67,7 @@ def recurse_size(contents, size_limit=None):
     return total, dirsum, dir_sizes
 
 
-# 2 hour power delay 
-# part 2: 19935440 - too hight
-def main():
-    lines = [line.replace("\n", "") for line in fileinput.input()]
-    # print(lines)
-    total_space = 70_000_000
-    unused_space_needed = 30_000_000
-
+def parse_cmd_history(lines):
     root_contents = {}
     curdir = None
     curdir_contents = []
@@ -113,11 +106,29 @@ def main():
         process_ls_output(root_contents, curdir, curdir_contents)
         ls_results = False
         curdir_contents = []
+    
+    return root_contents
 
+
+# 2 hour "power" delay 
+# part 2: 19935440 - too high
+# 1989474 (95437)
+# 1111607 (24933642)
+def main():
+    lines = [line.replace("\n", "") for line in fileinput.input()]
+
+    root_contents = parse_cmd_history(lines)
     # print(root_contents)
+
+    # Part 1
     # print(recurse_size(root_contents))
     total_used, smalldirs, alldirs = recurse_size(root_contents, size_limit=100_000)
-    # print(smalldirs)
+    print(smalldirs)
+
+    # Part 2
+    total_space = 70_000_000
+    unused_space_needed = 30_000_000
+
     total_unused = total_space - total_used
     space_need_to_free = unused_space_needed - total_unused
     # print(space_need_to_free)
@@ -125,7 +136,7 @@ def main():
     for dir_size in sorted(alldirs, key=lambda t: t[1]):
         dir, size = dir_size
         if size >= space_need_to_free:
-            print(dir, size)
+            print(f"{size} ({dir})")
             break
 
 
