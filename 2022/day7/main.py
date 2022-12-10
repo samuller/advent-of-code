@@ -70,42 +70,29 @@ def recurse_size(contents, size_limit=None):
 def parse_cmd_history(lines):
     root_contents = {}
     curdir = None
-    curdir_contents = []
-    ls_results = False
-    for line in lines:
-        if line.startswith("$"):
-            if ls_results:
-                process_ls_output(root_contents, curdir, curdir_contents)
-                ls_results = False
-                curdir_contents = []
-            # Split and dop dollar
-            cmd = line.split()[1:]
-            assert cmd[0] in ['ls', 'cd'], cmd[0]
-            if cmd[0] == "cd":
-                newdir = cmd[1]
-                if ".." in newdir:
-                    assert curdir is not None
-                    assert newdir == "..", newdir
-                    curdir = "/".join(curdir.split("/")[0:-1])
-                    if len(curdir) == 0:
-                        curdir = "/"
-                    # curdir = f"{curdir}/"
-                elif curdir is None or newdir == "/":
-                    assert newdir == "/", newdir
-                    curdir = "/"
-                else:
-                    curdir = f"{curdir}/{newdir}".replace("//", "/")
-            if cmd[0] == "ls":
-                ls_results = True
-        elif ls_results:
-            result = line.split()
-            curdir_contents.append(line)
-        # print(curdir)
 
-    if ls_results:
-        process_ls_output(root_contents, curdir, curdir_contents)
-        ls_results = False
-        curdir_contents = []
+    for group in grouped_rule(lines, lambda ln: ln.startswith("$")):
+        if group[0].startswith("$"):
+            for line in group:
+                # Split and drop dollar
+                cmd = line.split()[1:]
+                assert cmd[0] in ['ls', 'cd'], cmd[0]
+                if cmd[0] == "cd":
+                    newdir = cmd[1]
+                    if ".." in newdir:
+                        assert curdir is not None
+                        assert newdir == "..", newdir
+                        curdir = "/".join(curdir.split("/")[0:-1])
+                        if len(curdir) == 0:
+                            curdir = "/"
+                        # curdir = f"{curdir}/"
+                    elif curdir is None or newdir == "/":
+                        assert newdir == "/", newdir
+                        curdir = "/"
+                    else:
+                        curdir = f"{curdir}/{newdir}".replace("//", "/")
+        else:
+            process_ls_output(root_contents, curdir, group)
     
     return root_contents
 

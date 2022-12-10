@@ -42,11 +42,17 @@ class ANSIColor:
    END = '\033[0m'
 
 
-
-
-def grouped(lines):
+def grouped(lines, is_separator=None):
     """Separate list of lines into groups of consecutive non-empty lines.
+
+    is_separator
+        A function to determine if a line separates other groups of lines (defaults to True for empty lines). Has to be
+        based only on the contents of the line. The line itself will be dropped and not included in any groups that are
+        output.
     """
+    if is_separator is None:
+        is_separator = lambda ln: ln == ''
+
     group = []
     for line in lines:
         if line == '':
@@ -60,6 +66,22 @@ def grouped(lines):
     # but this requires modifying or copying the input
     if len(group) > 0:
         yield group
+
+
+def grouped_rule(lines, line_id):
+    """Group multiple consecutive lines that fit the given rule.
+
+    line_id
+        A value extracted from a line with which to group a line with neighbours if their values also match.
+    """
+    group = []
+    for line in lines:
+        group.append(line)
+        if len(set([line_id(line) for line in group])) > 1:
+            group = group[:-1]
+            yield group
+            group = [line]
+    yield group
 
 
 def print_dict(dic):
