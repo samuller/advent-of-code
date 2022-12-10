@@ -42,93 +42,40 @@ def move(loc, dir):
         assert False
     return row, col
 
-def move_rope(rope, dir, count):
-    head, tail = rope
+
+def move_rope(long_rope, dir, count):
     visited = set()
-
     for _ in range(count):
-        head = move(head, dir)
-        tail = move_tail(tail, head)
-        visited.add(tail)
-        # print('T', tail)
-
-    return (head, tail), visited
-
-    # Before refactor for part 2
-    # row, col = head
-    # if dir == 'L':
-    #     # head = (row, col-count)
-    #     for _ in range(count):
-    #         row, col = (row, col-1)
-    #         head = row, col
-    #         tail = move_tail(tail, head)
-    #         visited.add(tail)
-    #         print('T', tail)
-    # elif dir == 'R':
-    #     # head = (row, col+count)
-    #     for _ in range(count):
-    #         row, col = (row, col+1)
-    #         head = row, col
-    #         tail = move_tail(tail, head)
-    #         visited.add(tail)
-    #         print('T', tail)
-    # elif dir == 'U':
-    #     # head = (row-count, col)
-    #     for _ in range(count):
-    #         row, col = (row-1, col)
-    #         head = row, col
-    #         tail = move_tail(tail, head)
-    #         visited.add(tail)
-    #         print('T', tail, head)
-    # elif dir == 'D':
-    #     # head = (row+count, col)
-    #     for _ in range(count):
-    #         row, col = (row+1, col)
-    #         head = row, col
-    #         tail = move_tail(tail, head)
-    #         visited.add(tail)
-    #         print('T', tail)
-    # else:
-    #     assert False
+        # Move head by 1
+        long_rope[0] = move(long_rope[0], dir)
+        # Move tails in response
+        for idx in range(len(long_rope)-1):
+            curr_head, curr_tail = long_rope[idx], long_rope[idx+1]
+            curr_tail = move_tail(curr_tail, curr_head)
+            long_rope[idx+1] = curr_tail
+        # print(rope)
+        visited.add(long_rope[-1])
+    return long_rope, visited
 
 
 def main():
     lines = [line.replace("\n", "") for line in fileinput.input()]
-    # print(lines)
-
-    # Part 1
-    # top-left
-    # head = (0, 0)
-    # tail = head
-    # visited = set()
-    # for line in lines:
-    #     dir, count = line.split()
-    #     count = int(count)
-    #     print(dir, count)
-    #     rope, tail_visited = move_rope((head, tail), dir, count)
-    #     head, tail = rope
-    #     visited.update(tail_visited)
-    #     print(head, tail)
-    # print(len(visited))
-
-    # Part 2
-    rope = [(0, 0)]*10
-    visited = set()
+    # (0, 0) is top-left (row, col)
+    short_rope = [(0, 0)]*2
+    long_rope = [(0, 0)]*10
+    visited = [set(), set()]
     for line in lines:
         dir, count = line.split()
         count = int(count)
-        print(dir, count)
-        for _ in range(count):
-            # Move head by 1
-            rope[0] = move(rope[0], dir)
-            # Move tails in response
-            for idx in range(len(rope)-1):
-                curr_head, curr_tail = rope[idx], rope[idx+1]
-                curr_tail = move_tail(curr_tail, curr_head)
-                rope[idx+1] = curr_tail
-            print(rope)
-            visited.add(rope[-1])
-    print(len(visited))
+        # Part 1
+        short_rope, tail_visited = move_rope(short_rope, dir, count)
+        visited[0].update(tail_visited)
+        # Part 2
+        long_rope, tail_visited = move_rope(long_rope, dir, count)
+        visited[1].update(tail_visited)
+
+    print(len(visited[0]))
+    print(len(visited[1]))
 
 
 if __name__ == '__main__':
