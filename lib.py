@@ -22,7 +22,7 @@ from math import sqrt, pow, radians, sin, cos, tan
 """
 BFS
 2d scanning (4-way/tblr & 8-way):
-- 4-way: DR=[-1,0,1,0], DC=[0,-1,0,1]
+- 4-way: DR=[-1,0,1,0], DC=[0,-1,0,1]  for i in range(4)
 - 9-way: for dr, dc in itertools.product([-1,0,1],[-1,0,1]):
 """
 

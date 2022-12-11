@@ -7,6 +7,7 @@ from lib import *
 
 
 def read_packet(data, size):
+    """Find first X (size) distinct characters in a row to indicate the start of a packet or message."""
     for idx in range(0, len(data)):
         packet = data[idx:idx + size]
         if len(set(packet)) == size:
@@ -16,7 +17,7 @@ def read_packet(data, size):
 
 def main():
     lines = [line.replace("\n", "") for line in fileinput.input()]
-    print(lines)
+    # print(lines)
 
     for data in lines:
         pos, _ = read_packet(data, 4)
