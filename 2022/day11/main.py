@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import fileinput
+from copy import deepcopy
 from collections import Counter
 from collections import namedtuple
 
@@ -19,75 +20,46 @@ def parse_operation(operation):
         return lambda old: old * int(val2)
 
 
-# https://stackoverflow.com/questions/15347174/python-finding-prime-factors
-def largest_prime_factor(n):
-    i = 2
-    while i * i <= n:
-        if n % i:
-            i += 1
-        else:
-            n //= i
-    # print(n)
-    return n
+def play_keep_away(monkeys, rounds, part1=True):
+    primes = prod([mnk.test_div for mnk in monkeys])
+    inspect_count = [0] * len(monkeys)
+    for round in range(rounds):
+        for idx in range(len(monkeys)):
+            monkey = monkeys[idx]
+            inspect_count[idx] += len(monkey.items)
+            # Inspect items
+            for item in monkey.items:
+                # Increase worry level
+                item = monkey.op(item)
+                # Decrease worry level
+                if part1:
+                    item = item // 3
+                # Check if it is divisible
+                if item % monkey.test_div == 0:
+                    new_mnk_idx = monkey.test_true
+                else:
+                    new_mnk_idx = monkey.test_false
+                assert new_mnk_idx != idx
+                new_item = item
+                if not part1:
+                    # Shrink worry count without losing divisible property...
+                    new_item = new_item % primes
+                # Pass item to a new monkey
+                # Tuple is immutable, but list it's pointing to isn't (alternative: tuple._replace(items=...))
+                monkeys[new_mnk_idx].items.append(new_item)
+            # Remove items just moved
+            while len(monkey.items) != 0:
+                monkey.items.pop()
+        # print(round+1, [mnk.items for mnk in monkeys])
+        # if (round+1) % 100 == 0 or (round+1) in [1, 20]:
+        #     print(round+1, [mnk.items for mnk in monkeys])
+    # print(inspect_count)
+    print(prod(sorted(inspect_count)[-2:]))
 
-assert largest_prime_factor(4526634765) == 15882929
-
-
-# https://stackoverflow.com/questions/15347174/python-finding-prime-factors
-def prime_factors(n):
-    i = 2
-    factors = []
-    while i * i <= n:
-        if n % i:
-            i += 1
-        else:
-            n //= i
-            factors.append(i)
-    if n > 1:
-        factors.append(n)
-    return factors
-
-
-def largest_prime_factor_and_not_divisible(n):
-    factors = sorted(prime_factors(n), reverse=True)
-    # for factor in factors:
-    #     if factor % 2 != 0
-    # large_prime = largest_prime_factor(n)
-    return 1
-
-# print(largest_prime_factor_and_not_divisible(4526634765))
-# exit()
-
-
-def shrink_worry(item):
-    new_item = item
-    while new_item > 23*19*13*17:  # 29
-        new_item -= 23*19*13*17
-    assert item % 23 == new_item % 23, f"{item} ({item % 23}) vs. {new_item} ({new_item % 23})"
-    return new_item
-
-    # shrink worry count (keep lower prime factors...)
-    new_item = item
-    largest = largest_prime_factor(item)
-    while largest > 23:
-        print(largest)
-        new_item = new_item // largest
-        largest = largest_prime_factor(new_item)
-    assert item % 23 == new_item % 23, f"{item} ({item % 23}) vs. {new_item} ({new_item % 23})"
-
-    # for high_prime in reversed([23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]):
-    #     if item % high_prime == 0:
-    #         new_item = new_item // high_prime
-    #         print(item, " -> ", new_item)
-    #         # break
-    if new_item > 2**32:
-        print("Failed:", new_item)
-        exit()
-    return new_item
 
 def main():
     lines = [line.replace("\n", "") for line in fileinput.input()]
-    # print(lines)
+    # Parse input
     monkeys = []
     Monkey = namedtuple('Monkey', ['items', 'op', 'test_div', 'test_true', 'test_false'])
     for monkey in grouped(lines):
@@ -102,84 +74,11 @@ def main():
         monkeys.append(Monkey(
             items=starting, op=operation, test_div=test_div, test_true=test_true, test_false=test_false
         ))
-
-    # Part 1
-    inspect_count = [0] * len(monkeys)
-    for round in range(20):
-        for idx in range(len(monkeys)):
-            monkey = monkeys[idx]
-            inspect_count[idx] += len(monkey.items)
-            for item in monkey.items:
-                # print(item)
-                item = monkey.op(item)
-                # print(item)
-                item = item // 3
-                # print(item)
-                if item % monkey.test_div == 0:
-                    new_mnk_idx = monkey.test_true
-                else:
-                    new_mnk_idx = monkey.test_false
-                assert new_mnk_idx != idx
-                new_mnk = monkeys[new_mnk_idx]
-                # Tuple is immutable, but list it's pointing to isn't (alternative: tuple._replace(items=...))
-                new_mnk.items.append(item)
-                # print()
-            # Remove items just moved
-            while len(monkey.items) != 0:
-                monkey.items.pop()
-            # print(len(monkeys), idx, round)
-            # print([mnk.items for mnk in monkeys])
-        # print(round+1, [mnk.items for mnk in monkeys])
-        # if round % 100 == 0:
-        #     print(round+1, [mnk.items for mnk in monkeys])
-    print(inspect_count)
-    print(prod(sorted(inspect_count)[-2:]))
-    exit()
-
+    # Part 1 (need a deepcopy for part 2 since we alter lists)
+    play_keep_away(deepcopy(monkeys), rounds=20)
     # Part 2
-    primes = prod([mnk.test_div for mnk in monkeys])
-    print(primes)
-    inspect_count = [0] * len(monkeys)
-    for round in range(10000):
-        for idx in range(len(monkeys)):
-            monkey = monkeys[idx]
-            inspect_count[idx] += len(monkey.items)
-            for item in monkey.items:
-                # print(item)
-                item = monkey.op(item)
-                # print(item)
-                # item = item // 3
-                # print(item)
-                if item % monkey.test_div == 0:
-                    new_mnk_idx = monkey.test_true
-                else:
-                    new_mnk_idx = monkey.test_false
-                assert new_mnk_idx != idx
-                new_mnk = monkeys[new_mnk_idx]
-                # shrink worry count (keep lower prime factors...)
-                # new_item = shrink_worry(item)
-                new_item = item
-                # print(new_item)
-                # while new_item >= primes:  # 23*19*13*17:  # 29
-                #     new_item -= primes # 23*19*13*17
-                new_item = new_item % primes
-                # print(new_item)
-                # Tuple is immutable, but list it's pointing to isn't (alternative: tuple._replace(items=...))
-                new_mnk.items.append(new_item)
-                # print()
-            # Remove items just moved
-            while len(monkey.items) != 0:
-                monkey.items.pop()
-            # print(len(monkeys), idx, round)
-            # print([mnk.items for mnk in monkeys])
-        # print(round+1, [mnk.items for mnk in monkeys])
-        # if (round+1) % 100 == 0 or (round+1) in [1, 20]:
-        #     print(round+1, [mnk.items for mnk in monkeys])
-        #     print(inspect_count)
-    print(inspect_count)
-    print(prod(sorted(inspect_count)[-2:]))
+    play_keep_away(monkeys, rounds=10000, part1=False)
     exit()
-
 
 
 if __name__ == '__main__':
