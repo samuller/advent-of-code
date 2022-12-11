@@ -7,12 +7,14 @@ from lib import *
 
 
 def draw_char(X, cycle):
+    style = [' ', '█']  # Full block (U+2588)
+    # style = ['⬛', '🟦']  # Large squares
     # print("D", cycle, X)
     pos = (cycle%40) - 1
     if pos in [X-1, X, X+1]:  #X in [cycle-1, cycle, cycle+1]:
-        return '#'
+        return style[1]
     else:
-        return '.' 
+        return style[0]
 
 
 def check_signal(cycle, X):
