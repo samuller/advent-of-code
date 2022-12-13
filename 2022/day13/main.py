@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import fileinput
 from functools import cmp_to_key
 
@@ -55,8 +56,9 @@ def main():
     for idx, group in enumerate(grouped(lines)):
         assert len(group) == 2
         # group = [eval(line) for line in group]
-        left = eval(group[0])
-        right = eval(group[1])
+        # Prefer JSON parsing over eval() which is too Python specific
+        left = json.loads(group[0])
+        right = json.loads(group[1])
         _sorted = is_packet_sorted(left, right)
         # print(_sorted, idx, left, 'vs', right)
         # print()

@@ -93,7 +93,7 @@ def bfs(grid, start, end):
 
 
 # 7:56 - accidentally implemented depth-recursive first (while thinking it was BFS...)
-# 8:17 - 7010 too high
+# 8:17 - 7010 too high (actually just my default value since end point wasn't reached)
 # 8:31 - stop for now
 # 11:50 - 12:13 (part-time)
 # 12:18 - complete
