@@ -18,6 +18,7 @@ def parse_operation(operation):
         return lambda old: old * old
     if op == '*':
         return lambda old: old * int(val2)
+    assert False
 
 
 def play_keep_away(monkeys, rounds, part1=True):
@@ -42,7 +43,9 @@ def play_keep_away(monkeys, rounds, part1=True):
                 assert new_mnk_idx != idx
                 new_item = item
                 if not part1:
-                    # Shrink worry count without losing divisible property...
+                    # Shrink worry count without losing divisible properties...
+                    # Assumes all divisible values used by monkeys are prime numbers. We initially subtracted this
+                    # number continuously until new_item was small enough, but that was too slow.
                     new_item = new_item % primes
                 # Pass item to a new monkey
                 # Tuple is immutable, but list it's pointing to isn't (alternative: tuple._replace(items=...))
