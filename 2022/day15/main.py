@@ -34,6 +34,9 @@ def search_any_overlap(location, sensors, ranges):
 # 14:19 - move around the edges
 def main():
     lines = [line.replace("\n", "") for line in fileinput.input()]
+    # Edited input files to add argument to first line
+    yy = int(lines[0].replace("y = ", ""))
+    # Parse rest of input
     sensors = []
     seen_beacon = []
     max_dist = 0
@@ -41,16 +44,18 @@ def main():
     min_y = 2**30
     max_x = -2**30
     max_y = -2**30
-    for line in lines:
-        # Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+    # Skip the first custom line we added
+    for line in lines[1:]:
         xs, ys = line.split()[2:4]
         xs = int(xs.replace("x=", "").replace(",", ""))
         ys = int(ys.replace("y=", "").replace(":", ""))
         sensors.append((xs, ys))
+
         xc, yc = line.split()[8:10]
         xc = int(xc.replace("x=", "").replace(",", ""))
         yc = int(yc.replace("y=", "").replace(":", ""))
         seen_beacon.append((xc, yc))
+        # Find data limits
         dist = abs(xs - xc) + abs(ys - yc)
         max_dist = max(dist, max_dist)
         min_x = min(xs, xc, min_x)
@@ -59,79 +64,30 @@ def main():
         max_y = max(ys, yc, max_y)
         # print(f"{sensors[-1]} -> {seen_beacon[-1]} = {dist}")
 
-    # print(sensors)
-    # print(seen_beacon)
-
     # Part 1
-    # # yy = 10
-    # yy = 2000000
-    # # seen_x = []
-    # is_seen_count = 0
+    is_seen_count = 0
     # print((max_x + max_dist) - (min_x - max_dist))
-    # for xx in range(min_x - max_dist, max_x + max_dist): # part1
-    # # for xx in range(-10, 30): # part1
-    # # for xx in range(0, 20): # part2
-    #     # where beacon's cannot possibly exist
-    #     if (xx, yy) in seen_beacon:
-    #         continue
-    #     is_seen = False
-    #     for idx in range(len(sensors)):
-    #         xs, ys = sensors[idx]
-    #         xc, yc = seen_beacon[idx]
-    #         dist_close = abs(xs - xc) + abs(ys - yc)
-    #         dist_sensor = abs(xs - xx) + abs(ys - yy)
-    #         if dist_sensor <= dist_close:
-    #             is_seen = True
-    #     if is_seen:
-    #         is_seen_count += 1
-    #     if xx % 100000 == 0:
-    #         print(xx)
-    #     # seen_x.append(is_seen)
-    # # print(seen_x)
-    # # print(sum([1 if s else 0 for s in seen_x]))
-    # print(is_seen_count)
-
-    # Part 2?
-    # max_search = 20
-    # max_search = 4000000
-    # # seen_x = []
-    # is_seen_count = 0
-    # # print(max_search)
-    # found = None
-    # count = 0
-    # for xx in range(0, max_search):
-    #     for yy in range(0, max_search):
-    #         if (xx, yy) in seen_beacon:
-    #             continue
-    #         is_seen = False
-    #         for idx in range(len(sensors)):
-    #             xs, ys = sensors[idx]
-    #             xc, yc = seen_beacon[idx]
-    #             dist_close = abs(xs - xc) + abs(ys - yc)
-    #             dist_sensor = abs(xs - xx) + abs(ys - yy)
-    #             if dist_sensor <= dist_close:
-    #                 is_seen = True
-    #         if is_seen:
-    #             is_seen_count += 1
-    #         if not is_seen:
-    #             found = xx, yy
-    #             print(xx, yy)
-    #             break
-    #         tuning = xx*4000000 + yy
-    #         if tuning % 100000 == 0:
-    #             print("Progress", xx, yy)
-    #     if found:
-    #         break
-    #         # seen_x.append(is_seen)
-    # # print(seen_x)
-    # # print(sum([1 if s else 0 for s in seen_x]))
-    # print(xx*4000000 + yy)
-
+    for xx in range(min_x - max_dist, max_x + max_dist):
+        # Where beacon's cannot possibly exist
+        if (xx, yy) in seen_beacon:
+            continue
+        is_seen = False
+        for idx in range(len(sensors)):
+            xs, ys = sensors[idx]
+            xc, yc = seen_beacon[idx]
+            dist_close = abs(xs - xc) + abs(ys - yc)
+            dist_sensor = abs(xs - xx) + abs(ys - yy)
+            if dist_sensor <= dist_close:
+                is_seen = True
+        if is_seen:
+            is_seen_count += 1
+        if (1 + xx - (min_x - max_dist)) % 100_000 == 0:
+            print(".", end="", flush=True)
+    print()
+    print(is_seen_count)
+    exit()
 
     # # Part 1++
-    # yy = 10
-    # # yy = 2000000
-    # # seen_x = []
     # is_seen_count = 0
     # for xx in range(min_x - max_dist, max_x + max_dist): # part1
     # # for xx in range(-10, 30): # part1
