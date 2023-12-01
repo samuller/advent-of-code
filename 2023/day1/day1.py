@@ -4,7 +4,7 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
-# zero is not acvtually one of the words so we shouldn't accidentally detect it
+# zero is not actually one of the words so we shouldn't accidentally detect it
 NUMBERS = ["_ZERO_X", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
 
@@ -15,7 +15,7 @@ def ending_num_name(word):
     return None
 
 
-# 7:28 54623 [overlapping - test with 4threeight7]
+# [7:28] wrong submission - 54623 [overlapping - test with 4threeight7]
 def main():
     lines = [line.strip() for line in fileinput.input()]
 
