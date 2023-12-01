@@ -4,14 +4,6 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
-def isnum(input):
-    try:
-        int(input)
-    except:
-        return False
-    return True
-
-
 # zero is not acvtually one of the words so we shouldn't accidentally detect it
 NUMBERS = ["_ZERO_X", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
@@ -31,7 +23,7 @@ def main():
     values2 = []
     for line in lines:
         # Part 1
-        only_nums = "".join([a for a in line if isnum(a)])
+        only_nums = "".join([ch for ch in line if ch.isdecimal()])
         values1.append(int(only_nums[0] + only_nums[-1]))
         # Part 2
         nums = []
@@ -39,7 +31,7 @@ def main():
             num_name = ending_num_name(line[:idx+1])
             if num_name is not None:
                 nums.append(num_name)
-            if isnum(line[idx]):
+            if line[idx].isdecimal():
                 nums.append(int(line[idx]))
         values2.append(int(f"{nums[0]}{nums[-1]}"))
     print(sum(values1))
