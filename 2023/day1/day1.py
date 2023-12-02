@@ -24,13 +24,15 @@ def main():
     for line in lines:
         # Part 1
         only_nums = "".join([ch for ch in line if ch.isdecimal()])
-        values1.append(int(only_nums[0] + only_nums[-1]))
+        if len(only_nums) != 0:
+            values1.append(int(only_nums[0] + only_nums[-1]))
         # Part 2
         nums = []
         for idx in range(len(line)):
             num_name = ending_num_name(line[:idx+1])
             if num_name is not None:
                 nums.append(num_name)
+            # https://stackoverflow.com/questions/44891070/whats-the-difference-between-str-isdigit-isnumeric-and-isdecimal-in-pyth
             if line[idx].isdecimal():
                 nums.append(int(line[idx]))
         values2.append(int(f"{nums[0]}{nums[-1]}"))
