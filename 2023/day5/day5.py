@@ -78,57 +78,6 @@ def overlap_mapping(prev: Tuple[int, int], src: Tuple[int, int], dest: Tuple[int
     return tuple(src), tuple(dest)
 
 
-# def create_missing_ranges(interval, overlaps):
-#     # not_covered = [interval]
-
-#     # missing = []
-#     # for lap in overlaps:
-#     #     new_missing = missing_overlaps(interval, lap)
-#     #     print("IN", new_missing, overlaps, new_missing in overlaps)
-#     #     if all(mis in overlaps for mis in new_missing):
-#     #         return []
-#     #     missing.extend(new_missing)
-#     # print("      LAPS", interval, overlaps, missing)
-#     # if len(overlaps) > 1:
-#     #     print("ERR")
-#     #     print(missing_overlaps(missing[0], overlaps[1]))
-#     #     exit()
-
-#     missing = []
-#     overlaps = sorted(overlaps)
-#     curr = interval[0]
-#     if curr < overlaps[0][0]:
-#         missing.append((interval[0], overlaps[0][0]-1))
-#         curr = overlaps[0][0]
-#         del overlaps[0]
-#     # print("      LAPS", interval, overlaps, missing)
-#     while curr <= interval[1]:
-#         # print(curr, interval[1])
-#         jump_forward = False
-#         for lap in overlaps:
-#             if lap[0] <= curr <= lap[1]:
-#                 curr = lap[1] + 1
-#                 jump_forward = True
-#         if jump_forward:
-#             # print("jump", overlaps)
-#             continue
-
-#         if len(overlaps) > 0 and curr < overlaps[0][0]:
-#             print("A")
-#             missing.append((interval[0], overlaps[0][0]-1))
-#             curr = overlaps[0][0]
-#             del overlaps[0]
-#         else:
-#             print("B", overlaps)
-#             missing.append((curr, interval[1]))
-#             curr = interval[1] + 1
-
-#     # print("      LAPS", interval, overlaps, missing)
-#     # missing = missing_overlaps(interval, overlaps[0])
-#     print("      LAPS", interval, overlaps, "-->", missing)
-#     return missing
-
-
 def create_missing_ranges(interval, overlaps):
     for rng1, rng2 in itertools.product(overlaps, overlaps):
         if rng1 == rng2:
@@ -175,54 +124,9 @@ def create_missing_ranges(interval, overlaps):
     return missing
 
 assert create_missing_ranges((0, 36), [(0, 6), (11, 52)]) == [(7, 10)]
-# assert create_missing_ranges(
-#     (3170364973, 3209522796), [
-#         (3170364973, 3200607867),
-#         (3202949622, 3209522796),
-#         (3112802515, 3200607867),
-#         (3202949622, 3244527155)
-#     ]) == [(7, 10)]
 
 
-#[7:24]
-# curr_mapping = generate_mapping(lines[1:], prev_mapping.values())
-# if lines[0] == 'seed-to-soil map:':
-#     # seed_to_soil = generate_mapping(lines[1:], seeds_to_plant)
-#     new_mapping = {key: val for key, val in curr_mapping.items() if key in seeds_to_plant}
-#     for seed in seeds_to_plant:
-#         if seed not in new_mapping:
-#             new_mapping[seed] = seed
-#     curr_mapping = new_mapping
-# else:
-#     new_mapping = {key: val for key, val in curr_mapping.items() if key in prev_mapping.values()}
-#     for val in prev_mapping.values():
-#         if val not in new_mapping:
-#             new_mapping[val] = val
-#     curr_mapping = new_mapping
-#[7:28]
-# def generate_mapping(input, nums_to_keep):
-#     mapping = dict()
-#     for line in input:
-#         dest_start, src_start, range_len = [int(val) for val in line.split()]
-#         src = list(range(src_start, src_start + range_len))
-#         dest = list(range(dest_start, dest_start + range_len))
-#         assert len(src) == len(dest)
-#         # print(src)
-#         # print(dest)
-#         for idx in range(len(src)):
-#             assert src[idx] not in mapping, f"{idx} / {src[idx]} / {mapping[src[idx]]}"
-#             mapping[src[idx]] = dest[idx]
-#             # prev = seed_to_soil.get(src[idx], sys.maxsize)
-#             # seed_to_soil[src[idx]] = min(dest[idx], prev)
-
-#     new_mapping = {key: val for key, val in mapping.items() if key in nums_to_keep}
-#     for val in nums_to_keep:
-#         if val not in new_mapping:
-#             new_mapping[val] = val
-#     mapping = new_mapping
-#     return mapping
-
-
+# Part 1
 def generate_mapping(input, nums_to_keep):
     mapping = dict()
     for line in input:
@@ -239,6 +143,7 @@ def generate_mapping(input, nums_to_keep):
     return mapping
 
 
+# Part 2
 def generate_mapping_ranges(input, ranges_to_keep):
     mapping = dict()
     for line in input:
@@ -246,27 +151,6 @@ def generate_mapping_ranges(input, ranges_to_keep):
         src_rng = (src_start, src_start + range_len - 1)
         dest_rng = (dest_start, dest_start + range_len - 1)
         mapping[src_rng] = dest_rng
-        # for rng in ranges_to_keep:
-        #     src, dest = overlap_mapping(rng, src_rng, dest_rng)
-        #     mapping[src] = dest
-            # bgn, end = rng
-            # rng_size = end - bgn
-            # overlap(rng, )
-            # if src_start <= bgn < src_start + range_len:
-            #     offset = bgn - src_start
-            #     bgn = dest_start + offset
-            # if src_start <= end < src_start + range_len:
-            #     offset = end - src_start
-            #     # print(f"{num} => {dest_start + offset} ({dest_start}, {offset})")
-            #     end = dest_start + offset
-            # # new_size = end - bgn
-            # # assert new_size <= old_size
-            # mapping[rng] = (bgn, end)
-            # # if new_size < old_size:
-            # #     pass
-            # # if new_size > old_size:
-            # #     pass
-    # print("INPUT", mapping, ranges_to_keep)
 
     # remove non-overlaps
     for rng in list(mapping.keys()):
@@ -305,31 +189,6 @@ def generate_mapping_ranges(input, ranges_to_keep):
                 mapping[miss] = miss
     # print("IDS", mapping)
 
-    # new_mapping = deepcopy(mapping)
-    # for rng in mapping:
-    #     bgn, end = rng
-    #     size = end - bgn
-
-    #     new_rng = mapping[rng]
-    #     new_bgn, new_end = mapping[rng]
-    #     new_size = new_end - new_bgn
-
-    #     if new_size != size:
-    #         print("missing", rng, new_rng)
-    #         if new_bgn != bgn:
-    #             assert new_end == end
-    #             new_mapping[(bgn, new_bgn-1)] = (bgn, new_bgn-1)
-    #         if new_end != end:
-    #             assert new_bgn == bgn
-    #             # new_mapping[[]]
-    #             assert False
-    # mapping = new_mapping
-
-    # for rng in ranges_to_keep:
-    #     bgn, end = rng
-    #     if num not in mapping:
-    #         mapping[num] = num
-    # return mapping
     # BUG:!!!return new_mapping
     return mapping
 
@@ -460,22 +319,6 @@ def traverse_mapping_ranges(new_mapping, ranges_to_keep):
                 mapping[src] = dest
                 check_mapping_keys(mapping)
                 # mapping[(range_to_keep[0], curr)] = (range_to_keep[0], curr)
-            # else:
-            #     print("c")
-            #     while new_range[1] < curr:
-            #         new_ranges.pop(0)
-            #         if len(new_ranges) == 0:
-            #             new_range = None
-            #             break
-            #         new_range = new_ranges[0]
-        # else:
-        #     print("C")
-        #     while range_to_keep[1] < curr:
-        #         ranges_to_keep.pop(0)
-        #         if len(ranges_to_keep) == 0:
-        #             range_to_keep = None
-        #             break
-        #         range_to_keep = ranges_to_keep[0]
 
         # if new_range[0] <= curr <= new_range[1]:
         # if not in_first(curr, ranges_to_keep):
@@ -486,26 +329,24 @@ def traverse_mapping_ranges(new_mapping, ranges_to_keep):
 
 
 # [13:46] 15147306 - too low
+# bugs: return new_mapping, has_overlap not checking outer overlap (where 2nd arg fully covers 1st), rewrote create_missing_ranges
+# Attempt other approach & found bugs in underlying functions
+# [21:21] got answer after reverting back to first approach
 def main():
     lines = [line.strip() for line in fileinput.input()]
-    # print(f'Lines: {len(lines)}')
 
-    # Part 1 - 
+    # Part 1
     seeds_to_plant = [int(val) for val in lines[0].split(": ")[1].split()]
-    # prev_mapping = dict()
-    # curr_mapping = dict()
-    # print(seeds_to_plant)
-    # for lines in grouped(lines[1:]):
-    #     if lines[0] == 'seed-to-soil map:':
-    #         curr_mapping = generate_mapping(lines[1:], seeds_to_plant)
-    #     else:
-    #         curr_mapping = generate_mapping(lines[1:], prev_mapping.values())
+    prev_mapping = dict()
+    curr_mapping = dict()
+    for group in grouped(lines[1:]):
+        if group[0] == 'seed-to-soil map:':
+            curr_mapping = generate_mapping(group[1:], seeds_to_plant)
+        else:
+            curr_mapping = generate_mapping(group[1:], prev_mapping.values())
 
-    #     prev_mapping = curr_mapping
-    #     # print(curr_mapping)
-    #     # exit()           
-    # # print(seed_to_soil)
-    # print(min(curr_mapping.values()))
+        prev_mapping = curr_mapping
+    print(min(curr_mapping.values()))
 
     # Part 2
     seed_ranges = []
@@ -513,8 +354,6 @@ def main():
         start, rng = seeds_to_plant[idx:idx+2]
         bgn, end = start, start + rng - 1
         seed_ranges.append((bgn, end))
-    print(f"{len(seed_ranges)}", seed_ranges)
-    print()
 
     prev_mapping = dict()
     curr_mapping = dict()
