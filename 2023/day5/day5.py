@@ -519,24 +519,33 @@ def main():
     prev_mapping = dict()
     curr_mapping = dict()
     for group in grouped(lines[1:]):
-        new_mapping = dict()
-        for line in group[1:]:
-            dest_start, src_start, range_len = [int(val) for val in line.split()]
-            src_rng = (src_start, src_start + range_len - 1)
-            dest_rng = (dest_start, dest_start + range_len - 1)
-            new_mapping[src_rng] = dest_rng
+        # Attempt 1 (seemed to work but answer was intially wrong)
+        if group[0] == 'seed-to-soil map:':
+            curr_mapping = generate_mapping_ranges(group[1:], seed_ranges)
+        else:
+            curr_mapping = generate_mapping_ranges(group[1:], prev_mapping.values())
+
+        # Attempt 2 - incomplete
+        # if group[0] == 'seed-to-soil map:':
+        #     curr_mapping = generate_mapping_ranges2(group[1:], seed_ranges)
+        # else:
+        #     curr_mapping = generate_mapping_ranges2(group[1:], prev_mapping.values())
+
+        # Attempt 3 - thought it would simplify - but still incomplete
+        # new_mapping = dict()
+        # for line in group[1:]:
+        #     dest_start, src_start, range_len = [int(val) for val in line.split()]
+        #     src_rng = (src_start, src_start + range_len - 1)
+        #     dest_rng = (dest_start, dest_start + range_len - 1)
+        #     new_mapping[src_rng] = dest_rng
         # if group[0] == 'seed-to-soil map:':
         #     curr_mapping = traverse_mapping_ranges(new_mapping, seed_ranges)
         # else:
         #     curr_mapping = traverse_mapping_ranges(new_mapping, prev_mapping.values())
-        if group[0] == 'seed-to-soil map:':
-            curr_mapping = generate_mapping_ranges2(group[1:], seed_ranges)
-        else:
-            curr_mapping = generate_mapping_ranges2(group[1:], prev_mapping.values())
 
         prev_mapping = curr_mapping
         # print(group[0])
-        print(curr_mapping)
+        # print(curr_mapping)
         # print(len(curr_mapping))
         # exit()           
     # print(seed_to_soil)
