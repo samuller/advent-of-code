@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 import fileinput
+from enum import Enum
 from collections import Counter
-# import sys; sys.path.append("../..")
-# from lib import *
-
-
-class Classy:
-    def __init__(self):
-        pass
 
 
 # 7 Five of a kind, where all five cards have the same label: AAAAA
@@ -18,6 +12,20 @@ class Classy:
 # 2 One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
 # 1 High card, where all cards' labels are distinct: 234
 # 0
+class HandTypes(Enum):
+    # Pentuplet, quintuplet
+    FIVE_OF_A_KIND = 7
+    # Quads, quadruplet, tetraplet
+    FOUR_OF_A_KIND = 6
+    FULL_HOUSE = 5
+    # Triplet
+    TRIPS = 4
+    TWO_PAIR = 3
+    # Couplet
+    ONE_PAIR = 2
+    # Singlet
+    HIGH_CARD = 1
+
 
 def replace_jokers(hand, card_ranks):
     assert 'J' in hand
@@ -29,8 +37,8 @@ def replace_jokers(hand, card_ranks):
     count_others = Counter(other_cards)
 
     match unique['J'], len(count_others):
-        # 5x Js are just lowest pentuplets
         case 5 , _:
+            # 5x Js are just lowest pentuplets
             pass
         case 4 , _:
             assert len(count_others) == 1
@@ -101,45 +109,48 @@ def value_of_hand(hand, card_ranks, jokers=False):
     if jokers and 'J' in hand:
         hand = replace_jokers(hand, card_ranks)
     unique = Counter(hand)
-    most = unique.most_common()[0]
+    most_common_value, most_common_count = unique.most_common()[0]
     common = unique.most_common()
-    # pentuplets
-    if most[1] == 5:
-        assert len(common) == 1
-        assert most[0] == hand[0]
-        # return (7, card_ranks.index(most[0]))
-        return (7, *per_card_value)
-    # quads
-    if most[1] == 4:
-        assert len(common) == 2
-        # return (6, card_ranks.index(most[0]))
-        return (6, *per_card_value)
-    # Full house
-    if len(common) == 2 and most[1] == 3 and common[1][1] == 2:
-        # return (5, card_ranks.index(most[0]), card_ranks.index(common[1][0]))
-        return (5, *per_card_value)
-    # trips
-    if most[1] == 3:
-        assert len(common) in [2, 3]
-        # return (4, card_ranks.index(most[0]))
-        return (4, *per_card_value)
-    # two pair
-    if len(common) == 3 and most[1] == 2 and common[1][1] == 2:
-        # value of 2nd pair?
-        # return (3, card_ranks.index(most[0]), card_ranks.index(common[1][0]))
-        return (3, *per_card_value)
-    # pair
-    if len(common) == 4:
-        assert most[1] == 2
-        # return (2, card_ranks.index(most[0]))
-        return (2, *per_card_value)
+    match most_common_count, len(unique):
+        # pentuplets
+        case 5, _:
+            assert len(unique) == 1
+            assert most_common_value == hand[0]
+            # return (7, card_ranks.index(most[0]))
+            return (HandTypes.FIVE_OF_A_KIND.value, *per_card_value)
+        # quads
+        case 4, _:
+            assert len(unique) == 2
+            # return (6, card_ranks.index(most[0]))
+            return (HandTypes.FOUR_OF_A_KIND.value, *per_card_value)
+        # Full house
+        case 3, 2:
+            assert common[1][1] == 2
+            # return (5, card_ranks.index(most[0]), card_ranks.index(common[1][0]))
+            return (HandTypes.FULL_HOUSE.value, *per_card_value)
+        # trips
+        case 3, _:
+            assert len(unique) in [2, 3]
+            # return (4, card_ranks.index(most[0]))
+            return (HandTypes.TRIPS.value, *per_card_value)
+        # two pair
+        case 2, 3:
+            assert common[1][1] == 2
+            # value of 2nd pair?
+            # return (3, card_ranks.index(most[0]), card_ranks.index(common[1][0]))
+            return (HandTypes.TWO_PAIR.value, *per_card_value)
+        # pair
+        case _, 4:
+            assert most_common_count == 2
+            # return (2, card_ranks.index(most[0]))
+            return (HandTypes.ONE_PAIR.value, *per_card_value)
     # high card
-    assert len(common) == 5
+    assert len(common) == 5, hand
     card_values = [card_ranks.index(val) for val in hand]
     highest_card = max(card_values)
     # type, within_type
     # return (0, highest_card)
-    return (1, *per_card_value)
+    return (HandTypes.HIGH_CARD.value, *per_card_value)
 
 
 def total_winnings(lines, card_ranks, jokers=False):
