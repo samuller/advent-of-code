@@ -27,39 +27,41 @@ def replace_jokers(hand, card_ranks):
     # sort by value
     other_cards.sort(key=lambda val: card_ranks.index(val))
     count_others = Counter(other_cards)
-    # 5x Js are just lowest pentuplets
-    if unique['J'] == 4:
-        assert len(count_others) == 1
-        other_card = other_cards[0]
-        # highest other card - pents
-        new_hand = other_card*5
-    elif unique['J'] == 3:
-        assert len(count_others) in [1, 2]
-        # highest other card - quads
-        new_hand = hand.replace('J', other_cards[-1])
-    elif unique['J'] == 2:
-        assert len(count_others) in [1, 2, 3]
-        if len(count_others) == 3:
+
+    match unique['J'], len(count_others):
+        # 5x Js are just lowest pentuplets
+        case 5 , _:
+            pass
+        case 4 , _:
+            assert len(count_others) == 1
+            # highest other card - pents
+            new_hand = other_cards[0]*5
+        case 3, _:
+            assert len(count_others) in [1, 2]
+            # highest other card - quads
+            new_hand = hand.replace('J', other_cards[-1])
+        case 2, 3:
             # highest other card - trips
             new_hand = hand.replace('J', other_cards[-1])
-        elif len(count_others) == 2:
+        case 2, 2:
             # most other cards - quads
             joker_card = Counter(other_cards).most_common()[0][0]
             new_hand = hand.replace('J', joker_card)
-        elif len(count_others) == 1:
+        case 2, 1:
             # any - pents
             new_hand = hand.replace('J', other_cards[0])
-    elif unique['J'] == 1:
-        assert len(count_others) in [1, 2, 3, 4]
-        if len(count_others) == 4:
+        case 2, _:
+            assert len(count_others) in [1, 2, 3]
+            assert False
+        case 1, 4:
             # highest other card - pair
             new_hand = hand.replace('J', other_cards[-1])
-        if len(count_others) == 3:
+        case 1, 3:
             # most other cards - trips
             # (or highest other card?)
             joker_card = Counter(other_cards).most_common()[0][0]
             new_hand = hand.replace('J', joker_card)
-        elif len(count_others) == 2:
+        case 1, 2:
             # most other cards - quads or full house!!!
             commons = count_others.most_common()
             # 3/1 quads
@@ -78,9 +80,13 @@ def replace_jokers(hand, card_ranks):
                 assert False
                 # joker_card = commons[0][0]
                 # new_hand = hand.replace('J', joker_card)
-        elif len(count_others) == 1:
+        case 1, 1:
             # any - pents
             new_hand = hand.replace('J', other_cards[0])
+        case 1, _:
+            assert len(count_others) in [1, 2, 3, 4]
+            assert False
+
     # print(hand, "->", new_hand)
     return new_hand
 
