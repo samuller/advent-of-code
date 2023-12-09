@@ -40,6 +40,22 @@ def follow_multiple(starts, instructions, nodes):
     return math.lcm(*steps_needed)
 
 
+# https://stackoverflow.com/questions/15347174/python-finding-prime-factors
+def prime_factors(n):
+    i = 2
+    factors = []
+    while i * i <= n:
+        if n % i == 0:
+            n = n//i
+            factors.append(i)
+        else:
+            i += 1
+    factors.append(n)
+    return factors
+
+assert prime_factors(600851475143) == [71, 839, 1471, 6857]
+
+
 def follow_cycles(starts, instructions, nodes):
     """Process data with expectation of proper cycles in graph."""
     steps_needed = []
@@ -47,8 +63,11 @@ def follow_cycles(starts, instructions, nodes):
     for start in starts:
         steps = follow(start, instructions, nodes, lambda val: val[-1] == "Z")
         steps_needed.append(steps)
+    lcm = math.lcm(*steps_needed)
     # Can also take all prime factors, remove duplicates and multiple them all together.
-    return math.lcm(*steps_needed)
+    primes = set([p for n in steps_needed for p in prime_factors(n)])
+    assert prod(primes) == lcm
+    return lcm
 
 
 def follow(start, instructions, nodes, is_end = lambda val: val == "ZZZ"):
