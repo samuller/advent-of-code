@@ -19,14 +19,7 @@ class Classy:
 # 1 High card, where all cards' labels are distinct: 234
 # 0
 
-card_ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
-# Part 2
-card_ranks = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
-card_ranks.reverse()
-hand_ranks = []
-
-
-def replace_jokers(hand):
+def replace_jokers(hand, card_ranks):
     assert 'J' in hand
     unique = Counter(hand)
     new_hand = hand
@@ -92,15 +85,15 @@ def replace_jokers(hand):
     return new_hand
 
 
-def value_of_hand(hand):
+def value_of_hand(hand, card_ranks, jokers=False):
     assert len(hand) == 5
     for c in hand:
         assert c in card_ranks
     per_card_value = tuple([card_ranks.index(c) for c in hand])
     # Part 2
     # TODO: full house
-    if 'J' in hand:
-        hand = replace_jokers(hand)
+    if jokers and 'J' in hand:
+        hand = replace_jokers(hand, card_ranks)
     unique = Counter(hand)
     most = unique.most_common()[0]
     common = unique.most_common()
@@ -143,14 +136,7 @@ def value_of_hand(hand):
     return (1, *per_card_value)
 
 
-# assert value_of_hand("2345A") == (1, 12)  #  "Bug"
-# Part 1
-# assert value_of_hand("A2345") == (1, 12, 0, 1, 2, 3), value_of_hand("A2345")
-# Part 2
-assert value_of_hand("A2345") == (1, 12, 1, 2, 3, 4), value_of_hand("A2345")
-
-
-def total_winnings(lines):
+def total_winnings(lines, card_ranks, jokers=False):
     hand_to_value = dict()
     hand_to_bid = dict()
     for line in lines:
@@ -158,18 +144,19 @@ def total_winnings(lines):
         assert len(hand) == 5
         bid = int(bid)
         hand_to_bid[hand] = bid
-        hand_to_value[hand] = value_of_hand(hand)
+        hand_to_value[hand] = value_of_hand(hand, card_ranks, jokers)
         # print(hand, value_of_hand(hand))
-    print()
+    # print()
     hand_values = list(hand_to_value.items())
     hand_values.sort(key=lambda val: val[1])
     # print(hand_to_bid)
-    print(hand_values)
+    # print(hand_values)
     ans1 = 0
     for rank, hand_value in enumerate(hand_values):
         hand, value = hand_value
         bid = hand_to_bid[hand]
         ans1 += (bid * (rank + 1))
+    # print(hands_value)
     return ans1
 
 
@@ -179,11 +166,21 @@ def total_winnings(lines):
 def main():
     lines = [line.strip() for line in fileinput.input()]
 
-    print(card_ranks)
-
-    ans1 = total_winnings(lines)
+    card_ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+    card_ranks.reverse()
+    ans1 = total_winnings(lines, card_ranks, False)
     print(ans1)
-    # print(hands_value)
+    # assert value_of_hand("2345A") == (1, 12)  #  "Bug"
+    # Part 1
+    assert value_of_hand("A2345", card_ranks) == (1, 12, 0, 1, 2, 3), value_of_hand("A2345", card_ranks)
+
+    # Part 2
+    card_ranks = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+    card_ranks.reverse()
+    ans2 = total_winnings(lines, card_ranks, True)
+    print(ans2)
+    # Part 2
+    assert value_of_hand("A2345", card_ranks) == (1, 12, 1, 2, 3, 4), value_of_hand("A2345", card_ranks)
 
 
 if __name__ == '__main__':
