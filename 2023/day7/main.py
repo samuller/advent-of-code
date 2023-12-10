@@ -99,6 +99,52 @@ def replace_jokers(hand, card_ranks):
     return new_hand
 
 
+def type_of_hand(hand):
+    unique = Counter(hand)
+    most_common_value, most_common_count = unique.most_common()[0]
+    common = unique.most_common()
+    match most_common_count, len(unique):
+        # pentuplets
+        case 5, _:
+            assert len(unique) == 1
+            assert most_common_value == hand[0]
+            # return (7, card_ranks.index(most_common_value))
+            return HandTypes.FIVE_OF_A_KIND.value
+        # quads
+        case 4, _:
+            assert len(unique) == 2
+            # return (6, card_ranks.index(most_common_value))
+            return HandTypes.FOUR_OF_A_KIND.value
+        # Full house
+        case 3, 2:
+            assert common[1][1] == 2
+            # return (5, card_ranks.index(most_common_value), card_ranks.index(common[1][0]))
+            return HandTypes.FULL_HOUSE.value
+        # trips
+        case 3, _:
+            assert len(unique) in [2, 3]
+            # return (4, card_ranks.index(most_common_value))
+            return HandTypes.TRIPS.value
+        # two pair
+        case 2, 3:
+            assert common[1][1] == 2
+            # value of 2nd pair?
+            # return (3, card_ranks.index(most_common_value), card_ranks.index(common[1][0]))
+            return HandTypes.TWO_PAIR.value
+        # pair
+        case _, 4:
+            assert most_common_count == 2
+            # return (2, card_ranks.index(most_common_value))
+            return HandTypes.ONE_PAIR.value
+    # high card
+    assert len(common) == 5, hand
+    # card_values = [card_ranks.index(val) for val in hand]
+    # highest_card = max(card_values)
+    # type, within_type
+    # return (0, highest_card)
+    return HandTypes.HIGH_CARD.value
+
+
 def value_of_hand(hand, card_ranks, jokers=False):
     assert len(hand) == 5
     for c in hand:
@@ -108,49 +154,8 @@ def value_of_hand(hand, card_ranks, jokers=False):
     # TODO: full house
     if jokers and 'J' in hand:
         hand = replace_jokers(hand, card_ranks)
-    unique = Counter(hand)
-    most_common_value, most_common_count = unique.most_common()[0]
-    common = unique.most_common()
-    match most_common_count, len(unique):
-        # pentuplets
-        case 5, _:
-            assert len(unique) == 1
-            assert most_common_value == hand[0]
-            # return (7, card_ranks.index(most[0]))
-            return (HandTypes.FIVE_OF_A_KIND.value, *per_card_value)
-        # quads
-        case 4, _:
-            assert len(unique) == 2
-            # return (6, card_ranks.index(most[0]))
-            return (HandTypes.FOUR_OF_A_KIND.value, *per_card_value)
-        # Full house
-        case 3, 2:
-            assert common[1][1] == 2
-            # return (5, card_ranks.index(most[0]), card_ranks.index(common[1][0]))
-            return (HandTypes.FULL_HOUSE.value, *per_card_value)
-        # trips
-        case 3, _:
-            assert len(unique) in [2, 3]
-            # return (4, card_ranks.index(most[0]))
-            return (HandTypes.TRIPS.value, *per_card_value)
-        # two pair
-        case 2, 3:
-            assert common[1][1] == 2
-            # value of 2nd pair?
-            # return (3, card_ranks.index(most[0]), card_ranks.index(common[1][0]))
-            return (HandTypes.TWO_PAIR.value, *per_card_value)
-        # pair
-        case _, 4:
-            assert most_common_count == 2
-            # return (2, card_ranks.index(most[0]))
-            return (HandTypes.ONE_PAIR.value, *per_card_value)
-    # high card
-    assert len(common) == 5, hand
-    card_values = [card_ranks.index(val) for val in hand]
-    highest_card = max(card_values)
-    # type, within_type
-    # return (0, highest_card)
-    return (HandTypes.HIGH_CARD.value, *per_card_value)
+    hand_type = type_of_hand(hand)
+    return (hand_type, *per_card_value)
 
 
 def total_winnings(lines, card_ranks, jokers=False):
