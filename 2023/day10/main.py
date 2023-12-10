@@ -197,18 +197,32 @@ def main():
     print(len(path))
     print(len(path)/2)
 
-    # TODO:
+    # Part 2
+    # Idea was:
     # - split path/polygon into convex hull polygons
-    # - count empty areas within those polygons
+    # - count areas within those polygons
+    # But now:
+    # https://stackoverflow.com/questions/36399381/whats-the-fastest-way-of-checking-if-a-point-is-inside-a-polygon-in-python
+    # pip install shapely
+    from shapely.geometry import Point
+    from shapely.geometry.polygon import Polygon
+
+    polygon = Polygon(path)
+
     enclosed = 0
     for rr in range(len(grid)):
         for cc in range(len(grid[rr])):
             pipe = grid[rr][cc]
-            if pipe == ".":
-                print(rr, cc)
-
-        print(grid[rr])
+            if pipe not in path:
+            # if pipe == ".":
+                point = Point(rr, cc)
+                # print(rr, cc)
+                if polygon.contains(point):
+                    enclosed += 1
+    # 9:54 - wrong:  67
     print(enclosed)
+
+
 
     # # seen = set(start)
     # path1 = [start]
