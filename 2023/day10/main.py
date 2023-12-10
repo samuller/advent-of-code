@@ -208,17 +208,17 @@ def main():
     from shapely.geometry.polygon import Polygon
 
     polygon = Polygon(path)
-
     enclosed = 0
     for rr in range(len(grid)):
         for cc in range(len(grid[rr])):
-            pipe = grid[rr][cc]
-            if pipe not in path:
+            # pipe = grid[rr][cc]
             # if pipe == ".":
-                point = Point(rr, cc)
-                # print(rr, cc)
-                if polygon.contains(point):
-                    enclosed += 1
+            if (rr,cc) in path:
+                continue
+            point = Point(rr, cc)
+            # print(rr, cc)
+            if polygon.contains(point):
+                enclosed += 1
     # 9:54 - wrong:  67
     print(enclosed)
 
