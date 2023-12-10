@@ -182,17 +182,33 @@ def main():
     lines = [line.strip() for line in fileinput.input()]
     grid = [[c for c in line] for line in lines]
 
+    empty = 0
     for row in grid:
-        print(row)
+        # print(row)
         assert len(row) == len(grid[0])
+        empty += row.count(".")
+    print(empty)
 
     # S is the starting position of the animal;
     # there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.
     start = find_start(grid)
     path = follow_path(grid, start)
-    print(path)
+    # print(path)
     print(len(path))
     print(len(path)/2)
+
+    # TODO:
+    # - split path/polygon into convex hull polygons
+    # - count empty areas within those polygons
+    enclosed = 0
+    for rr in range(len(grid)):
+        for cc in range(len(grid[rr])):
+            pipe = grid[rr][cc]
+            if pipe == ".":
+                print(rr, cc)
+
+        print(grid[rr])
+    print(enclosed)
 
     # # seen = set(start)
     # path1 = [start]
