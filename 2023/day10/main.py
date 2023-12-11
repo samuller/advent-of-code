@@ -7,8 +7,6 @@ SOUTH = (1, 0)
 WEST = (0, -1)
 EAST = (0, 1)
 
-DRDC = [NORTH, EAST, SOUTH, WEST]
-
 PIPE_CONNECT = {
     # | is a vertical pipe connecting north and south.
     '|': (NORTH, SOUTH),
@@ -34,54 +32,54 @@ def follow_path(grid, start):
     R = len(grid)
     C = len(grid[0])
     path = [start]
-    look_dirs = DRDC
+    # We initially might be connected in any direction
+    look_dirs = [NORTH, EAST, SOUTH, WEST]
     while True:
         r1, c1 = path[-1]
-        added = []
+        locs_found = []
         for dr, dc in look_dirs:
-            # dr, dc = DRDC[i] #DR[i], DC[i]
             # look
-            lr, lc = r1+dr, c1+dc
-            # print(f"{(r1, c1)} + {(dr, dc)} = {(lr, lc)}")
+            # lr, lc = r1+dr, c1+dc
+            lr, lc = rel_to_abs((r1, c1), (dr, dc))
             # If out of bounds
             if not ((0 <= lr < R) and (0 <= lc < C)):
                 continue
-            # Take first direction we haven't been to yet
+            # Only look/move in directions we haven't been to yet
             if (lr, lc) in path:
                 continue
 
             pipe1 = grid[lr][lc]
-            # if pipe1 == 'S'
-            connects = PIPE_CONNECT[pipe1]
-            abs_conn = [rel_to_abs((lr, lc), conn) for conn in connects]
-            # print('----')
-            # print(path[-1])
-            # print(lr, lc, pipe1)
-            # print(connects, '->', abs_conn)
+            # Get relative connected locations for this ype of pipe
+            rel_conn = PIPE_CONNECT[pipe1]
+            # Convert to absolute connected locations
+            abs_conn = [rel_to_abs((lr, lc), conn) for conn in rel_conn]
             # Ignore pipes not connected to us (only relevant at start due to look_dirs?)
             if not path[-1] in abs_conn:
                 continue
             abs_conn.remove(path[-1])
+            assert len(abs_conn) == 1
+            # Get next location connected to via pipe
             nr, nc = abs_conn[0]
-            # If out of bounds
+            # If out of bounds, leave it
             if not ((0 <= nr < R) and (0 <= nc < C)):
                 continue
+            # If we've looped back to the start, then we're done
             if (nr, nc) == start:
                 path.append((lr, lc))
                 return path
-            # Take first direction we haven't been to yet
-            if (nr, nc) in path:
-                continue
-
+            # Path should not have crazy loops, etc.
+            assert (nr, nc) not in path
+            # Add the look location and the next location to the path
             path.append((lr, lc))
             path.append((nr, nc))
+            # Next round we should only look in directions connected to the "next" location we've now moved to
             new_pipe = grid[nr][nc]
-            # Next round we should only look in connected directions
             look_dirs = PIPE_CONNECT[new_pipe]
 
-            added.append((lr, lc))
+            locs_found.append((lr, lc))
             break
-        assert len(added) != 0, (lr, lc)
+        # Check that at least one valid path is found
+        assert len(locs_found) != 0, (lr, lc)
         # print(path)
 
 
@@ -96,20 +94,22 @@ def main():
     lines = [line.strip() for line in fileinput.input()]
     grid = [[c for c in line] for line in lines]
 
-    empty = 0
+    count_empty = 0
     for row in grid:
         # print(row)
         assert len(row) == len(grid[0])
-        empty += row.count(".")
-    print(empty)
+        count_empty += row.count(".")
+    # print(count_empty)
 
     # S is the starting position of the animal;
     # there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.
     start = find_start(grid)
     path = follow_path(grid, start)
     # print(path)
-    print(len(path))
-    print(len(path)/2)
+    # print(len(path))
+    halfway_dist = len(path)//2
+    assert halfway_dist == len(path)/2
+    print(halfway_dist)
 
     # Part 2
     # Idea was:
