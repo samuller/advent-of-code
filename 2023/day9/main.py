@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 import fileinput
-# import sys; sys.path.append("../..")
-# from lib import *
-
-
-class Classy:
-    def __init__(self):
-        pass
 
 
 def subs(nums):
