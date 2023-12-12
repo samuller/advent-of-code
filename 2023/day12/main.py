@@ -6,8 +6,12 @@ from collections import Counter
 # import sys; sys.path.append("../..")
 # from lib import *
 
-
+seen_calc = {}
 def calc_data(springs):
+    springs = tuple(springs)
+    if springs in seen_calc:
+        return seen_calc[springs]
+
     count = 0
     contig = []
     for c in springs:
@@ -19,18 +23,25 @@ def calc_data(springs):
     if count != 0:
         contig.append(count)
     # print(contig)
+    seen_calc[springs] = contig
     return contig
 
 
 assert calc_data([c for c in ".###.##...#.#.#"]) == [3,2,1,1,1]
 
 
+def inter_possibilities(springs, data):
+    springs = springs + ['?'] + list(springs)
+    data = data + list(data)
+    ans = possibilities(springs, data)
+    return ans
+
+# assert inter_possibilities([c for c in "?###????????"], [3,2,1]) == 10
+
+
 def possibilities(springs, data):
     print(springs, data)
     counts = Counter(springs)
-    # print(list(itertools.combinations(['.', '#'], 3)))
-    # print(list(itertools.permutations(('.', '#'), 2)))
-    # print(list(itertools.product(('.', '#'), repeat=3)))
     ans = 0
     for poss in itertools.product(('.', '#'), repeat=counts.get('?', 0)):
         imagine = list(springs)
@@ -44,10 +55,6 @@ def possibilities(springs, data):
             # print(imagine)
             ans += 1
     # ans = math.pow(2, counts.get('?', 0))
-    # print(counts)
-    
-    # ans = 0
-    # print(ans)
     return ans
 
 assert possibilities([c for c in "?###????????"], [3,2,1]) == 10
@@ -58,13 +65,18 @@ def main():
     print(f'Lines: {len(lines)}')
 
     ans1 = 0
+    ans2 = 0
     for line in lines:
         springs, data = line.split(' ')
         springs = [c for c in springs]
         data = [int(d) for d in data.split(",")]
         assert set(springs) - set(['#', '.', '?']) == set()
-        ans1 += possibilities(springs, data)
+        # ans1 += possibilities(springs, data)
+        # ans2 += possibilities(springs * 5, data * 5)
+        ans2 += possibilities(springs, data) * 5
+        ans2 += inter_possibilities(springs, data) * 4
     print(ans1)
+    print(ans2)
 
 
 if __name__ == '__main__':
