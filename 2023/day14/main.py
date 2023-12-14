@@ -44,6 +44,7 @@ def find_loops_at_end(history):
 
 
 def tilt(walls, rocks, tilt_dir, limits):
+    rock_set = set(rocks)
     outer_limits = (limits[0] - 1, limits[1] + 1)
     rolldir_rr, rolldir_cc = tilt_dir
     the_limit = min(limits) if rolldir_rr < 0 or rolldir_cc < 0 else max(limits)
@@ -65,7 +66,7 @@ def tilt(walls, rocks, tilt_dir, limits):
                         break
                     # Look one spot ahead
                     test_pos = (new_rr + rolldir_rr, old_cc + rolldir_cc)
-                    if test_pos in walls or test_pos in rocks:
+                    if test_pos in walls or test_pos in rock_set:
                         # print("break", test_pos in walls, test_pos in rocks)
                         break
 
@@ -76,7 +77,7 @@ def tilt(walls, rocks, tilt_dir, limits):
                         break
                     # Look one spot ahead
                     test_pos = (old_rr + rolldir_rr, new_cc + rolldir_cc)
-                    if test_pos in walls or test_pos in rocks:
+                    if test_pos in walls or test_pos in rock_set:
                         break
 
             diff_rr = abs(old_rr - new_rr)
@@ -85,6 +86,8 @@ def tilt(walls, rocks, tilt_dir, limits):
             moved += diff_cc
             # if diff_rr or diff_cc:
             #     print((old_rr, old_cc), '->', (new_rr, new_cc))
+            rock_set.remove((old_rr, old_cc))
+            rock_set.add((new_rr, new_cc))
             rocks[idx] = (new_rr, new_cc)
             # print(moved, rocks)
             # if idx == 5:
