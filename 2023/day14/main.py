@@ -30,10 +30,17 @@ def print_rocks(rocks, walls, R, C):
 
 
 def find_loops_at_end(history):
-    idx = 0
-    while history.count(history[-1 + idx]) > 1:
-        pass
-    return idx
+    # min_loop_len = len(history)
+    # max_loop_len = 0
+    for loop_len in range(1, len(history)//2):
+        part1 = history[-loop_len:]
+        part2 = history[-2*loop_len:-loop_len]
+        assert len(part1) == len(part2), len(history)
+        if part1 == part2:
+            return loop_len
+            # min_loop_len = min(min_loop_len, loop_len)
+            # max_loop_len = max(max_loop_len, loop_len)
+    return None
 
 
 def tilt(walls, rocks, tilt_dir, limits):
@@ -108,11 +115,19 @@ def main():
                 rocks.append((rr, cc))
             if row[cc] == '#':
                 walls.add((rr, cc))
+
+    new_rocks, _ = tilt(walls, list(rocks), ROLL_NORTH, limits=(0, R-1))
+    ans1 = 0
+    for rock in new_rocks:
+        ans1 += (R - rock[0])
+    print(ans1)
+
     # print(rocks)
     # print(walls)
     # rock_count = len(set(rocks))
     track = []
-    for count in range(1_000_000_000):
+    max_count = 1_000_000_000
+    for count in range(max_count):
         move_count = 0
         rocks, moves = tilt(walls, rocks, ROLL_NORTH, limits=(0, R-1))
         move_count += moves
@@ -132,9 +147,18 @@ def main():
         for rock in rocks:
             ans1 += (R-rock[0])
         track.append(ans1)
-        print(count+1, ans1)
-        find_loops_at_end(track)
-        # exit()
+        loops = find_loops_at_end(track)
+        # print(count, ans1, loops)
+        # Ignore small possible loops caused by coincidental repititions within loops
+        if loops is not None and loops > 4:
+            # Convert max_count from counter (1-indexed) to index (0-indexed) since we prefer to do all
+            # math in 0-indexed notations...
+            max_count_idx = max_count - 1
+            loop_start = 1 + count - 2*loops
+            loop_offset = (max_count_idx - loop_start) % loops
+            # print(loop_start, loop_offset)
+            print(track[loop_start + loop_offset])
+            exit()
 
 
 if __name__ == '__main__':
