@@ -65,30 +65,13 @@ def print_path(R, C, beam_path):
     assert len(used) == len(beam_path)
 
 
-# [7:34] - 6286
-# [8:08] - 6145 (popleft differs from pop?)
-# [8:42] - beam_history had incorrect values
-def main():
-    lines = [line.strip() for line in fileinput.input()]
-
-    mirrors_splitters = dict()
-    R = len(lines)
-    C = len(lines[0])
-    for rr, row in enumerate(lines):
-        assert len(row) == C
-        for cc, val in enumerate(row):
-            if val in ['/', '\\', '|', '-']:
-                mirrors_splitters[(rr, cc)] = val
-            else:
-                assert val == '.'
-    print(mirrors_splitters)
-
+def spread_beam(R, C, start_loc, start_dir, mirrors_splitters):
     # Start out of screen
-    beam_fronts = [(0, -1)]
-    beam_dirs = [EAST]
+    beam_fronts = [start_loc]
+    beam_dirs = [start_dir]
     beam_path = set()  # set(beam_fronts)
     beam_history = set()  # set(zip(beam_fronts, beam_dirs))
-    print(beam_history)
+    # print(beam_history)
     while len(beam_fronts) > 0:
         # print_path(R, C, beam_path)
         assert len(beam_fronts) == len(beam_dirs)
@@ -161,15 +144,49 @@ def main():
             beam_dirs.append(move_dir)
         # print(len(beam_path), beam_fronts)
         # print(len(beam_path), len(beam_fronts), beam_fronts)
-        print(len(beam_path), len(beam_fronts))
+        # print(len(beam_path), len(beam_fronts))
     assert len(beam_fronts) == 0
     # Remove first out of screen starting point
     # beam_history.remove(((0, -1), EAST))
     assert len(beam_path) <= len(beam_history)
-    print_path(R, C, beam_path)
-    print_history(R, C, beam_history, mirrors_splitters)
-    print(len(beam_path))
+    # print_path(R, C, beam_path)
+    # print_history(R, C, beam_history, mirrors_splitters)
+    # print(len(beam_path))
+    return len(beam_path)
 
+# [7:34] - 6286
+# [8:08] - 6145 (popleft differs from pop?)
+# [8:42] - beam_history had incorrect values
+def main():
+    lines = [line.strip() for line in fileinput.input()]
+
+    mirrors_splitters = dict()
+    R = len(lines)
+    C = len(lines[0])
+    for rr, row in enumerate(lines):
+        assert len(row) == C
+        for cc, val in enumerate(row):
+            if val in ['/', '\\', '|', '-']:
+                mirrors_splitters[(rr, cc)] = val
+            else:
+                assert val == '.'
+    # print(mirrors_splitters)
+
+    ans1 = spread_beam(R, C, (0, -1), EAST, mirrors_splitters)
+    print(ans1)
+
+    ans2 = ans1
+    for rr in range(R):
+        count = spread_beam(R, C, (rr, -1), EAST, mirrors_splitters)
+        ans2 = max(ans2, count)
+        count = spread_beam(R, C, (rr, C), WEST, mirrors_splitters)
+        ans2 = max(ans2, count)
+    for cc in range(C):
+        count = spread_beam(R, C, (-1, cc), SOUTH, mirrors_splitters)
+        ans2 = max(ans2, count)
+        count = spread_beam(R, C, (R, cc), NORTH, mirrors_splitters)
+        ans2 = max(ans2, count)
+    print(ans2)
 
 if __name__ == '__main__':
     main()
