@@ -18,11 +18,14 @@ LEFT_RIGHT = {
 
 
 
-def print_path(R, C, path):
+def print_path(R, C, path, spec_loc={}):
     for rr in range(R):
         for cc in range(C):
             if (rr, cc) in path:
-                print('#', end="")
+                val = '#'
+                if (rr, cc) in spec_loc:
+                    val = spec_loc[(rr, cc)]
+                print(val, end="")
             else:
                 print('.', end="")
         print()
@@ -48,6 +51,9 @@ def move(loc, move_dir):
 
 
 # [8:30] Realise sum_grid needs to contain info for forward-count as well
+# [8:30-9:35] take break
+# [9:42] 836 & 839 - answer too low
+# [10:20-] take break
 def main():
     lines = [line.strip() for line in fileinput.input()]
 
@@ -61,121 +67,144 @@ def main():
     # print(grid)
     print_grid(grid)
 
-    sum_grid_count = []
-    for _ in range(3):
-        sum_grid = []
-        for _ in range(R):
-            sum_grid.append([-1]*C)
-        sum_grid[0][0] = 0
-        sum_grid_count.append(sum_grid)
+    # sum_grid_count = []
+    # for _ in range(3+1):
+    #     sum_grid = []
+    #     for _ in range(R):
+    #         sum_grid.append([-1]*C)
+    #     sum_grid[0][0] = 0
+    #     sum_grid_count.append(sum_grid)
 
-    fronts = [(0,0), (0,0)]
-    front_dirs = [EAST, SOUTH]
-    front_fwd_count = [0, 0]
-    while len(fronts) > 0:
-        assert len(fronts) == len(front_dirs)
-        print(len(fronts), fronts)
-        choose_idx = 0
-        loc = fronts.pop(choose_idx)
-        from_dir = front_dirs.pop(choose_idx)
-        count = front_fwd_count.pop(choose_idx)
+    # fronts = [(0,0), (0,0)]
+    # front_dirs = [EAST, SOUTH]
+    # front_fwd_count = [0, 0]
+    # while len(fronts) > 0:
+    #     assert len(fronts) == len(front_dirs)
+    #     # print(len(fronts), fronts)
+    #     choose_idx = 0
+    #     loc = fronts.pop(choose_idx)
+    #     from_dir = front_dirs.pop(choose_idx)
+    #     count = front_fwd_count.pop(choose_idx)
 
-        curr_cost = max(sum_grid[loc[0]][loc[1]], 0)
-        for new_dir in [NORTH, SOUTH, EAST, WEST]:
-            new_loc = move(loc, new_dir)
-            # Out of bounds
-            if not (0 <= new_loc[0] < R and 0 <= new_loc[1] < C):
-                # print("|| oob ||", from_dir, '->',new_dir)
-                continue
-            rr, cc = new_loc
-            prev_cost = sum_grid[rr][cc]
-            new_cost = curr_cost + grid[rr][cc]
-            new_count = 0
-            # Moving forward
-            if new_dir == from_dir:
-                # Limited to 3 forward moves
-                if count >= 2:
-                    # print("|| fwd ||", from_dir, '->',new_dir)
-                    continue
-                new_count = count + 1
-            # If new path is better
-            if prev_cost == -1 or new_cost < prev_cost:
-                if (rr, cc) in [(R-1, C-1), (11, 12)]:
-                    print(f"==== {(rr, cc)} ====")
-                    print(loc, '->',new_loc)
-                    print(from_dir, '->',new_dir)
-                    print(prev_cost, '->', f"{curr_cost} + {grid[rr][cc]} = {new_cost}")
-                sum_grid[rr][cc] = new_cost
-                fronts.append(new_loc)
-                front_dirs.append(new_dir)
-                front_fwd_count.append(new_count)
-            else:
-                # print("|| max ||", from_dir, '->',new_dir)
-                pass
+    #     for new_dir in [NORTH, SOUTH, EAST, WEST]:
+    #         new_loc = move(loc, new_dir)
+    #         # Out of bounds
+    #         if not (0 <= new_loc[0] < R and 0 <= new_loc[1] < C):
+    #             # print("|| oob ||", from_dir, '->',new_dir)
+    #             continue
+    #         new_count = 1
+    #         # Moving forward
+    #         if new_dir == from_dir:
+    #             # Limited to 3 forward moves
+    #             if count >= 3:
+    #                 # print("|| fwd ||", from_dir, '->',new_dir)
+    #                 continue
+    #             new_count = count + 1
 
-    print_grid(sum_grid)
-    print(sum_grid[R-1][C-1])
+    #         rr, cc = new_loc
+    #         prev_cost = sum_grid_count[new_count][rr][cc]
+    #         curr_cost = max(sum_grid_count[count][loc[0]][loc[1]], 0)
+    #         new_cost = curr_cost + grid[rr][cc]
+
+    #         # If new path is better
+    #         if prev_cost == -1 or new_cost < prev_cost:
+    #             if (rr, cc) in [(R-1, C-1), (11, 12)]:
+    #                 print(f"==== {(rr, cc)} ====")
+    #                 print(loc, '->',new_loc)
+    #                 print(from_dir, '->',new_dir)
+    #                 print(prev_cost, '->', f"{curr_cost} + {grid[rr][cc]} = {new_cost}")
+    #             sum_grid_count[new_count][rr][cc] = new_cost
+    #             fronts.append(new_loc)
+    #             front_dirs.append(new_dir)
+    #             front_fwd_count.append(new_count)
+    #         else:
+    #             # print("|| max ||", from_dir, '->',new_dir)
+    #             pass
+
+    # for count in range(len(sum_grid_count)):
+    #     sum_grid = sum_grid_count[count]
+    #     print_grid(sum_grid)
+    #     print(sum_grid[R-1][C-1])
 
     # [7:29] needs BFS instead of following all paths blindly like yesterday
-    # path_loc = [(0, 0)]
-    # path_cost = [0]
-    # path_dir = [EAST]
-    # path_fwd_count = [0]
-    # path_history = [set()]
-    # min_solution = 10**20
-    # min_path = []
-    # while len(path_loc) > 0:
-    #     try:
-    #         print(min_solution, len(path_loc))
-    #         assert len(path_loc) == len(path_dir)
-    #         assert len(path_dir) == len(path_fwd_count)
-    #         assert len(path_fwd_count) == len(path_cost)
-    #         assert len(path_history) == len(path_loc)
-    #         choose_idx = 0
-    #         loc = path_loc.pop(choose_idx)
-    #         move_dir = path_dir.pop(choose_idx)
-    #         cost = path_cost.pop(choose_idx)
-    #         fwd_count = path_fwd_count.pop(choose_idx)
-    #         history = path_history.pop(choose_idx)
+    path_loc = [(0, -1)]
+    path_cost = [0]
+    path_dir = [EAST]
+    path_fwd_count = [-1]
+    path_history = [set()]
+    min_solution = 10**20
+    min_path = []
+    while len(path_loc) > 0:
+        try:
+            print(min_solution, len(path_loc))
+            # print(path_loc)
+            # print(path_dir)
+            assert len(path_loc) == len(path_dir)
+            assert len(path_dir) == len(path_fwd_count)
+            assert len(path_fwd_count) == len(path_cost)
+            assert len(path_history) == len(path_loc)
+            choose_idx = 0
+            loc = path_loc.pop(choose_idx)
+            move_dir = path_dir.pop(choose_idx)
+            cost = path_cost.pop(choose_idx)
+            fwd_count = path_fwd_count.pop(choose_idx)
+            history = path_history.pop(choose_idx)
 
-    #         loc = list(loc)
-    #         for idx in range(len(loc)):
-    #             loc[idx] += move_dir[idx]
-    #         loc = tuple(loc)
+            loc = list(loc)
+            for idx in range(len(loc)):
+                loc[idx] += move_dir[idx]
+            loc = tuple(loc)
 
-    #         # Out of bounds
-    #         if not (0 <= loc[0] < R and 0 <= loc[1] < C):
-    #             continue
-    #         if loc in history:
-    #             continue
+            # Out of bounds
+            if not (0 <= loc[0] < R and 0 <= loc[1] < C):
+                # print("|| oob ||")
+                continue
+            if loc in history:
+                # print("|| been ||")
+                continue
+            history.add(loc)
 
-    #         fwd_count += 1
-    #         cost += grid[loc[0]][loc[1]]
-    #         history.add(loc)
+            # if len(path_loc) >= 100:
+            #     break
 
-    #         if loc == (R-1, C-1):
-    #             min_solution = min(min_solution, cost)
-    #             min_path = history
-    #         else:
-    #             # Turn left and right
-    #             for new_dir in LEFT_RIGHT[move_dir]:
-    #                 path_loc.append(loc)
-    #                 path_dir.append(new_dir)
-    #                 path_cost.append(cost)
-    #                 path_fwd_count.append(0)
-    #                 # Copy separate history for new directions
-    #                 path_history.append(set(history))
-    #             # Forward
-    #             if fwd_count <= 4:
-    #                 path_loc.append(loc)
-    #                 path_dir.append(move_dir)
-    #                 path_cost.append(cost)
-    #                 path_fwd_count.append(fwd_count)
-    #                 path_history.append(history)
-    #     except KeyboardInterrupt:
-    #         break
-    # print_path(R, C, min_path)
-    # print(min_solution)
+            fwd_count += 1
+            cost += grid[loc[0]][loc[1]]
+
+            if loc == (R-1, C-1):
+                min_solution = min(min_solution, cost)
+                min_path = history
+            else:
+                # Turn left and right
+                for new_dir in LEFT_RIGHT[move_dir]:
+                    path_loc.append(loc)
+                    path_dir.append(new_dir)
+                    path_cost.append(cost)
+                    path_fwd_count.append(0)
+                    # Copy separate history for new directions
+                    path_history.append(set(history))
+                # Forward
+                if fwd_count <= 4:
+                    path_loc.append(loc)
+                    path_dir.append(move_dir)
+                    path_cost.append(cost)
+                    path_fwd_count.append(fwd_count)
+                    path_history.append(history)
+        except KeyboardInterrupt:
+            break
+    for idx in range(0, min(100, len(path_history))):
+        loc = path_loc[idx]
+        path = path_history[idx]
+        move_dir = path_dir[idx]
+        dir_to_chr = {
+            EAST: '>',
+            WEST: '<',
+            NORTH: '^',
+            SOUTH: 'v',
+        }
+        print_path(R, C, path, {loc: dir_to_chr[move_dir]})
+
+    print_path(R, C, min_path)
+    print(min_solution)
 
 
 if __name__ == '__main__':
