@@ -12,7 +12,11 @@ def parse_workflows(workflows):
     while set([st[0] for st in curr_states]) != set(['R', 'A']):
         # print('.', end="")
         next_states = []
-        print(curr_states)
+        # print(curr_states)
+        print('[')
+        for cst in curr_states:
+            print('  ', cst)
+        print(']')
         for curr_state, curr_limits in curr_states:
             if curr_state in ['R', 'A']:
                 next_states.append((curr_state, curr_limits))
@@ -25,26 +29,50 @@ def parse_workflows(workflows):
                     next_states.append((dest, new_limits))
                 elif '<' in cmp:
                     attr, val = cmp.split('<')
+                    val = int(val)
                     # if part[attr] < int(val):
                     next_limits = deepcopy(new_limits)
                     limit = next_limits[attr]
-                    limit[1] = val
+                    limit[1] = val - 1
                     next_limits[attr] = limit
-                    next_states.append((dest, new_limits))
-                    # Opposite
-                    new_limits
-
-                elif '>' in cmp:
-                    attr, val = cmp.split('>')
-                    # if part[attr] > int(val):
+                    next_states.append((dest, next_limits))
+                    # Opposite limit going forwards
                     limit = new_limits[attr]
                     limit[0] = val
                     new_limits[attr] = limit
-                    next_states.append((dest, new_limits))
+                elif '>' in cmp:
+                    attr, val = cmp.split('>')
+                    val = int(val)
+                    # if part[attr] > int(val):
+                    next_limits = deepcopy(new_limits)
+                    limit = next_limits[attr]
+                    limit[0] = val + 1
+                    next_limits[attr] = limit
+                    next_states.append((dest, next_limits))
+                    # Opposite limit going forwards
+                    limit = new_limits[attr]
+                    limit[1] = val
+                    new_limits[attr] = limit
                 else:
                     assert False, cmp
         curr_states = next_states
-    return curr_states
+    print('[')
+    for cst in curr_states:
+        print('  ', cst)
+    print(']')
+    print(len(curr_states))
+    counts = { 'R': 0, 'A': 0 }
+    # counts = defaultdict(list)
+    for state, limits in curr_states:
+        total = 1
+        for attr, interval in limits.items():
+            assert interval[0] <= interval[1], interval
+            total *= 1 + (interval[1] - interval[0])
+            # counts[state].append(tuple(interval))
+            # counts[state] *= 1 + (interval[1] - interval[0])
+        print(state, limits, total)
+        counts[state] += total
+    return counts
 
 
 def process(part, workflows):
@@ -74,6 +102,7 @@ def process(part, workflows):
     return curr_state
 
 
+# [8:15-9:15] break
 def main():
     lines = [line.strip() for line in fileinput.input()]
 
