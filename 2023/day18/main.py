@@ -117,12 +117,10 @@ def count_edges_before_after(row_edges, all_edges, Cmin, Cmax, rr, c_pos):
 
 
 def fill_trench(edges):
-    R_min = min([loc[0] for loc in edges])
-    Rmax = max([loc[0] for loc in edges])
-    Cmin = min([loc[1] for loc in edges])
-    Cmax = max([loc[1] for loc in edges])
+    all_rr = sorted([loc[0] for loc in edges])
+    all_cc = sorted([loc[1] for loc in edges])
     fill = set()
-    for rr in range(R_min, Rmax+1):
+    for rr in all_rr:
         same_row = [loc for loc in edges if loc[0] == rr]
         # Speed up processing processing only needed columns
         col_start = min([loc[1] for loc in same_row])
@@ -186,9 +184,11 @@ def print_grid(locs):
 
 
 # [7:27] 47721 wrong (only counted before edges)
-# [8:05] 11124 wrong
+# [8:05] 11124 wrong (reqruied equal before & after edges)
 # [8:18] break - should've gone BFS flood fill...
 # [19:30-20:30] start again, fix issues, then got distracted and submit correct at 23:08
+# [23:47] sleep
+# TODO: optimize part1 by skipping processing to only places that contain points
 def main():
     lines = [line.strip() for line in fileinput.input()]
     # Test data
@@ -220,14 +220,11 @@ def main():
     #     "U 1 (#d2c081)",
     # ]
 
-
-    ans1 = 0
     curr_loc = (0, 0)
     trench = set([curr_loc])
     for line in lines:
         dir_ins, amt, color = line.split(' ')
         amt = int(amt)
-        ans1 += amt
         for _ in range(amt):
             curr_loc = move(curr_loc, INS_TO_DIR[dir_ins])
             trench.add(curr_loc)
@@ -235,9 +232,58 @@ def main():
     fill = fill_trench(trench)
     print_grid(trench)
     print_grid(fill)
-    print(len(trench))
     print(len(fill) + len(trench))
-    # print(ans1)
+
+    # Part 2
+    # NUM_TO_DIR = {
+    #     0: EAST, # 'R',
+    #     1: SOUTH, # 'D',
+    #     2: WEST,  # 'L',
+    #     3: NORTH, # 'U',
+    # }
+    # trench_edges = set()
+    # prev_point = (0, 0)
+    # for line in lines:
+    #     _, _, dir_ins_amt = line.split(' ')
+    #     dir_ins = NUM_TO_DIR[int(dir_ins_amt[-2])]
+    #     amt = int(dir_ins_amt[2:-2], base=16)
+    #     move_vec = tuple([val*amt for val in dir_ins])
+    #     # print(dir_ins, amt, move_vec)
+    #     next_point = move(prev_point, move_vec)
+    #     trench_edges.add((prev_point, next_point))
+    #     prev_point = next_point
+    # # print(trench_edges)
+
+    # vert_edges = []
+    # horz_edges = []
+    # for edge in trench_edges:
+    #     p1, p2 = edge
+    #     if p1[1] == p2[1]:
+    #         assert p1[0] != p2[0]
+    #         vert_edges.append(edge)
+    #     else:
+    #         assert p1[0] == p2[0]
+    #         horz_edges.append(edge)
+    # assert len(horz_edges) + len(vert_edges) == len(trench_edges)
+    # vert_edges.sort(key=lambda val: val[1])
+    # horz_edges.sort(key=lambda val: val[0])
+    # print(vert_edges)
+    # print(horz_edges)
+
+    # while len(trench_edges) > 0:
+    #     # Count rectangles starting at most western outer edge and moving east (so can guarantee in/out)
+    #     outer_edge = vert_edges.pop(0)
+    #     outer_rr_min = min(outer_edge[0][0], outer_edge[1][0])
+    #     outer_rr_max = max(outer_edge[0][0], outer_edge[1][0])
+    #     # Find closest overlapping vertical edge
+    #     for edge in vert_edges:
+    #         p1, p2 = edge
+    #         cc = p1[1]
+    #         min_rr = min(p1[0], p2[0])
+    #         max_rr = max(p1[0], p2[0])
+    #         if min_rr <= outer_rr <= max_rr
+    #         rr_range = ()
+    #     break
 
 
 if __name__ == '__main__':
