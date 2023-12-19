@@ -13,10 +13,10 @@ def parse_workflows(workflows):
         # print('.', end="")
         next_states = []
         # print(curr_states)
-        print('[')
-        for cst in curr_states:
-            print('  ', cst)
-        print(']')
+        # print('[')
+        # for cst in curr_states:
+        #     print('  ', cst)
+        # print(']')
         for curr_state, curr_limits in curr_states:
             if curr_state in ['R', 'A']:
                 next_states.append((curr_state, curr_limits))
@@ -56,21 +56,18 @@ def parse_workflows(workflows):
                 else:
                     assert False, cmp
         curr_states = next_states
-    print('[')
-    for cst in curr_states:
-        print('  ', cst)
-    print(']')
-    print(len(curr_states))
+    # print('[')
+    # for cst in curr_states:
+    #     print('  ', cst)
+    # print(']')
+    # print(len(curr_states))
+
     counts = { 'R': 0, 'A': 0 }
-    # counts = defaultdict(list)
     for state, limits in curr_states:
         total = 1
         for attr, interval in limits.items():
             assert interval[0] <= interval[1], interval
             total *= 1 + (interval[1] - interval[0])
-            # counts[state].append(tuple(interval))
-            # counts[state] *= 1 + (interval[1] - interval[0])
-        print(state, limits, total)
         counts[state] += total
     return counts
 
@@ -147,7 +144,7 @@ def main():
             ans1 += sum(part.values())
     print(ans1)
 
-    print(parse_workflows(workflows))
+    print(parse_workflows(workflows)['A'])
 
 if __name__ == '__main__':
     main()
