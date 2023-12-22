@@ -2,6 +2,7 @@
 import fileinput
 from dataclasses import dataclass
 from collections import Counter, defaultdict
+from typing import List, Tuple
 
 
 # @dataclass
@@ -17,8 +18,12 @@ from collections import Counter, defaultdict
 #     end: Tuple[int, int, int]
 
 
+Index = int
+Coord = Tuple[int, int, int]
+Brick = Tuple[Coord, Coord]
+
+
 # Day 5
-from typing import Tuple
 def overlap_interval(int1: Tuple[int, int], int2: Tuple[int, int]):
     start = max(int1[0], int2[0])
     end = min(int1[1], int2[1])
@@ -104,7 +109,7 @@ def get_overlaps(brick1, bricks, ignore_idx=-1):
 
 
 
-def brick_xy_overlap(brick1, brick2):
+def brick_xy_overlap(brick1, brick2) -> Tuple[bool, List[Tuple[int, int]]]:
     s1, e1 = brick1  #.start, brick.end
     s2, e2 = brick2  #.start, other.end
     overlap_region = []
@@ -120,7 +125,7 @@ def brick_xy_overlap(brick1, brick2):
     return overlap, overlap_region
 
 
-def find_xy_overlaps(brick1, bricks, ignore_idx=-1):
+def find_xy_overlaps(brick1, bricks, ignore_idx=-1) -> List[Index]:
     overlaps = []
     for idx2, brick2 in enumerate(bricks):
         if idx2 == ignore_idx:
@@ -131,10 +136,19 @@ def find_xy_overlaps(brick1, bricks, ignore_idx=-1):
     return overlaps
 
 
-def apply_gravity(bricks):
+def apply_gravity(bricks: List[Brick]):
+    # Group bricks into columns of possible interaction since xy-coords never change
+    xy_overlaps = {}
+    for idx, brick in enumerate(bricks):
+        overlaps = find_xy_overlaps(brick, bricks, ignore_idx=idx)
+        # print(f"{idx} => {len(overlaps)}")
+        # Have to use indexes since brick positions will be changing as they fall
+        xy_overlaps[idx] = overlaps
+        # print("no xy overlap", idx)
+
     # Drop all bricks
     settled_bricks = [brick_on_floor(b) for b in bricks]
-    held_up_by = [[] for _ in bricks]
+    held_up_by: List[List[Index]] = [[] for _ in bricks]
     next_idx = 0
     stable_count = Counter(settled_bricks)[True]
     while not all(settled_bricks):
@@ -146,20 +160,26 @@ def apply_gravity(bricks):
         try:
             idx = next_idx + settled_bricks[next_idx:].index(False)
         except ValueError:
-            print("reset next_idx")
+            # print("reset next_idx")
             next_idx = 0
             continue
         # print(idx)
         # pre_drop = bricks[idx]
         post_drop = drop_brick(bricks[idx])
-        overlap_idx = does_overlap(post_drop, bricks, ignore_idx=idx)
-        if overlap_idx is None:
+
+        # overlap_idx = does_overlap(post_drop, bricks, ignore_idx=idx)
+        xy_bricks = [bricks[oidx] for oidx in xy_overlaps[idx]]
+        xy_overlap_idx = does_overlap(post_drop, xy_bricks)
+        if xy_overlap_idx is None:
             # print(post_drop, overlap_idx)
             bricks[idx] = post_drop
             if brick_on_floor(post_drop):
                 settled_bricks[idx] = True
                 stable_count += 1
         else:
+            # Get index in original list
+            overlap_idx = xy_overlaps[idx][xy_overlap_idx]
+            # bricks.index(xy_overlaps[idx][xy_overlap_idx])
             # print(post_drop, overlap_idx, bricks[overlap_idx])
             if settled_bricks[overlap_idx]:
                 settled_bricks[idx] = True
@@ -192,15 +212,8 @@ def main():
     # assert find_first_overlap(bricks) is None, find_first_overlap(bricks)
     # print(bricks)
 
-    # xy_overlaps = {}
-    # for idx, brick in enumerate(bricks):
-    #     overlaps = find_xy_overlaps(brick, bricks, ignore_idx=idx)
-    #     print(f"{idx} => {len(overlaps)}")
-    #     xy_overlaps[idx] = overlaps
-    #     # print("no xy overlap", idx)
-    # exit()
-
     bricks = apply_gravity(bricks)
+    # pre-calced fallen
 
     # Determine which bricks we can remove
     shared_support = set()
