@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 import fileinput
-from typing import Tuple, List
 from dataclasses import dataclass
-from itertools import combinations
 from collections import Counter, defaultdict
-# import sys; sys.path.append("../..")
-# from lib import *
 
 
 # @dataclass
@@ -22,32 +18,11 @@ from collections import Counter, defaultdict
 
 
 # Day 5
-# def any_overlap(int1: Tuple[int, int], int2: Tuple[int, int]):
-#     if int2[0] <= int1[0] <= int2[1] or int2[0] <= int1[1] <= int2[1] \
-#         or int1[0] <= int2[0] <= int1[1] or int1[0] <= int2[1] <= int1[1]:
-#         return True
-#     return False
-
-
+from typing import Tuple
 def overlap_interval(int1: Tuple[int, int], int2: Tuple[int, int]):
     start = max(int1[0], int2[0])
     end = min(int1[1], int2[1])
     return (start, end)
-
-
-# def brick_coords(brick):
-#     start, end = brick
-#     for x in range(start[0], end[0]+1):
-#         for y in range(start[1], end[1]+1):
-#             for z in range(start[2], end[2]+1):
-#                 yield (x,y,z)
-
-
-# def coord_in_brick(brick, coord):
-#     for (x, y, z) in brick_coords(brick):
-#         if (x,y,z) == coord:
-#             return True
-#     return False
 
 
 def drop_brick(brick):
@@ -83,13 +58,6 @@ def brick_overlap(brick1, brick2):
         #     or s1[i] <= s2[i] <= e1[i] or s1[i] <= e2[i] <= e1[i]:
         #     overlap = True
         #     break
-
-        # abrick_coords = set(brick_coords(brick))
-        # bbrick_coords = set(brick_coords(other))
-        # overlap = abrick_coords.intersection(bbrick_coords)
-        # if len(overlap) > 0:
-        #     print("overlap", overlap)
-        #     return (brick, other)
 
     # if overlap:
     #     print(overlap_region)
@@ -165,18 +133,18 @@ def find_xy_overlaps(brick1, bricks, ignore_idx=-1):
 
 def apply_gravity(bricks):
     # Drop all bricks
-    stable_bricks = [brick_on_floor(b) for b in bricks]
+    settled_bricks = [brick_on_floor(b) for b in bricks]
     held_up_by = [[] for _ in bricks]
     next_idx = 0
-    stable_count = Counter(stable_bricks)[True]
-    while not all(stable_bricks):
+    stable_count = Counter(settled_bricks)[True]
+    while not all(settled_bricks):
         # print(Counter(stable_bricks))
         # print(stable_count)
 
         # print(stable_bricks)
         # next_idx is a counter so that we're never stuck checking the same brick after each iteration
         try:
-            idx = next_idx + stable_bricks[next_idx:].index(False)
+            idx = next_idx + settled_bricks[next_idx:].index(False)
         except ValueError:
             print("reset next_idx")
             next_idx = 0
@@ -189,28 +157,18 @@ def apply_gravity(bricks):
             # print(post_drop, overlap_idx)
             bricks[idx] = post_drop
             if brick_on_floor(post_drop):
-                stable_bricks[idx] = True
+                settled_bricks[idx] = True
                 stable_count += 1
         else:
             # print(post_drop, overlap_idx, bricks[overlap_idx])
-            if stable_bricks[overlap_idx]:
-                stable_bricks[idx] = True
+            if settled_bricks[overlap_idx]:
+                settled_bricks[idx] = True
                 stable_count += 1
                 held_up_by[idx].append(overlap_idx)
             else:
                 # next_idx = overlap_idx
-                next_idx = (idx + 1) % len(stable_bricks)
-    # print(bricks)
-    # print(held_up_by)
-    count = Counter(held_up_by[0])
-    for i in range(1, len(held_up_by)):
-        count.update(Counter(held_up_by[i]))
-    # print(count)
+                next_idx = (idx + 1) % len(settled_bricks)
     return bricks
-
-
-def count_would_fall(idx_to_remove, bricks):
-    pass
 
 
 # [9:11] 603 too high (dropping bricks takes 4min!) - didn't count cant_be_shared
@@ -223,23 +181,16 @@ def main():
         start, end = line.split('~')
         start = [int(c) for c in start.split(',')]
         end = [int(c) for c in end.split(',')]
-        # bricks.append(Brick(
-        #     Coord(start[0], start[1], start[2]),
-        #     Coord(end[0], end[1], end[2])
-        # ))
         bricks.append((start, end))
-    # states = [brick_on_floor(b) for b in bricks]
-    # print(all(states))
-    # exit()
-
-    # bricks[1] = drop_brick(bricks[1])
-    # assert find_first_overlap(bricks) is None, find_first_overlap(bricks)
-    # print(bricks)
 
     # check all bricks are single block lines
     for brick in bricks:
         st, en = brick
         assert st[0] == en[0] or st[1] == en[1] or st[2] == en[2]
+
+    # bricks[1] = drop_brick(bricks[1])
+    # assert find_first_overlap(bricks) is None, find_first_overlap(bricks)
+    # print(bricks)
 
     # xy_overlaps = {}
     # for idx, brick in enumerate(bricks):
@@ -277,8 +228,6 @@ def main():
     # Remove shared blocks that are also holding up other non-shared blocks
     shared_support = shared_support.difference(cant_be_shared)
     assert len(cant_be_shared.intersection(shared_support)) == 0
-    # print(shared_support)
-    # print(doesnt_supports_others)
     assert len(shared_support.intersection(doesnt_supports_others)) == 0
     can_be_removed = shared_support.union(doesnt_supports_others)
     assert len(can_be_removed) == len(shared_support) + len(doesnt_supports_others)
@@ -289,43 +238,19 @@ def main():
     ans2 = 0
     for idx in range(len(bricks)):
         if idx in can_be_removed:
-            # print(idx, '=>', 0)
             continue
         would_fall = set()
         next_to_fall = keeps_up[frozenset([idx])]
-        # while len(next_to_fall) > 0:
         # while we've detected new falling blocks
         while not next_to_fall.issubset(would_fall):
             would_fall = would_fall.union(next_to_fall)
-            # print(idx, '=>', next_to_fall, '=>', would_fall)
-            # print(would_fall)
             new_next_to_fall = set()
             for combo in keeps_up:
                 if len(combo) == 0:
                     continue
                 if combo.issubset(would_fall):
-                    # print('   ', combo)
                     new_next_to_fall = new_next_to_fall.union(keeps_up[combo])
             next_to_fall = new_next_to_fall
-
-            # new_next_to_fall = []
-            # for combo_size in range(1, len(would_fall)+1):
-            #     # print(' ', combo_size)
-            #     for combo in combinations(would_fall, combo_size):
-            #         # print('    ', combo)
-            #         new_next_to_fall.extend(list(keeps_up[frozenset(combo)]))
-            # next_to_fall = new_next_to_fall
-
-            # next_to_fall = []
-            # for br in next_to_fall:
-            #     next_to_fall.extend(list(keeps_up[br]))
-            #     if len(keeps_up[br]) == 0:
-            #         assert br in can_be_removed
-
-            # if len(next_to_fall) > 0:
-            #     print(next_to_fall)
-        # ans2 += count_would_fall(idx, bricks)
-        # print(len(would_fall))
         ans2 += len(would_fall)
     print(ans2)
 
