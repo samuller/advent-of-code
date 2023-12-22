@@ -47,7 +47,7 @@ def brick_on_floor(brick):
     return False
 
 
-def brick_overlap(brick1, brick2):
+def brick_overlap_region(brick1, brick2):
     s1, e1 = brick1  #.start, brick.end
     s2, e2 = brick2  #.start, other.end
     overlap_region = []
@@ -59,14 +59,24 @@ def brick_overlap(brick1, brick2):
             overlap = False
             break
         overlap_region.append(new_int)
+    return overlap, overlap_region
+
+
+def brick_overlap(brick1, brick2):
+    s1, e1 = brick1
+    s2, e2 = brick2
+    overlap = True
+    for i in range(3):
+        new_int = overlap_interval((s1[i], e1[i]), (s2[i], e2[i]))
+        # If not an overlapping/valid interval
+        if new_int[0] > new_int[1]:
+            overlap = False
+            break
         # if s2[i] <= s1[i] <= e2[i] or s2[i] <= e1[i] <= e2[i] \
         #     or s1[i] <= s2[i] <= e1[i] or s1[i] <= e2[i] <= e1[i]:
         #     overlap = True
         #     break
-
-    # if overlap:
-    #     print(overlap_region)
-    return overlap, overlap_region
+    return overlap
 
 
 def find_first_overlap(bricks):
@@ -76,7 +86,7 @@ def find_first_overlap(bricks):
         # TODO: only consider "neighbours"???
         for idx2 in range(idx1+1, len(bricks)):
             brick2 = bricks[idx2]
-            overlap, overlap_region = brick_overlap(brick1, brick2)
+            overlap, overlap_region = brick_overlap_region(brick1, brick2)
             if overlap:
                 print(overlap_region)
                 # return (idx, idx2)
@@ -89,7 +99,7 @@ def does_overlap(brick1, bricks, ignore_idx=-1):
     for idx2, brick2 in enumerate(bricks):
         if idx2 == ignore_idx:
             continue
-        overlap, overlap_region = brick_overlap(brick1, brick2)
+        overlap = brick_overlap(brick1, brick2)
         if overlap:
             # print(ignore_idx, idx2, overlap_region)
             return idx2
@@ -101,7 +111,7 @@ def get_overlaps(brick1, bricks, ignore_idx=-1):
     for idx2, brick2 in enumerate(bricks):
         if idx2 == ignore_idx:
             continue
-        overlap, overlap_region = brick_overlap(brick1, brick2)
+        overlap = brick_overlap(brick1, brick2)
         if overlap:
             # print(ignore_idx, idx2, overlap_region, f"| {brick1} vs {brick2}")
             overlaps.append(idx2)
