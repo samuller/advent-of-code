@@ -5,21 +5,8 @@ from itertools import permutations, combinations, product
 # from lib import *
 
 
-def main():
-    # for perm in permutations(['+', '*'], 3):
-    #     print(perm)
-    # print(list(permutations(['+', '-']*2, 2)))
-    # print(list(combinations(['+', '-']*2, 2)))
-    # print()
-    # print(list(combinations(range(2), 3)))
-    # print(list(product(['+'], ['*'], repeat=1)))
-    # print(set(combinations(['+', '-']*2, 2)))
-    # print(set(combinations(['+', '-']*1, 1)))
-    # print(list(combinations(['+', '*']*(2), (2))))
-    # print(list(permutations(['+', '*']*(2), (2))))
-    # print(list(combinations(['0', '1']*(2), (2))))
-    # print(list(permutations(['0', '1']*(2), (2))))
 
+def main():
     lines = [line.strip() for line in fileinput.input()]
     res1 = 0
     for progress, line in enumerate(lines):
@@ -28,8 +15,7 @@ def main():
         total = int(fields[0])
         values = [int(v) for v in fields[1].split()]
         print(total, values)
-        options = set(combinations(['+', '*', '||']*(len(values)-1), (len(values)-1)))
-        # print(options)
+        options = product(['+', '*', '||'], repeat=len(values)-1)
         matches = 0
         for option in options:
             result = values[0]
