@@ -4,7 +4,7 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
-def search(map, r, c, from_height, peeks_seen):
+def search(map, r, c, from_height, peaks_seen):
     height = map.get(r, c)
     if height == '.':
         return 0
@@ -13,10 +13,11 @@ def search(map, r, c, from_height, peeks_seen):
         return 0
     if height == 9:
         # Part 2
-        return 1
+        if peaks_seen is None:
+            return 1
         # Part 1
-        if (r,c) not in peeks_seen:
-            peeks_seen.add((r,c))
+        if (r,c) not in peaks_seen:
+            peaks_seen.add((r,c))
             return 1
         else:
             return 0
@@ -27,7 +28,7 @@ def search(map, r, c, from_height, peeks_seen):
     for i in range(4):
         rr, cc = r+DR[i], c+DC[i]
         if 0 <= rr < map.rows and 0 <= cc < map.cols:
-            valid_routes += search(map, rr, cc, height, peeks_seen)
+            valid_routes += search(map, rr, cc, height, peaks_seen)
     return valid_routes
 
 
@@ -35,14 +36,17 @@ def main():
     lines = [line.strip() for line in fileinput.input()]
     map = Map2D()
     map.load_from_data(lines)
-    print(map)
+    # print(map)
     p1 = 0
+    p2 = 0
     for r in range(map.rows):
         for c in range(map.cols):
             height = map.get(r, c)
             if height == '0':
                 p1 += search(map, r, c, -1, set())
+                p2 += search(map, r, c, -1, None)
     print(p1)
+    print(p2)
 
 if __name__ == '__main__':
     main()
