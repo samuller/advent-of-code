@@ -5,23 +5,6 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
-def remap(map, lines):
-    unique_id = 0
-    curr_region = None
-    new_map = Map2D()
-    new_map.load_from_data(lines)
-    for rr in range(map.rows):
-        for cc in range(map.cols):
-            new_region = map[rr, cc]
-            if curr_region is None:
-                curr_region = new_region
-            if new_region != curr_region:
-                unique_id += 1
-            new_map.set(rr, cc, str(unique_id))
-            curr_region = new_region
-    print(new_map)
-
-
 seen_area = set()
 seen_boundary = set()
 def grow_out(map, rr, cc):
@@ -34,9 +17,11 @@ def grow_out(map, rr, cc):
     seen_area.add((rr, cc))
     for i in range(4):
         nr, nc = rr+DR[i], cc+DC[i]
-        if (nr, nc) not in seen_boundary and (not map.in_bounds(nr, nc) or map[nr, nc] != region_id):
+        if (not map.in_bounds(nr, nc) or map[nr, nc] != region_id):
             boundaries += 1
-            seen_boundary.add((rr, cc))
+            # rr, cc -> nr, nc
+            # print(map[rr, cc], rr, cc, DR[i], DC[i])
+            seen_boundary.add((rr, cc, DR[i], DC[i]))
         if (nr, nc) not in seen_area and map.in_bounds(nr, nc) and map[nr, nc] == region_id:
             new_area, new_boundaries = grow_out(map, nr, nc)
             area += new_area
@@ -49,8 +34,8 @@ def main():
     map = Map2D()
     map.load_from_data(lines)
     print(map)
-
-    # remap(map, lines)
+    # Region = namedtuple('Region', ['area', 'diff_neighbours'])
+    # regions = defaultdict(Region)
     unseen = set()
     for rr in range(map.rows):
         for cc in range(map.cols):
@@ -63,7 +48,51 @@ def main():
         region_id = map[rr, cc]
         if region_id not in regions:
             area, perimeter = grow_out(map, rr, cc)
-        regions[loc] = (area, perimeter)
+            # Part 2
+            print(seen_boundary)
+            straight_bounds = 0
+            while len(seen_boundary) > 0:
+                # bound: rr, cc, dr, dc
+                brr, bcc, bdr, bdc = seen_boundary.pop()
+                connected_bounds = set()
+                # look for neighbour bounds vertically
+                # if bdr == 0:
+                diff = 1
+                while True:
+                    possible_neighbour = (brr - diff, bcc, bdr, bdc)
+                    if possible_neighbour not in seen_boundary:
+                        break
+                    connected_bounds.add(possible_neighbour)
+                    diff += 1
+                diff = 1
+                while True:
+                    possible_neighbour = (brr + diff, bcc, bdr, bdc)
+                    if possible_neighbour not in seen_boundary:
+                        break
+                    connected_bounds.add(possible_neighbour)
+                    diff += 1
+                # look for neighbour bounds horizontally
+                # if bdc == 0:
+                diff = 1
+                while True:
+                    possible_neighbour = (brr, bcc - diff, bdr, bdc)
+                    if possible_neighbour not in seen_boundary:
+                        break
+                    connected_bounds.add(possible_neighbour)
+                    diff += 1
+                diff = 1
+                while True:
+                    possible_neighbour = (brr, bcc + diff, bdr, bdc)
+                    if possible_neighbour not in seen_boundary:
+                        break
+                    connected_bounds.add(possible_neighbour)
+                    diff += 1
+                for bound in connected_bounds:
+                    seen_boundary.remove(bound)
+                straight_bounds += 1
+            print(straight_bounds)
+        # regions[loc] = (area, perimeter)  # Part 1
+        regions[loc] = (area, straight_bounds)  # Part 2
         for seen in seen_area:
             if seen in unseen:
                 unseen.remove(seen)
@@ -72,29 +101,10 @@ def main():
         print(loc, region_id, area, perimeter)
 
     p1 = 0
-    # # count, same_neighbours
-    # Region = namedtuple('Region', ['area', 'diff_neighbours'])
-    # regions = defaultdict(Region)
-    # for rr in range(map.rows):
-    #     for cc in range(map.cols):
-    #         region_id = map[rr, cc]
-    #         diff_neighbours = 0
-    #         DR=[-1,0,1,0]
-    #         DC=[0,-1,0,1]
-    #         for i in range(4):
-    #             dr, dc = rr+DR[i], cc+DC[i]
-    #             if not map.in_bounds(dr, dc) or map[dr, dc] != region_id:
-    #                 diff_neighbours += 1
-    #         if region_id not in regions:
-    #             regions[region_id] = Region(area=1, diff_neighbours=diff_neighbours)
-    #         else:
-    #             prev_area, prev_diffs = regions[region_id]
-    #             regions[region_id] = Region(area=prev_area + 1, diff_neighbours=prev_diffs + diff_neighbours)
-
     for region in regions:
         area, diff_neighbours = regions[region]
         perimeter = diff_neighbours
-        print(region, area, perimeter, area * perimeter)
+        # print(region, area, perimeter, area * perimeter)
         p1 += area * perimeter
     print(p1)
 
