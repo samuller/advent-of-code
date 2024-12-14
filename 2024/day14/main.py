@@ -16,10 +16,23 @@ def draw(robots, dimensions):
             else:
                 print(count, end="")
         print()
-    print(robots)
+    # print(robots)
+
+
+def find_longest_diagonal(robots):
+    robots_pos = set([tuple(r[0]) for r in robots])
+    longest_diag = 0
+    for pos in robots_pos:
+        diag = 1
+        while (pos[0]+1, pos[1]+1) in robots_pos:
+            diag += 1
+            pos = (pos[0]+1, pos[1]+1)
+        if diag > longest_diag:
+            longest_diag = diag
+    return longest_diag
+
 
 # 7:16 wrong 100066560 -> wrong width-height
-
 def main():
     lines = [line.strip() for line in fileinput.input()]
     Robot = namedtuple('Robot', ['pos', 'vel'])
@@ -31,7 +44,22 @@ def main():
         robots.append(Robot(pos=pos, vel=vel))
     # width, height = 11, 7
     width, height = 101, 103
-    for iter in range(100):
+    dims = (width, height)
+    p2 = 0
+    longest_diag = 0
+    for iter in range(10000):
+        # Part 2 - investigate
+        # if iter % 100 == 0:
+        # print(iter)
+        # draw(robots, (width, height))
+        diag = find_longest_diagonal(robots)
+        if diag > longest_diag:
+            longest_diag = diag
+            p2 = iter
+        # if diag > 10:
+        #     print(iter, ":", diag)
+        # if iter == 6493:
+        #     draw(robots, (width, height))
         for idx, robot in enumerate(robots):
             pos, vel = robot
             new_pos = ((pos[0]+vel[0]) % width, (pos[1]+vel[1]) % height)
@@ -55,6 +83,7 @@ def main():
         if quad is not None:
             quadrants[quad] += 1
     print(prod(quadrants))
+    print(p2)
 
 if __name__ == '__main__':
     main()
