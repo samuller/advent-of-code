@@ -28,49 +28,37 @@ def calc_jumps(machines):
     #     # print(lowest_cost, lowest_cost_jumps)
     #     if lowest_cost is not None:
     #         cost += lowest_cost
+
     for machine in machines:
         a_jumps, b_jumps, prize_loc = machine
         # Math
-        # # print(start_a, start_b)
-        # # presses = a,b / jumps = (x_a, y_a), (x_b, y_b) / prize_loc = (x,y)
-        # # f_1: x = a*x_a + b*x_b
-        # # f_2: y = a*y_a + b*y_b
-        # # ???: a = ?, b = ?
-        # # x = a*x_a + b*x_b
-        # # f_3: a = (x - b*x_b)/x_a
-        # # place into f_2
-        # # y = (x - b*x_b)/x_a * y_a + b*y_b
-        # # y = x*y_a/x_a - b*x_b*y_a/x_a + b*y_b
-        # # y = x*y_a/x_a - b*(x_b*y_a/x_a + y_b)
-        # ### b = (y - x*y_a/x_a)/(x_b*y_a/x_a + y_b)
-        # ## b = -(y - x*y_a/x_a)/(x_b*y_a/x_a + y_b)
-        # # b = (x*y_a/x_a - y)/(x_b*y_a/x_a + y_b)
-        # # place into f_3
-        # # a = x/x_a - (y - x*y_a/x_a)/(x_by_a/x_a + y_b)*x_b/x_a
-        # ### press_b = (prize_loc[1] - prize_loc[0]*a_jumps[1]/a_jumps[0])/(b_jumps[0]*a_jumps[1]/a_jumps[0] + b_jumps[1])
-        # press_b = (prize_loc[0]*a_jumps[1]/a_jumps[0] - prize_loc[1])/(b_jumps[0]*a_jumps[1]/a_jumps[0] + b_jumps[1])
-        # press_a = (prize_loc[0] - press_b*b_jumps[0])/a_jumps[0]
-        # # y = a*y_a + b*y_b
-        # #   = (x - b*x_b)/x_a * y_a + (x*y_a/x_a - y)/(x_b*y_a/x_a + y_b) * y_b
-        # #   = x*y_a/x_a - b*x_b*y_a/x_a + x*y_b*y_b/(x_a*(x_b*y_a/x_a + y_b)) - y*y_b/(x_b*y_a/x_a + y_b)
-        # #   = x*y_a/x_a - b*x_b*y_a/x_a + x*y_b*y_b/(x_a*x_b*y_a/x_a + x_a*y_b) - y*y_b/(x_b*y_a/x_a + y_b)
-        # # y*(1 + y_b/(x_b*y_a/x_a + y_b)) = x*y_a/x_a - b*x_b*y_a/x_a + x*y_b*y_b/(x_a*x_b*y_a/x_a + x_a*y_b)
-        # # y = (x*y_a/x_a - b*x_b*y_a/x_a + x*y_b*y_b/(x_a*x_b*y_a/x_a + x_a*y_b))/(1 + y_b/(x_b*y_a/x_a + y_b))
-        # print(press_a, press_b)
-        # print(prize_loc, a_jumps[0]*press_a + b_jumps[0]*press_b, a_jumps[1]*press_a + b_jumps[1]*press_b)
-        # # x, y = prize_loc
-        # # x_a, y_a = a_jumps
-        # # x_b, y_b = b_jumps
-        # # b = -(y - x*y_a/x_a)/(x_b*y_a/x_a + y_b)
-        # # a = (x - b*x_b)/x_a
-        # # print(a, b)
-
-        # newton optimization?
-        # start_a, start_b = prize_loc[0]//b_jumps[0], prize_loc[1]//b_jumps[1]
-
-        # okay, now integer-only math..
-        # a > 0 and b > 0
-
+        # print(start_a, start_b)
+        # presses = a,b / jumps = (x_a, y_a), (x_b, y_b) / prize_loc = (x,y)
+        # f_1: x = a*x_a + b*x_b
+        # f_2: y = a*y_a + b*y_b
+        # ???: a = ?, b = ?
+        # x = a*x_a + b*x_b
+        # f_3: a = (x - b*x_b)/x_a
+        # place into f_2
+        # y = (x - b*x_b)/x_a * y_a + b*y_b
+        # y = x*y_a/x_a - b*x_b*y_a/x_a + b*y_b
+        # Typo:
+        #      y = x*y_a/x_a - b*(x_b*y_a/x_a + y_b)
+        # Attempt #1 from typo:
+        #    b = (y - x*y_a/x_a)/(x_b*y_a/x_a + y_b)
+        #    press_b = (prize_loc[1] - prize_loc[0]*a_jumps[1]/a_jumps[0])/(b_jumps[0]*a_jumps[1]/a_jumps[0] + b_jumps[1])
+        # Attempt #2:
+        #    b = -(y - x*y_a/x_a)/(x_b*y_a/x_a + y_b)
+        # Attempt #3:
+        #    b = (x*y_a/x_a - y)/(x_b*y_a/x_a + y_b)
+        #    press_b = (prize_loc[0]*a_jumps[1]/a_jumps[0] - prize_loc[1])/(b_jumps[0]*a_jumps[1]/a_jumps[0] + b_jumps[1])
+        # Investigate - place into f_3:
+        #    a = x/x_a - (y - x*y_a/x_a)/(x_by_a/x_a + y_b)*x_b/x_a
+        # Alternatives:
+        # - newton optimization?
+        #    - start_a, start_b = prize_loc[0]//b_jumps[0], prize_loc[1]//b_jumps[1]
+        # - integer-only math.. and a > 0 and b > 0?
+        # Recalculate with example:
         # 8400 = 94a + 22b
         # 5400 = 34a + 67b
         # a = (8400-22b) / 94
@@ -78,8 +66,6 @@ def calc_jumps(machines):
         # 5400 = 34*8400/94 - 34*22b/94 + 67b
         # 5400 - 34*8400/94 = b(-(34*22/94) + 67)
         # b = (5400 - 34*8400/94) / (-(34*22/94) + 67)
-        # b = 40
-        # a = 80
         press_b = (prize_loc[1] - a_jumps[1]*prize_loc[0]/a_jumps[0]) / (-(a_jumps[1]*b_jumps[0]/a_jumps[0]) + b_jumps[1])
         press_a = (prize_loc[0] - press_b*b_jumps[0])/a_jumps[0]
         press_a = round(press_a)
