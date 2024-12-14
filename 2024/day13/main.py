@@ -5,27 +5,11 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
-def main():
-    lines = [line.strip() for line in fileinput.input()]
-    Machine = namedtuple('Machine', ['a_jumps', 'b_jumps', 'prize_loc'])
-    machines = []
-    for group in grouped(lines):
-        assert group[0].split(': ')[0] == 'Button A'
-        assert group[1].split(': ')[0] == 'Button B'
-        assert group[2].split(': ')[0] == 'Prize'
-        a_jumps = tuple([int(s[1:]) for s in group[0].split(': ')[1].split(', ')])
-        b_jumps = tuple([int(s[1:]) for s in group[1].split(': ')[1].split(', ')])
-        prize_loc = tuple([int(s[2:]) for s in group[2].split(': ')[1].split(', ')])
-        # Part 2
-        prize_loc = (10000000000000+prize_loc[0], 10000000000000+prize_loc[1])
-        # print(a_jumps, b_jumps, prize_loc)
-        machines.append(Machine(a_jumps=a_jumps, b_jumps=b_jumps, prize_loc=prize_loc))
-
+def calc_jumps(machines):
     cost_a = 3
     cost_b = 1
-    p1 = 0
-    # # machines = machines[0:4]
-    # # machines = [machines[10]]
+    cost = 0
+    # Brute force
     # for machine in machines:
     #     lowest_cost = None
     #     lowest_cost_jumps = None
@@ -43,11 +27,10 @@ def main():
     #                     lowest_cost_jumps = (press_a, press_b)
     #     # print(lowest_cost, lowest_cost_jumps)
     #     if lowest_cost is not None:
-    #         p1 += lowest_cost
-    # print(p1)
-    p2 = 0
+    #         cost += lowest_cost
     for machine in machines:
         a_jumps, b_jumps, prize_loc = machine
+        # Math
         # # print(start_a, start_b)
         # # presses = a,b / jumps = (x_a, y_a), (x_b, y_b) / prize_loc = (x,y)
         # # f_1: x = a*x_a + b*x_b
@@ -109,7 +92,30 @@ def main():
         #     p2 += round(press_a)*cost_a + round(press_b)*cost_b
         if prize_loc == (x_loc, y_loc):
             # print(prize_loc, a_jumps[0]*press_a + b_jumps[0]*press_b, a_jumps[1]*press_a + b_jumps[1]*press_b)
-            p2 += press_a*cost_a + press_b*cost_b
+            cost += press_a*cost_a + press_b*cost_b
+    return cost
+
+
+def main():
+    lines = [line.strip() for line in fileinput.input()]
+    Machine = namedtuple('Machine', ['a_jumps', 'b_jumps', 'prize_loc'])
+    machines = []
+    machines_p2 = []
+    for group in grouped(lines):
+        assert group[0].split(': ')[0] == 'Button A'
+        assert group[1].split(': ')[0] == 'Button B'
+        assert group[2].split(': ')[0] == 'Prize'
+        a_jumps = tuple([int(s[1:]) for s in group[0].split(': ')[1].split(', ')])
+        b_jumps = tuple([int(s[1:]) for s in group[1].split(': ')[1].split(', ')])
+        prize_loc = tuple([int(s[2:]) for s in group[2].split(': ')[1].split(', ')])
+        machines.append(Machine(a_jumps=a_jumps, b_jumps=b_jumps, prize_loc=prize_loc))
+        # Part 2
+        prize_loc = (10000000000000+prize_loc[0], 10000000000000+prize_loc[1])
+        machines_p2.append(Machine(a_jumps=a_jumps, b_jumps=b_jumps, prize_loc=prize_loc))
+
+    p1 = calc_jumps(machines)
+    p2 = calc_jumps(machines_p2)
+    print(p1)
     print(p2)
 
 if __name__ == '__main__':

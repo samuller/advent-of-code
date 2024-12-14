@@ -96,5 +96,6 @@ def main():
     run_sim(robots, dims, iterations=10_000, custom_checks=has_tree)
     print(p2)
 
+
 if __name__ == '__main__':
     main()
