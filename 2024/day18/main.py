@@ -11,6 +11,8 @@ def shortest_path(start, end, map):
     queue = deque([(start, 0)])
     seen = set([start])
     steps = 0
+    # shortest_paths = {start: []}
+    # path_taken = []
     while len(queue) > 0:
         curr, steps = queue.popleft()
         for i in range(4):
@@ -24,6 +26,8 @@ def shortest_path(start, end, map):
             if (nr, nc) in seen:
                 continue
             if (nr, nc) == end:
+                # path_taken.append((nr, nc))
+                # return path_taken
                 return steps + 1
             seen.add((nr, nc))
             queue.append(((nr, nc), steps + 1))
@@ -73,10 +77,13 @@ def to_map(size, bytes):
 
 def main():
     lines = [line.strip() for line in fileinput.input()]
-    # size = 7  # 71
-    # first_n = 12  # 1024
+    # Input
     size = 71
-    first_n = 1024
+    p1_first_n = 1024
+    # Test
+    size = 7
+    p1_first_n = 12
+
     start = (0, 0)
     end = (size-1, size-1)
     bytes = []
@@ -84,18 +91,27 @@ def main():
         fields = [int(f) for f in line.split(',')]
         # Swap X,Y to R,C
         bytes.append((fields[1], fields[0]))
-    bytes = bytes[:first_n]
-    print(bytes)
-    print_mem(size, bytes)
-    # for step in range(12):
-    #     for idx in range(len(bytes)):
-    #         byte = bytes[idx]
-    #         bytes[idx] = (byte[0], byte[1]+1)
-    # print(f"After {step}:")
-    # print_mem(size, bytes)
-    map = to_map(size, bytes)
+
+    bytes_p1 = bytes[:p1_first_n]
+    print(bytes_p1)
+    print_mem(size, bytes_p1)
+    map = to_map(size, bytes_p1)
     p1 = shortest_path(start, end, map)
     print(p1)
+
+    for idx in range(p1_first_n, len(bytes)):
+        map = to_map(size, bytes[:idx+1])
+        # path = shortest_path(start, end, map)
+        # steps = len(path)
+        steps = shortest_path(start, end, map)
+        print(f"{idx}: {steps}")
+        if steps is None:
+            p2 = bytes[idx]
+            # Swap back to X,Y
+            p2 = (p2[1], p2[0])
+            print(p2)
+            break
+    # print(bytes[idx])
 
 
 if __name__ == '__main__':
