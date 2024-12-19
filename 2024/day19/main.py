@@ -4,64 +4,79 @@ import sys; sys.path.append("../..")
 from lib import *
 
 
-class Classy:
-    def __init__(self):
-        pass
-
-
-def function(input):
-    return False
+CACHE = {}
+def solve(want, available):
+    if want in CACHE:
+        return CACHE[want]
+    if len(want) == 0:
+        return 1
+    possibilities = []
+    for towel in available:
+        if want.startswith(towel):
+            possibilities.append(towel)
+    counts = 0
+    for poss in possibilities:
+        attempt = want[len(poss):]
+        counts += solve(attempt, available)
+    assert want not in CACHE
+    CACHE[want] = counts
+    return counts
 
 
 # 7:11 - 228 wrong attempt #1
 # 7:25 right attempt #2
+# 7:38 part2 - wrong 3510259888632
 def main():
     lines = [line.strip() for line in fileinput.input()]
     available = list(grouped(lines))[0][0].split(", ")
     wanted = list(grouped(lines))[1]
     p1 = 0
+    p2 = 0
     for want in wanted:
-        # Attempt #2
-        attempts = [want]
-        found = False
-        while len(attempts) > 0:
-            # print(attempts)
-            attempt = attempts.pop()
-            possibilities = []
-            for towel in available:
-                if attempt.startswith(towel):
-                    possibilities.append(towel)
-            for poss in possibilities:
-                attempt = attempt[len(poss):]
-                if len(attempt) == 0:
-                    found = True
-                attempts.append(attempt)
-            if found:
-                break
-        if found:
+        found = solve(want, available)
+        if found > 0:
             p1 += 1
-        else:
-            print(want)
-        # Attempt #1
-        # attempt = want
-        # while True:
-        #     longest_possible = None
-        #     possibilities = []
-        #     for towel in available:
-        #         if attempt.startswith(towel):
-        #             possibilities.append(towel)
-        #     possibilities.sort()
-        #     if len(possibilities) == 0 or len(attempt) == 0:
-        #         if longest_possible is None and len(attempt) != 0:
-        #             print(want, attempt)
-        #         break
-        #     # print(want, longest_possible)
-        #     attempt = attempt[len(possibilities[0]):]
-        # if len(attempt) == 0:
-        #     # print(want)
-        #     p1 += 1
-    print(p1)
+        # else:
+        #     print(want)
+        p2 += found
 
+    # for want in wanted:
+    #     print(f"=== {want} ===")
+    #     # attempts = [want]
+    #     attempts = set([want])
+    #     found = 0
+    #     # counts_as = defaultdict(lambda: 1)  # randomness???
+    #     counts_as = {}
+    #     while len(attempts) > 0:
+    #         print(attempts, counts_as)
+    #         attempt = attempts.pop()
+    #         if attempt in counts_as:
+    #             parent_count = counts_as[attempt] + 1
+    #         else:
+    #             parent_count = 1
+    #         possibilities = []
+    #         for towel in available:
+    #             if attempt.startswith(towel):
+    #                 possibilities.append(towel)
+    #         for poss in possibilities:
+    #             change = attempt[len(poss):]
+    #             if change in counts_as:
+    #                 count = counts_as[change] + parent_count
+    #             else:
+    #                 count = parent_count
+    #             if len(change) == 0:
+    #                 found += count
+    #             else:
+    #                 attempts.add(change)
+    #                 counts_as[change] = count
+    #     if found > 0:
+    #         p1 += 1
+    #     # else:
+    #     #     print(want)
+    #     p2 += found
+    #     print(want, found)
+    print(p1)
+    print(p2)
 
 if __name__ == '__main__':
     main()
